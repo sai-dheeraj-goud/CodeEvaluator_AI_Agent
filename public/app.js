@@ -456,8 +456,20 @@ function showStep(stepNumber) {
 
 function showLoading(show, text = 'Loading...') {
     const overlay = document.getElementById('loadingOverlay');
-    document.getElementById('loadingText').textContent = text;
+    const loadingText = document.getElementById('loadingText');
+    loadingText.textContent = text;
     overlay.classList.toggle('hidden', !show);
+
+    // Clear any previous slow-server timer
+    if (window._slowServerTimer) { clearTimeout(window._slowServerTimer); window._slowServerTimer = null; }
+    if (show) {
+        // After 4 seconds, hint that the cloud server may be waking up
+        window._slowServerTimer = setTimeout(() => {
+            if (!overlay.classList.contains('hidden')) {
+                loadingText.textContent = text + '\nServer is waking up, please wait...';
+            }
+        }, 4000);
+    }
 }
 
 function showToast(message, type = 'info') {

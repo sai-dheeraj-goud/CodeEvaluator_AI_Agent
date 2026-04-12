@@ -127,6 +127,10 @@ function releaseProcessLock() {
 }
 acquireProcessLock();
 
+// ==================== PRE-CREATE TEMP DIRECTORY ====================
+const TEMP_DIR = path.join(__dirname, '../temp');
+try { fs.mkdirSync(TEMP_DIR, { recursive: true }); } catch (e) {}
+
 // ==================== UTILITY HELPERS ====================
 function execAsync(cmd, opts) {
     return new Promise((resolve, reject) => {
@@ -2368,8 +2372,7 @@ const server = http.createServer(async (req, res) => {
             try {
                 let { code, input } = JSON.parse(body);
                 const stdinInput = input || null;
-                const tempDir = path.join(__dirname, '../temp');
-                if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+                const tempDir = TEMP_DIR;
 
                 // Sanitize code
                 code = code.replace(/^\uFEFF/, '');
@@ -2388,7 +2391,7 @@ const server = http.createServer(async (req, res) => {
                 }
 
                 const javaFile = path.join(tempDir, 'TempProgram.java');
-                fs.writeFileSync(javaFile, Buffer.from(modifiedCode, 'utf8'));
+                await fs.promises.writeFile(javaFile, modifiedCode, 'utf8');
 
                 const cleanup = () => {
                     try { fs.unlinkSync(javaFile); } catch {}
@@ -2411,7 +2414,7 @@ const server = http.createServer(async (req, res) => {
 
                 // Compile
                 try {
-                    const javacCmd = `"${JAVAC_CMD}" TempProgram.java`;
+                    const javacCmd = `"${JAVAC_CMD}" -J-XX:TieredStopAtLevel=1 TempProgram.java`;
                     await execAsync(javacCmd, { cwd: tempDir, timeout: 15000 });
                 } catch (compileErr) {
                     cleanup();
@@ -2433,11 +2436,11 @@ const server = http.createServer(async (req, res) => {
                     let stdout, stderr;
                     if (stdinInput) {
                         console.log(`[Java] Providing stdin input: ${JSON.stringify(stdinInput.substring(0, 100))}`);
-                        const result = await spawnWithInput(JAVA_CMD, ['TempProgram'], { cwd: tempDir, timeout: 10000 }, stdinInput);
+                        const result = await spawnWithInput(JAVA_CMD, ['-XX:TieredStopAtLevel=1', 'TempProgram'], { cwd: tempDir, timeout: 10000 }, stdinInput);
                         stdout = result.stdout;
                         stderr = result.stderr;
                     } else {
-                        const javaRunCmd = `"${JAVA_CMD}" TempProgram`;
+                        const javaRunCmd = `"${JAVA_CMD}" -XX:TieredStopAtLevel=1 TempProgram`;
                         const result = await execAsync(javaRunCmd, { cwd: tempDir, timeout: 10000 });
                         stdout = result.stdout;
                         stderr = result.stderr;
@@ -2489,8 +2492,7 @@ const server = http.createServer(async (req, res) => {
             try {
                 let { code, input } = JSON.parse(body);
                 const stdinInput = input || null;
-                const tempDir = path.join(__dirname, '../temp');
-                if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+                const tempDir = TEMP_DIR;
 
                 // Sanitize code
                 code = code.replace(/^\uFEFF/, '');
@@ -2501,7 +2503,7 @@ const server = http.createServer(async (req, res) => {
                 code = code.replace(/\r\n/g, '\n');
 
                 const pythonFile = path.join(tempDir, 'temp_script.py');
-                fs.writeFileSync(pythonFile, Buffer.from(code, 'utf8'));
+                await fs.promises.writeFile(pythonFile, code, 'utf8');
 
                 const cleanup = () => {
                     try { fs.unlinkSync(pythonFile); } catch {}
@@ -2600,8 +2602,7 @@ const server = http.createServer(async (req, res) => {
             try {
                 let { code, input } = JSON.parse(body);
                 const stdinInput = input || null;
-                const tempDir = path.join(__dirname, '../temp');
-                if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+                const tempDir = TEMP_DIR;
 
                 // Sanitize code
                 code = code.replace(/^\uFEFF/, '');
@@ -2612,7 +2613,7 @@ const server = http.createServer(async (req, res) => {
                 code = code.replace(/\r\n/g, '\n');
 
                 const jsFile = path.join(tempDir, 'temp_script.js');
-                fs.writeFileSync(jsFile, Buffer.from(code, 'utf8'));
+                await fs.promises.writeFile(jsFile, code, 'utf8');
 
                 const cleanup = () => {
                     try { fs.unlinkSync(jsFile); } catch {}
@@ -3634,6 +3635,26 @@ server.listen(PORT, HOST, () => {
 
             if (USE_OLLAMA) {
                 await warmupOllama();
+            }
+
+            // ==================== KEEP-ALIVE SELF-PING ====================
+            // Prevents Render/Railway free tier from spinning down after inactivity
+            if (process.env.RENDER || process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production') {
+                const KEEP_ALIVE_INTERVAL = 14 * 60 * 1000; // 14 minutes (Render spins down at 15)
+                const selfUrl = process.env.RENDER_EXTERNAL_URL
+                    || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null)
+                    || `http://localhost:${PORT}`;
+                setInterval(() => {
+                    const pingUrl = `${selfUrl}/api/version`;
+                    const mod = pingUrl.startsWith('https') ? https : http;
+                    mod.get(pingUrl, (r) => {
+                        r.resume();
+                        console.log(`[KeepAlive] Ping ${r.statusCode}`);
+                    }).on('error', (e) => {
+                        console.log(`[KeepAlive] Ping failed: ${e.message}`);
+                    });
+                }, KEEP_ALIVE_INTERVAL);
+                console.log(`\u2713 Keep-alive ping enabled (every 14 min) → ${selfUrl}`);
             }
 
             console.log(`\u2713 Ready for requests\n`);
