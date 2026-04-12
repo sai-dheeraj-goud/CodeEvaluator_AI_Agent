@@ -279,8 +279,111 @@ async function sendOTPViaResend(email, otp, apiKey) {
     });
 }
 
+// Gmail API via OAuth2 (HTTPS — works on all cloud platforms, no SMTP port needed)
+async function sendOTPViaGmailAPI(email, otp) {
+    const clientId = process.env.GMAIL_CLIENT_ID || '';
+    const clientSecret = process.env.GMAIL_CLIENT_SECRET || '';
+    const refreshToken = process.env.GMAIL_REFRESH_TOKEN || '';
+    const senderEmail = process.env.GMAIL_API_USER || process.env.GMAIL_SMTP_USER || '';
+
+    if (!clientId || !clientSecret || !refreshToken || !senderEmail) return false;
+
+    // Step 1: Get access token from refresh token
+    const tokenPayload = `client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}&refresh_token=${encodeURIComponent(refreshToken)}&grant_type=refresh_token`;
+
+    const accessToken = await new Promise((resolve) => {
+        const req = https.request({
+            hostname: 'oauth2.googleapis.com',
+            path: '/token',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength(tokenPayload)
+            }
+        }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                try {
+                    const parsed = JSON.parse(data);
+                    resolve(parsed.access_token || null);
+                } catch { resolve(null); }
+            });
+        });
+        req.on('error', () => resolve(null));
+        req.setTimeout(10000, () => { req.destroy(); resolve(null); });
+        req.write(tokenPayload);
+        req.end();
+    });
+
+    if (!accessToken) {
+        console.error('[Gmail API] Failed to get access token');
+        return false;
+    }
+
+    // Step 2: Build the email in RFC 2822 format and base64url encode it
+    const rawEmail = [
+        `From: "Code Evaluator" <${senderEmail}>`,
+        `To: ${email}`,
+        `Subject: Your OTP Code`,
+        `MIME-Version: 1.0`,
+        `Content-Type: text/html; charset=UTF-8`,
+        ``,
+        `<html><body><h2>Your OTP Code: ${otp}</h2><p>Expires in 5 minutes.</p></body></html>`
+    ].join('\r\n');
+
+    const base64Email = Buffer.from(rawEmail)
+        .toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+    const sendPayload = JSON.stringify({ raw: base64Email });
+
+    // Step 3: Send via Gmail API
+    return new Promise((resolve) => {
+        const req = https.request({
+            hostname: 'gmail.googleapis.com',
+            path: '/gmail/v1/users/me/messages/send',
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(sendPayload)
+            }
+        }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    console.log(`✓ OTP sent to ${email} via Gmail API`);
+                    resolve(true);
+                } else {
+                    console.error(`[Gmail API] HTTP ${res.statusCode}: ${data}`);
+                    resolve(false);
+                }
+            });
+        });
+        req.on('error', (err) => {
+            console.error('[Gmail API] Request error:', err.message);
+            resolve(false);
+        });
+        req.setTimeout(10000, () => { req.destroy(); resolve(false); });
+        req.write(sendPayload);
+        req.end();
+    });
+}
+
 async function sendOTPEmail(email, otp) {
-    // Try HTTP-based email first (works on cloud platforms that block SMTP ports)
+    // Try Gmail API first (HTTPS — works on all cloud platforms)
+    try {
+        const sentGmailApi = await sendOTPViaGmailAPI(email, otp);
+        if (sentGmailApi) return true;
+    } catch (err) {
+        console.error('[Gmail API] Error:', err.message);
+    }
+
+    // Try Resend API (HTTPS fallback)
     const resendKey = process.env.RESEND_API_KEY || '';
     if (resendKey) {
         try {
