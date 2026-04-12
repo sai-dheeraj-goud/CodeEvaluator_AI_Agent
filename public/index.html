@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Evaluator AI Agent</title>
+    
+    <link rel="stylesheet" href="/public/lib/codemirror/codemirror.min.css" onerror="this.onerror=null;this.href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css'">
+    <link rel="stylesheet" href="/public/lib/codemirror/material.min.css" onerror="this.onerror=null;this.href='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material.min.css'">
+    <link rel="stylesheet" href="/public/styles.css">
+</head>
+<body>
+    <!-- Tab Switch Warning (outside container to avoid overflow clip) -->
+    <div id="tabSwitchWarning" class="tab-switch-warning hidden"></div>
+
+    <!-- Timer Warning Popup (outside container) -->
+    <div id="timerWarningPopup" class="timer-warning-popup hidden"></div>
+
+    <!-- Total session timer (fixed top-right, draggable) -->
+    <div id="totalTimer" class="total-timer hidden">
+        <span id="totalTimerDragHandle" class="drag-handle" title="Drag to move">⠿</span>
+        <span id="totalTimerText">⏱ Total: 00:00</span>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" class="loading-indicator hidden">
+        <div class="spinner"></div>
+        <p>Executing code...</p>
+    </div>
+
+    <!-- Resume Dialog (outside container) -->
+    <div id="resumeDialog" class="resume-dialog hidden">
+        <div class="resume-content">
+            <h2>Resume Assessment?</h2>
+            <p>Your previous session was saved. Would you like to continue?</p>
+            <div class="resume-actions">
+                <button id="resumeBtn" class="btn btn-primary">Resume</button>
+                <button id="startFreshBtn" class="btn btn-secondary">Start Fresh</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <header class="header">
+            <h1>Code Evaluator AI Agent</h1>
+        </header>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <p id="loadingText">Loading...</p>
+        </div>
+
+        <!-- Toast Messages -->
+        <div id="toastContainer" class="toast-container"></div>
+
+        <!-- STEP 0: LOGIN -->
+        <section id="step-0" class="step active">
+            <div class="login-container">
+                <div class="login-box">
+                    <div class="login-icon">🔒</div>
+                    <h2>Candidate Login</h2>
+                    <p class="login-subtitle">Enter your email to receive a One-Time Password (OTP)</p>
+                    
+                    <!-- Email Input Form -->
+                    <div id="emailForm">
+                        <div class="form-group">
+                            <label for="emailInput">Candidate Email Address</label>
+                            <input type="email" id="emailInput" placeholder="Enter your email address" autofocus>
+                        </div>
+                        <button id="sendOtpBtn" class="btn btn-primary" style="width: 100%;">Send OTP</button>
+                    </div>
+
+                    <!-- OTP Verification Form (hidden initially) -->
+                    <div id="otpForm" style="display: none;">
+                        <div class="otp-message">
+                            <p>✓ An OTP has been sent to <strong id="otpEmail"></strong></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="otpInput">Enter OTP</label>
+                            <input type="text" id="otpInput" class="otp-input" placeholder="Enter 6-digit OTP" maxlength="6" inputmode="numeric">
+                        </div>
+                        <button id="verifyOtpBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">Verify & Login</button>
+                        <button id="resendOtpBtn" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">Resend OTP</button>
+                        <button id="changeEmailLink" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">← Change Email</button>
+                    </div>
+
+                    <div id="loginStatus" style="margin-top: 15px; text-align: center; color: #d32f2f;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2: CANDIDATE DETAILS -->
+        <section id="step-2" class="step">
+            <h2>Enter your details to start the assessment</h2>
+
+            <table class="form-table">
+                <tr>
+                    <td class="form-label-cell">Candidate Name:</td>
+                    <td class="form-input-cell">
+                        <input type="text" id="candidateName" placeholder="Enter your name">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label-cell">Relevant Experience in Years:</td>
+                    <td class="form-input-cell">
+                        <input type="text" id="experienceYears" placeholder="e.g. 3, 4.6, 5.11">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label-cell">Preferred Programming Language:</td>
+                    <td class="form-input-cell">
+                        <select id="preferredLanguage" style="padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:15px;width:100%;background:#fff;cursor:pointer;">
+                            <option value="" disabled selected>-- Select a Language --</option>
+                            <option value="java">☕ Java</option>
+                            <option value="python">🐍 Python</option>
+                            <option value="javascript">📜 JavaScript</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button id="proceedDetailsBtn" class="btn btn-primary">Proceed to Instructions</button>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="info-box-details">
+                <p>📚 <strong id="totalQuestionsInfo">Questions will be selected based on your experience level. (Available: 52)</strong></p>
+            </div>
+        </section>
+
+        <!-- STEP 1: INSTRUCTIONS & CONSENT -->
+        <section id="step-1" class="step">
+            <h2>Assessment Instructions</h2>
+
+            <div class="instruction-timer-box" id="instructionTimerBox">
+                <span>⏳ Please read the instructions carefully. Consent will be enabled in <strong id="instructionTimerCount">—</strong> seconds.</span>
+            </div>
+            
+            <div class="instructions-box">
+                <ol>
+                    <li>You will be presented with programming questions to solve in <strong>CodeEditor</strong>.</li>
+                    <li>Each question has a countdown timer shown on the right, and once the timer ends, the <strong>CodeEditor is disabled</strong> and you move to the next question.</li>
+                    <li id="instructionLine3">You will receive questions based on your experience level. A <strong>total session countdown timer</strong> will be displayed on the top right corner of the screen.</li>
+                    <li>After the timer ends on the final question, click on <strong>AI Code Review Score</strong> to view your results.</li>
+                    <li id="instructionLine5">You may choose <strong>Java or Python or JavaScript</strong>, and click <strong>"Run Code"</strong> to test your solution against the expected output.</li>
+                    <li id="instructionLine6">The <strong>AI Code Review Score</strong> is calculated <strong>only based on the language selected in the first question</strong>, so choose carefully.</li>
+                    <li>Tab switching during the assessment is monitored, and switching tabs will automatically lock and submit your assessment.</li>
+                    <li>Your results, including code scores, and speed analysis, will be displayed and saved at the end.</li>
+                </ol>
+            </div>
+
+            <div class="consent-box" id="consentBox" style="opacity: 0.5; pointer-events: none;">
+                <label>
+                    <input type="checkbox" id="consentCheckbox" disabled>
+                    <span>🛡️ I accept — I have read and understood all the above instructions and agree to proceed with the assessment.</span>
+                </label>
+            </div>
+
+            <button id="startAssessmentBtn" class="btn btn-primary" style="width: 100%;" disabled>Start Assessment</button>
+        </section>
+
+        <!-- STEP 3: CODING ASSESSMENT -->
+        <section id="step-3" class="step">
+            <div class="step-content">
+                <div class="progress-header">
+                    <h2>Solve Programming Challenges</h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text">
+                        Question <span id="currentQuestion">0</span> of <span id="totalQuestions">0</span>
+                        <span id="questionTimer" class="question-timer">⏱ 02:00</span>
+                    </p>
+                </div>
+
+                <div id="programmingContainer" class="programming-container">
+                    <!-- Dynamically populated by loadQuestion() -->
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 4: RESULTS -->
+        <section id="step-4" class="step">
+            <div class="step-content">
+                <div class="results-container">
+                    <h2>Your Performance Summary</h2>
+                    <div class="results-display">
+                        <div class="result-score">
+                            <span class="score" id="finalScore">0/0</span>
+                            <p>Correct Programs</p>
+                        </div>
+                        <div class="result-details" id="resultDetails">
+                            <!-- Dynamically generated by displayResults() -->
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="backHomeBtn" class="btn btn-primary">Back to Home</button>
+                        <button id="viewCodeBtn" class="btn btn-secondary">View Candidate Code &amp; Results</button>
+                        <button id="viewPerformanceBtn" class="btn btn-secondary">View Candidate Performance</button>
+                        <button id="viewAllCandidatesBtn" class="btn btn-secondary" style="background:#4CAF50;color:#fff;border-color:#4CAF50;">📊 View All Candidates Summary</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Floating Feedback Widget (fixed bottom-right, visible only on results page) -->
+    <div id="feedbackWidget" class="feedback-widget hidden">
+        <div class="feedback-toggle" id="feedbackToggle" title="Send Feedback">
+            <svg class="feedback-icon-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="28" height="28">
+                <rect rx="8" ry="8" width="48" height="48" fill="#8B0000"/>
+                <rect x="8" y="13" width="32" height="22" rx="3" ry="3" fill="#fff"/>
+                <path d="M8 13l16 12 16-12" fill="none" stroke="#8B0000" stroke-width="2.5" stroke-linejoin="round"/>
+            </svg>
+            <span class="feedback-label">Feedback</span>
+        </div>
+        <div class="feedback-form-container hidden" id="feedbackFormContainer">
+            <textarea id="feedbackText" class="feedback-textarea" placeholder="Write your feedback or query here..." rows="4"></textarea>
+            <div class="feedback-actions">
+                <button id="submitFeedbackBtn" class="btn btn-primary feedback-submit-btn">Submit</button>
+                <button id="cancelFeedbackBtn" class="btn btn-secondary feedback-cancel-btn">Cancel</button>
+            </div>
+            <div id="feedbackStatus" class="feedback-status"></div>
+        </div>
+    </div>
+
+    <!-- Script Libraries: Local first, CDN fallback -->
+    <script src="/public/lib/codemirror/codemirror.min.js"></script>
+    <script>if(typeof CodeMirror==='undefined'){document.write('<script src=\"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js\"><\/script>')}</script>
+    <script src="/public/lib/codemirror/mode/clike.min.js"></script>
+    <script>if(typeof CodeMirror==='undefined'||!CodeMirror.modes.clike){document.write('<script src=\"https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js\"><\/script>')}</script>
+    <script src="/public/lib/codemirror/mode/python.min.js"></script>
+    <script>if(typeof CodeMirror==='undefined'||!CodeMirror.modes.python){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"><\/script>')}</script>
+    <script src="/public/lib/codemirror/mode/javascript.min.js"></script>
+    <script>if(typeof CodeMirror==='undefined'||!CodeMirror.modes.javascript){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"><\/script>')}</script>
+    <script src="/public/lib/codemirror/addon/closebrackets.min.js"></script>
+    <script src="/public/lib/codemirror/addon/matchbrackets.min.js"></script>
+    <script src="/public/lib/codemirror/addon/comment.min.js"></script>
+    <script>
+    // Fallback: if addons didn't load from local, load from CDN
+    if(typeof CodeMirror!=='undefined' && !CodeMirror.defaults.autoCloseBrackets && CodeMirror.defaults.autoCloseBrackets!==false){
+        var addons=['addon/edit/closebrackets.min.js','addon/edit/matchbrackets.min.js','addon/comment/comment.min.js'];
+        addons.forEach(function(a){var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/'+a;document.head.appendChild(s);});
+    }
+    </script>
+
+    <!-- Application Script -->
+    <script src="/public/app.js?v=5"></script>
+</body>
+</html>

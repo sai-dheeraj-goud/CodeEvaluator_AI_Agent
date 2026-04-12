@@ -1,0 +1,23 @@
+# Portable runtimes (downloaded per machine via setup-runtimes.bat/.sh)
+runtimes/
+
+# Downloaded CodeMirror library (downloaded per machine via setup-runtimes.bat/.sh)
+public/lib/
+
+# Node modules (not needed — zero dependencies)
+node_modules/
+package-lock.json
+
+# Temp files
+temp/
+.server.lock
+
+# Environment
+.env
+
+# Results (optional — uncomment to exclude candidate data)
+# results/
+
+# OS files
+Thumbs.db
+.DS_Store

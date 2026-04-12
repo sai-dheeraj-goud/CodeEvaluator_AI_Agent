@@ -1,0 +1,94 @@
+{
+  "personName": "Thawne1",
+  "email": "dheeraj.sai171998@gmail.com",
+  "experienceYears": "8",
+  "preferredLanguage": "javascript",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 51,
+      "title": "Count Vowels and Consonants",
+      "description": "Write a program to count the total number of vowels and consonants in a string (ignoring non-alphabetic characters).",
+      "completed": true,
+      "language": "javascript",
+      "code": "function countVowelsAndConsonants(str) {\n  let vowelsCount = 0;\n  let consonantsCount = 0;\n  \n  // Define vowels for easy lookup\n  const vowels = \"aeiouAEIOU\";\n\n  for (let char of str) {\n    // Check if the character is a letter using a Regular Expression\n    if (/[a-zA-Z]/.test(char)) {\n      if (vowels.includes(char)) {\n        vowelsCount++;\n      } else {\n        consonantsCount++;\n      }\n    }\n  }\n\n  console.log(`vowels count: ${vowelsCount}`);\n  console.log(`consonants: ${consonantsCount}`);\n}\n\n// Example usage\ncountVowelsAndConsonants(\"HelloWorld\"); \n// Output: vowels count: 3, consonants: 7\n",
+      "expectedOutput": "vowels count: 3\nconsonants: 7",
+      "actualOutput": "vowels count: 3\nconsonants: 7",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 83,
+      "agentSuggestion": "Good solution. Has output statement; Output format matches expected pattern; Logic aligns well with reference solution; Has iteration/recursion logic. Minor: Input data may not match problem specification; Array.includes() in loop is O(n) — consider Set for O(1) lookup.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic aligns well with reference solution",
+        "Has iteration/recursion logic",
+        "Uses modern const/let declarations",
+        "Uses modern iteration methods"
+      ],
+      "agentMissed": [
+        "Input data may not match problem specification",
+        "Array.includes() in loop is O(n) — consider Set for O(1) lookup"
+      ],
+      "aiLikelihood": 90,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 579 characters of changes",
+        "Unrealistic typing speed (521 chars/min)"
+      ],
+      "tabSwitchCount": 2,
+      "questionTimeSpent": 45
+    },
+    {
+      "questionId": 45,
+      "title": "Print 1 to 100 Without Loops",
+      "description": "Write a program to print numbers from 1 to 100 without using any loop (for/while/do-while). Use recursion.",
+      "completed": false,
+      "language": "javascript",
+      "code": "// Write your solution here\n",
+      "expectedOutput": "1 2 3 4 ... 99 100",
+      "actualOutput": "vowels count: 3\nconsonants: 7",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 19
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 64,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 42
+  },
+  "aiLikelihood": {
+    "average": 45,
+    "highest": 90,
+    "perQuestion": [
+      {
+        "questionId": 51,
+        "title": "Count Vowels and Consonants",
+        "score": 90,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 579 characters of changes",
+          "Unrealistic typing speed (521 chars/min)"
+        ]
+      },
+      {
+        "questionId": 45,
+        "title": "Print 1 to 100 Without Loops",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

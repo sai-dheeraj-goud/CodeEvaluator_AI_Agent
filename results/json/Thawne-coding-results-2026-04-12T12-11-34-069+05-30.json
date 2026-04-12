@@ -1,0 +1,63 @@
+{
+  "personName": "Thawne",
+  "email": "dheeraj.sai171998@gmail.com",
+  "experienceYears": "4",
+  "preferredLanguage": "python",
+  "programsCompleted": 1,
+  "totalPrograms": 1,
+  "results": [
+    {
+      "questionId": 29,
+      "title": "Sum of Odd and Even Numbers",
+      "description": "Write a program to calculate the sum of all odd numbers and sum of all even numbers in a list.",
+      "completed": true,
+      "language": "python",
+      "code": "# Input list\nnumbers = [2, 3, 4, 5]\n\n# Initialize variables to store sums\neven_sum = 0\nodd_sum = 0\n\n# Iterate through the list\nfor num in numbers:\n    # Check if the number is even\n    if num % 2 == 0:\n        even_sum += num\n    # If not even, it must be odd\n    else:\n        odd_sum += num\n\n# Output the results\nprint(f\"Even Sum = {even_sum}, Odd Sum = {odd_sum}\")\n",
+      "expectedOutput": "Even Sum = 6, Odd Sum = 8",
+      "actualOutput": "Even Sum = 6, Odd Sum = 8",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 83,
+      "agentSuggestion": "Good solution. Has output statement; Output format matches expected pattern; Logic aligns well with reference solution; Correctly initializes input data from problem. Minor: Consider using functions for modularity.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper variable usage"
+      ],
+      "agentMissed": [
+        "Consider using functions for modularity"
+      ],
+      "aiLikelihood": 90,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 341 characters of changes",
+        "Unrealistic typing speed (619 chars/min)"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 33
+    }
+  ],
+  "tabSwitchCount": 1,
+  "totalTimeTaken": 33,
+  "agentAnalysis": {
+    "analyzedCount": 1,
+    "averagePercentage": 83
+  },
+  "aiLikelihood": {
+    "average": 90,
+    "highest": 90,
+    "perQuestion": [
+      {
+        "questionId": 29,
+        "title": "Sum of Odd and Even Numbers",
+        "score": 90,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 341 characters of changes",
+          "Unrealistic typing speed (619 chars/min)"
+        ]
+      }
+    ]
+  }
+}

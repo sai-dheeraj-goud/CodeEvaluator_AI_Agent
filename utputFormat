@@ -1,0 +1,16 @@
+HTTP/1.1 500 Internal Server Error
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Allow-Headers: Content-Type, Authorization
+Cache-Control: no-cache
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+Referrer-Policy: strict-origin-when-cross-origin
+Content-Type: application/json
+Date: Wed, 08 Apr 2026 17:59:53 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{"success":false,"message":"Agent assist failed","error":"Expected property name or '}' in JSON at position 1 (line 1 column 2)"}

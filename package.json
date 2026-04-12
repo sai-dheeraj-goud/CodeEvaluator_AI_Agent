@@ -1,0 +1,24 @@
+{
+  "name": "code-evaluator-ai-agent",
+  "version": "1.0.0",
+  "description": "AI Agent for code practice with Java and Python support — Zero Dependencies, Fully Portable",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "setup": "node -e \"console.log('Run setup-runtimes.bat (Windows) or setup-runtimes.sh (Linux/Mac) to download portable runtimes')\""
+  },
+  "keywords": [
+    "coding",
+    "practice",
+    "java",
+    "python",
+    "ai",
+    "agent",
+    "education",
+    "portable",
+    "zero-dependency"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}

@@ -1,0 +1,13 @@
+# Don't send these to Docker build context
+.git
+.gitignore
+node_modules
+runtimes
+temp
+results
+.env
+.server.lock
+*.md
+*.bat
+*.sh
+.vscode

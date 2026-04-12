@@ -1,0 +1,82 @@
+{
+  "personName": "Thawne",
+  "email": "dheeraj.sai171998@gmail.com",
+  "experienceYears": "9",
+  "preferredLanguage": "python",
+  "programsCompleted": 0,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 41,
+      "title": "First Non-Repeating Character",
+      "description": "Write a program to find the first non-repeating character in a given string.",
+      "completed": false,
+      "language": "python",
+      "code": "def find_first_non_repeating(s):\n    # Step 1: Build a frequency dictionary\n    counts = {}\n    for char in s:\n        counts[char] = counts.get(char, 0) + 1\n    \n    # Step 2: Traverse the string to find the first char with count 1\n    for char in s:\n        if counts[char] == 1:\n            return char\n            \n    return None\n\n# Example Usage\ninput_str = \"GeeksForGeeks\"\nresult = find_first_non_repeating(input_str)\nprint(f\"Input: {input_str}\")\nprint(f\"Output: {result}\")\n",
+      "expectedOutput": "F",
+      "actualOutput": "[object Object]",
+      "validationMessage": "Python interpreter not found. Run setup-runtimes.bat to install portable Python, or install Python on your system.",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "Output does not match expected for PYTHON. Please run your code first.",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 454 characters of changes"
+      ],
+      "tabSwitchCount": 3,
+      "questionTimeSpent": 120
+    },
+    {
+      "questionId": 50,
+      "title": "Merge Two Unsorted Arrays - Sorted, No Duplicates",
+      "description": "Write a program to merge two unsorted arrays into a single sorted array without duplicates.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here",
+      "expectedOutput": "[1, 2, 4, 5, 8, 9]",
+      "actualOutput": "[object Object]",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 65
+    }
+  ],
+  "tabSwitchCount": 4,
+  "totalTimeTaken": 187,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 41,
+        "title": "First Non-Repeating Character",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 454 characters of changes"
+        ]
+      },
+      {
+        "questionId": 50,
+        "title": "Merge Two Unsorted Arrays - Sorted, No Duplicates",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

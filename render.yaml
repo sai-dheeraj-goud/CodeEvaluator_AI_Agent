@@ -1,0 +1,30 @@
+# render.yaml — One-click deploy to Render.com
+# Push to GitHub, connect repo on Render, and it auto-deploys.
+
+services:
+  - type: web
+    name: code-evaluator-ai-agent
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      # Email (set these in Render dashboard for security)
+      - key: EMAIL_PROVIDER
+        value: auto
+      - key: GMAIL_SMTP_USER
+        sync: false  # Must set manually in dashboard
+      - key: GMAIL_SMTP_PASS
+        sync: false
+      # AI Providers (set in Render dashboard)
+      - key: USE_CLAUDE
+        value: "false"
+      - key: USE_OLLAMA
+        value: "false"
+      - key: OPENAI_API_KEY
+        sync: false  # Must set manually in dashboard
+    healthCheckPath: /api/version
