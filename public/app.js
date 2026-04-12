@@ -1518,12 +1518,11 @@ function normalizeOutput(text) {
     return text
         .replace(/\r\n/g, '\n')              // Normalize line endings
         .split('\n')
-        .map(line => line.trim())              // Trim each line
+        .map(line => line.trim().replace(/[^\S\n]+/g, ' '))  // Trim each line + collapse horizontal whitespace
         .filter(Boolean)                       // Remove empty lines
         .join('\n')
         .replace(/[\u2018\u2019]/g, "'")      // Smart quotes → straight quotes
         .replace(/[\u201C\u201D]/g, '"')
-        .replace(/\s+/g, ' ')                 // Collapse whitespace
         .trim();
 }
 
@@ -1583,8 +1582,12 @@ function validateOutput(question, output) {
         };
     }
 
+    // Flatten for content-only comparison (ignores newline differences)
+    const flatActual = actual.replace(/\s+/g, ' ').trim();
+    const flatExpected = expected.replace(/\s+/g, ' ').trim();
+
     // Exact match or substring match
-    if (actual === expected || actual.includes(expected) || expected.includes(actual)) {
+    if (actual === expected || flatActual === flatExpected || flatActual.includes(flatExpected) || flatExpected.includes(flatActual)) {
         return {
             isCorrect: true,
             expectedOutput: expected,
@@ -1594,8 +1597,8 @@ function validateOutput(question, output) {
     }
 
     // Numeric comparison with tolerance (handles floating point)
-    const expectedNumber = extractTrailingNumber(expected);
-    const actualNumber = extractTrailingNumber(actual);
+    const expectedNumber = extractTrailingNumber(flatExpected);
+    const actualNumber = extractTrailingNumber(flatActual);
     if (expectedNumber !== null && actualNumber !== null && Math.abs(expectedNumber - actualNumber) < 0.01) {
         return {
             isCorrect: true,
@@ -1654,19 +1657,24 @@ function outputsMatch(actual, expected) {
     // Avoid false positives when question data has no expected output.
     if (!normA || !normE) return false;
 
-    // 1. Try exact normalized match first
+    // 1. Try exact normalized match first (preserves newlines)
     if (normA === normE) return true;
 
-    // 2. Substring match (ONLY for multi-line outputs like lists, arrays, or structured data)
-    // Don't use substring match for single-word or short outputs (high false positive rate)
-    if (normE.length > 10 && (normA.includes(normE) || normE.includes(normA))) return true;
+    // 2. Flatten comparison — collapse all whitespace for content-only match
+    const flatA = normA.replace(/\s+/g, ' ').trim();
+    const flatE = normE.replace(/\s+/g, ' ').trim();
+    if (flatA === flatE) return true;
 
-    // 3. Numeric match
-    const expectedNum = extractTrailingNumber(normE);
-    const actualNum = extractTrailingNumber(normA);
+    // 3. Substring match (ONLY for multi-line outputs like lists, arrays, or structured data)
+    // Don't use substring match for single-word or short outputs (high false positive rate)
+    if (flatE.length > 10 && (flatA.includes(flatE) || flatE.includes(flatA))) return true;
+
+    // 4. Numeric match
+    const expectedNum = extractTrailingNumber(flatE);
+    const actualNum = extractTrailingNumber(flatA);
     if (expectedNum !== null && actualNum !== null && Math.abs(expectedNum - actualNum) < 0.01) return true;
 
-    // 4. Order-independent match
+    // 5. Order-independent match
     if (outputsMatchOrderIndependent(actual, expected)) return true;
 
     return false;
@@ -2992,8 +3000,8 @@ function displayResults(aiLikelihoods) {
             <p>Status: <strong style="color:${statusColor};">${statusText}</strong></p>
             <p>Time Spent: <strong style="color:#2196F3;">⏱️ ${qTimeDisplay}</strong></p>
             <p>Language: <strong>${lang}</strong></p>
-            <p>Expected: <span style="font-family:monospace;font-size:0.9em;">${escapeHtml(r.expectedOutput || '')}</span></p>
-            <p>Actual: <span style="font-family:monospace;font-size:0.9em;">${escapeHtml(r.actualOutput || '')}</span></p>
+            <div style="margin:4px 0;"><strong>Expected:</strong><pre style="margin:4px 0;background:#1a1a2e;padding:8px;border-radius:4px;border-left:3px solid #2196F3;white-space:pre-wrap;font-family:monospace;font-size:0.85em;color:#e0e0e0;">${escapeHtml(r.expectedOutput || '')}</pre></div>
+            <div style="margin:4px 0;"><strong>Actual:</strong><pre style="margin:4px 0;background:#1a1a2e;padding:8px;border-radius:4px;border-left:3px solid ${r.completed ? '#4CAF50' : '#f44336'};white-space:pre-wrap;font-family:monospace;font-size:0.85em;color:#e0e0e0;">${escapeHtml(r.actualOutput || '')}</pre></div>
             ${validationMsg ? `<p style=\"font-size:0.9em;color:${r.status === 'completed' ? '#4CAF50' : '#d32f2f'};\">${validationMsg}</p>` : ''}
             <p>Agent Score: <strong style="color:${agentColor};">${agentPct !== null && agentPct !== undefined ? agentPct + '%' : 'N/A'}</strong></p>
             ${agentResult && agentResult.covered && agentResult.covered.length > 0 ? `<div style=\"margin:6px 0 2px 0;\"><strong style=\"color:#4CAF50; font-size:0.9em;\">✅ Covered:</strong><ul style=\"margin:2px 0 4px 18px; padding:0; font-size:0.85em; color:#e0e0e0;\">${agentResult.covered.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul></div>` : ''}

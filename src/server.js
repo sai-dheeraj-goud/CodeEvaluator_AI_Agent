@@ -1109,7 +1109,7 @@ function scoreOutputCorrectness(question, code, language) {
     const expectedOutput = outputMatch ? outputMatch[1].trim() : '';
     if (expectedOutput) {
         // Check if key values from expected output appear in print statements
-        const expectedTokens = expectedOutput.replace(/[^\w\d.]+/g, ' ').trim().split(/\s+/).filter(t => t.length > 0);
+        const expectedTokens = expectedOutput.replace(/[^\w\d.*#@]+/g, ' ').trim().split(/\s+/).filter(t => t.length > 0);
         const printStatements = language === 'java'
             ? (code.match(/System\.out\.print(?:ln)?\s*\([^)]*\)/g) || []).join(' ')
             : language === 'javascript'
