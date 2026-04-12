@@ -3698,3 +3698,20 @@ consonants: 7"
 [2026-04-12T07:22:47.088Z] [LOG] ✓ Ready for requests
 
 [2026-04-12T07:22:59.631Z] [LOG] ✓ OTP sent successfully to dheeraj.sai171998@gmail.com via SMTP
+[2026-04-12T19:25:21.878Z] [LOG] ✓ Loaded .env configuration
+[2026-04-12T19:25:21.904Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-12T19:25:21.905Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-12T19:25:21.906Z] [LOG] ✓ IST Timestamp: 2026-04-13T00:55:21-906+05:30
+[2026-04-12T19:25:21.907Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-12T19:25:21.907Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-12T19:25:21.908Z] [LOG]   Claude:  ✗ disabled
+[2026-04-12T19:25:21.909Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-12T19:25:21.910Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-12T19:25:21.911Z] [LOG]   Fallback chain: (none configured)
+[2026-04-12T19:25:21.913Z] [LOG] --------------------------------
+
+[2026-04-12T19:25:21.914Z] [LOG] ✓ Ready for requests
+
+[2026-04-12T19:27:58.361Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)

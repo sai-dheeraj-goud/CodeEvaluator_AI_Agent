@@ -56,6 +56,7 @@ let autoSaveInterval = null;
 let assessmentSubmitted = false;
 let internalClipboard = '';
 let questionCompletionTimes = {};
+let candidateLocation = '';
 
 // ==================== HELPER: IST TIMESTAMP ====================
 function getISTTimestamp() {
@@ -538,6 +539,7 @@ function saveSession() {
         personName,
         authToken,
         authEmail,
+        candidateLocation,
         experienceYears,
         experienceRaw,
         currentQuestionIndex,
@@ -716,9 +718,19 @@ document.getElementById('proceedDetailsBtn').addEventListener('click', async () 
     // Clear red border on successful validation
     document.getElementById('experienceYears').style.border = '';
 
+    // Validate location
+    const locSelect = document.getElementById('candidateLocation');
+    if (!locSelect || !locSelect.value) {
+        locSelect.style.border = '2px solid red';
+        showToast('Please select your location', 'error');
+        return;
+    }
+    locSelect.style.border = '';
+
     personName = name;
     experienceRaw = expInput;
     experienceYears = validation.years;
+    candidateLocation = locSelect.value;
 
     // Lock the preferred programming language
     const langSelect = document.getElementById('preferredLanguage');
@@ -2817,6 +2829,7 @@ async function submitAssessment() {
         await apiCall('POST', '/api/result', {
             personName: personName,
             email: authEmail,
+            location: candidateLocation,
             experienceYears: experienceRaw,
             preferredLanguage: lockedLanguage || currentLanguage,
             programsCompleted: programsCompleted,

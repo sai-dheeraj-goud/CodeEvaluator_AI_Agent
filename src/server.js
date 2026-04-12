@@ -2903,7 +2903,7 @@ const server = http.createServer(async (req, res) => {
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
-                const { personName, email, experienceYears, preferredLanguage, programsCompleted, totalPrograms,
+                const { personName, email, location, experienceYears, preferredLanguage, programsCompleted, totalPrograms,
                         results, tabSwitchCount, totalTimeTaken, agentAnalysis, aiLikelihood } = data;
 
                 const safeName = (personName || 'unknown').replace(/[^a-zA-Z0-9]/g, '_');
@@ -2939,7 +2939,7 @@ const server = http.createServer(async (req, res) => {
                 if (!fs.existsSync(csvDir)) fs.mkdirSync(csvDir, { recursive: true });
                 const csvFile = path.join(csvDir, `${safeName}-performance.csv`);
 
-                const csvHeaders = 'Date,Time,Candidate Name,Candidate EmailId,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken';
+                const csvHeaders = 'Date,Time,Candidate Name,Candidate EmailId,Location,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken';
 
                 let csvContent = '';
                 if (!fs.existsSync(csvFile)) {
@@ -3006,6 +3006,7 @@ const server = http.createServer(async (req, res) => {
                         escapeCsvField(time),
                         escapeCsvField(personName),
                         escapeCsvField(email),
+                        escapeCsvField(location || ''),
                         escapeCsvField(experienceYears),
                         escapeCsvField(idx + 1),
                         escapeCsvField(r.title || ''),
@@ -3036,7 +3037,7 @@ const server = http.createServer(async (req, res) => {
                 for (let qi = 1; qi <= numQuestions; qi++) {
                     perQTabHeaders.push(`Q${qi} Tab Switches`);
                 }
-                const conHeaders = 'Date,Time,Candidate Name,Candidate Emailid,Relevant Experience (Years),Language Preferred,Correct Programs,Test Execution Score (%),AI Code Review Score (%),AI Likelihood Avg (%),AI Likelihood Max (%),' + perQTabHeaders.join(',') + ',Total Tab Switches,Total Time Taken';
+                const conHeaders = 'Date,Time,Candidate Name,Candidate Emailid,Location,Relevant Experience (Years),Language Preferred,Correct Programs,Test Execution Score (%),AI Code Review Score (%),AI Likelihood Avg (%),AI Likelihood Max (%),' + perQTabHeaders.join(',') + ',Total Tab Switches,Total Time Taken';
 
                 let consolidatedContent = '';
                 if (!fs.existsSync(consolidatedFile)) {
@@ -3082,15 +3083,19 @@ const server = http.createServer(async (req, res) => {
                             fields.push(current);
 
                             // Old format: 12 fields (no per-Q tab switches, single Tab Switches + Total Time)
-                            // New format: 11 base + numQuestions Q-cols + Total Tab Switches + Total Time
-                            const expectedNewCount = 11 + targetQCount + 2;
+                            // New format: 12 base + numQuestions Q-cols + Total Tab Switches + Total Time
+                            const expectedNewCount = 12 + targetQCount + 2;
                             if (fields.length < expectedNewCount) {
-                                // This is an old-format row — may not have Language Preferred column
-                                // Old format had 10 base fields; new format has 11 (Language Preferred added at index 5)
-                                const baseFields = fields.slice(0, 5); // Date,Time,Name,Email,Experience
-                                const restFields = fields.slice(5);
+                                // This is an old-format row — may not have Location or Language Preferred columns
+                                const baseFields = fields.slice(0, 4); // Date,Time,Name,Email
+                                let restFields = fields.slice(4);
+                                // Insert empty Location if missing (old rows don't have it)
+                                if (fields.length < expectedNewCount) {
+                                    baseFields.push(''); // empty Location
+                                }
+                                baseFields.push(restFields.shift()); // Experience
                                 // If old row doesn't have Language Preferred, insert empty placeholder
-                                const hasLangCol = fields.length >= 12; // 11 base + at least 1 trailing
+                                const hasLangCol = fields.length >= 12;
                                 if (!hasLangCol || fields.length <= 12) {
                                     baseFields.push(''); // empty Language Preferred
                                 } else {
@@ -3138,6 +3143,7 @@ const server = http.createServer(async (req, res) => {
                     escapeCsvField(time),
                     escapeCsvField(personName),
                     escapeCsvField(email),
+                    escapeCsvField(location || ''),
                     escapeCsvField(experienceYears),
                     escapeCsvField(langDisplay),
                     escapeCsvField(`${correctCount}/${totalPrograms}`),
