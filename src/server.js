@@ -232,7 +232,66 @@ function upgradeToTLS(socket, host) {
     });
 }
 
+// HTTP-based email via Resend API (works on cloud platforms that block SMTP port 587)
+async function sendOTPViaResend(email, otp, apiKey) {
+    const fromAddress = process.env.RESEND_FROM || 'Code Evaluator <onboarding@resend.dev>';
+    const payload = JSON.stringify({
+        from: fromAddress,
+        to: [email],
+        subject: 'Your OTP Code',
+        html: `<html><body><h2>Your OTP Code: ${otp}</h2><p>Expires in 5 minutes.</p></body></html>`
+    });
+
+    return new Promise((resolve, reject) => {
+        const req = https.request({
+            hostname: 'api.resend.com',
+            path: '/emails',
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(payload)
+            }
+        }, (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    console.log(`✓ OTP sent to ${email} via Resend API`);
+                    resolve(true);
+                } else {
+                    console.error(`[Resend] HTTP ${res.statusCode}: ${data}`);
+                    resolve(false);
+                }
+            });
+        });
+        req.on('error', (err) => {
+            console.error('[Resend] Request error:', err.message);
+            resolve(false);
+        });
+        req.setTimeout(10000, () => {
+            req.destroy();
+            console.error('[Resend] Timeout');
+            resolve(false);
+        });
+        req.write(payload);
+        req.end();
+    });
+}
+
 async function sendOTPEmail(email, otp) {
+    // Try HTTP-based email first (works on cloud platforms that block SMTP ports)
+    const resendKey = process.env.RESEND_API_KEY || '';
+    if (resendKey) {
+        try {
+            const sent = await sendOTPViaResend(email, otp, resendKey);
+            if (sent) return true;
+        } catch (err) {
+            console.error('[Resend] Failed:', err.message);
+        }
+    }
+
+    // Fallback to SMTP
     const smtpConfig = getSmtpConfig(email);
     if (!smtpConfig.user || !smtpConfig.pass) {
         console.log(`[SMTP] No credentials configured. [Console Fallback] OTP for ${email}: ${otp}`);
@@ -249,22 +308,32 @@ async function sendOTPEmail(email, otp) {
         `<html><body><h2>Your OTP Code: ${otp}</h2><p>Expires in 5 minutes.</p></body></html>`
     ].join('\r\n');
 
-    try {
-        return await new Promise((resolve) => {
-            const timeout = setTimeout(() => {
-                console.log(`[SMTP] Timeout. [Console Fallback] OTP for ${email}: ${otp}`);
-                try { socket.end(); } catch (e) {}
-                resolve(false);
-            }, 15000);
+    // Try port 465 (direct SSL) first — some cloud platforms only block 587
+    const sent465 = await sendViaSMTP465(smtpConfig, email, otp, messageBody);
+    if (sent465) return true;
 
-            const socket = net.createConnection(smtpConfig.port, smtpConfig.host, async () => {
+    // Fallback to port 587 (STARTTLS)
+    const sent587 = await sendViaSMTP587(smtpConfig, email, otp, messageBody);
+    if (sent587) return true;
+
+    console.log(`[Console Fallback] OTP for ${email}: ${otp}`);
+    return false;
+}
+
+// SMTP via port 465 — direct TLS connection (no STARTTLS upgrade needed)
+function sendViaSMTP465(smtpConfig, email, otp, messageBody) {
+    return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+            console.log(`[SMTP-465] Timeout`);
+            try { tlsSocket.destroy(); } catch (e) {}
+            resolve(false);
+        }, 15000);
+
+        let tlsSocket;
+        try {
+            tlsSocket = tls.connect(465, smtpConfig.host, { rejectUnauthorized: false }, async () => {
                 try {
-                    await new Promise(r => socket.once('data', r));
-                    socket.write(`EHLO localhost\r\n`);
-                    await new Promise(r => socket.once('data', r));
-                    socket.write(`STARTTLS\r\n`);
-                    await new Promise(r => socket.once('data', r));
-                    const tlsSocket = await upgradeToTLS(socket, smtpConfig.host);
+                    await new Promise(r => tlsSocket.once('data', r)); // greeting
                     tlsSocket.write(`EHLO localhost\r\n`);
                     await new Promise(r => tlsSocket.once('data', r));
                     tlsSocket.write(`AUTH LOGIN\r\n`);
@@ -272,9 +341,9 @@ async function sendOTPEmail(email, otp) {
                     tlsSocket.write(Buffer.from(smtpConfig.user).toString('base64') + '\r\n');
                     await new Promise(r => tlsSocket.once('data', r));
                     tlsSocket.write(Buffer.from(smtpConfig.pass).toString('base64') + '\r\n');
-                    const authResp = await new Promise(r => { let d=''; tlsSocket.once('data', c => { d+=c; r(d); }); });
+                    const authResp = await new Promise(r => { let d = ''; tlsSocket.once('data', c => { d += c; r(d); }); });
                     if (!authResp.toString().startsWith('235')) {
-                        console.log(`[SMTP] Auth failed. [Console Fallback] OTP for ${email}: ${otp}`);
+                        console.log(`[SMTP-465] Auth failed`);
                         tlsSocket.end();
                         clearTimeout(timeout);
                         resolve(false);
@@ -291,29 +360,87 @@ async function sendOTPEmail(email, otp) {
                     tlsSocket.write(`QUIT\r\n`);
                     tlsSocket.end();
                     clearTimeout(timeout);
-                    console.log(`✓ OTP sent successfully to ${email} via SMTP`);
+                    console.log(`✓ OTP sent to ${email} via SMTP (port 465)`);
                     resolve(true);
                 } catch (err) {
                     clearTimeout(timeout);
-                    console.error('[SMTP] Error:', err.message);
-                    console.log(`[Console Fallback] OTP for ${email}: ${otp}`);
-                    try { socket.end(); } catch (e) {}
+                    console.error('[SMTP-465] Error:', err.message);
+                    try { tlsSocket.destroy(); } catch (e) {}
                     resolve(false);
                 }
             });
-
-            socket.on('error', (err) => {
+            tlsSocket.on('error', (err) => {
                 clearTimeout(timeout);
-                console.error('[SMTP] Connection error:', err.message);
-                console.log(`[Console Fallback] OTP for ${email}: ${otp}`);
+                console.error('[SMTP-465] Connection error:', err.message);
                 resolve(false);
             });
+        } catch (err) {
+            clearTimeout(timeout);
+            console.error('[SMTP-465] Failed:', err.message);
+            resolve(false);
+        }
+    });
+}
+
+// SMTP via port 587 — STARTTLS
+function sendViaSMTP587(smtpConfig, email, otp, messageBody) {
+    return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+            console.log(`[SMTP-587] Timeout`);
+            try { socket.end(); } catch (e) {}
+            resolve(false);
+        }, 15000);
+
+        const socket = net.createConnection(smtpConfig.port, smtpConfig.host, async () => {
+            try {
+                await new Promise(r => socket.once('data', r));
+                socket.write(`EHLO localhost\r\n`);
+                await new Promise(r => socket.once('data', r));
+                socket.write(`STARTTLS\r\n`);
+                await new Promise(r => socket.once('data', r));
+                const tlsSocket = await upgradeToTLS(socket, smtpConfig.host);
+                tlsSocket.write(`EHLO localhost\r\n`);
+                await new Promise(r => tlsSocket.once('data', r));
+                tlsSocket.write(`AUTH LOGIN\r\n`);
+                await new Promise(r => tlsSocket.once('data', r));
+                tlsSocket.write(Buffer.from(smtpConfig.user).toString('base64') + '\r\n');
+                await new Promise(r => tlsSocket.once('data', r));
+                tlsSocket.write(Buffer.from(smtpConfig.pass).toString('base64') + '\r\n');
+                const authResp = await new Promise(r => { let d=''; tlsSocket.once('data', c => { d+=c; r(d); }); });
+                if (!authResp.toString().startsWith('235')) {
+                    console.log(`[SMTP-587] Auth failed`);
+                    tlsSocket.end();
+                    clearTimeout(timeout);
+                    resolve(false);
+                    return;
+                }
+                tlsSocket.write(`MAIL FROM:<${smtpConfig.user}>\r\n`);
+                await new Promise(r => tlsSocket.once('data', r));
+                tlsSocket.write(`RCPT TO:<${email}>\r\n`);
+                await new Promise(r => tlsSocket.once('data', r));
+                tlsSocket.write(`DATA\r\n`);
+                await new Promise(r => tlsSocket.once('data', r));
+                tlsSocket.write(messageBody + '\r\n.\r\n');
+                await new Promise(r => tlsSocket.once('data', r));
+                tlsSocket.write(`QUIT\r\n`);
+                tlsSocket.end();
+                clearTimeout(timeout);
+                console.log(`✓ OTP sent to ${email} via SMTP (port 587)`);
+                resolve(true);
+            } catch (err) {
+                clearTimeout(timeout);
+                console.error('[SMTP-587] Error:', err.message);
+                try { socket.end(); } catch (e) {}
+                resolve(false);
+            }
         });
-    } catch (err) {
-        console.error('Email error:', err.message);
-        console.log(`[Console Fallback] OTP for ${email}: ${otp}`);
-        return false;
-    }
+
+        socket.on('error', (err) => {
+            clearTimeout(timeout);
+            console.error('[SMTP-587] Connection error:', err.message);
+            resolve(false);
+        });
+    });
 }
 
 
