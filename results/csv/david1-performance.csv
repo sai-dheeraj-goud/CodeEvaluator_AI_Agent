@@ -1,2 +1,0 @@
-Date,Time,Candidate Name,Candidate EmailId,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
-"2026-04-12","12:53:50-855","david1","dheeraj.sai171998@gmail.com","4","1","Find Positions of Element in Array","Not Attempted","JAVASCRIPT","1st and 6th","[object Object]","0","0","Minimal code written","0","0","0","0:02","0:02"

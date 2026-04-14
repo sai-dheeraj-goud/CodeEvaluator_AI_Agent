@@ -1,2 +1,0 @@
-Date,Time,Candidate Name,Candidate EmailId,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
-"2026-04-12","12:52:21-438","david","dheeraj.sai171998@gmail.com","3","1","Star Pyramid Pattern","Not Attempted","PYTHON","*    * *   * * *  * * * * * * * * *","[object Object]","0","0","Minimal code written","0","0","0","0:04","0:04"
