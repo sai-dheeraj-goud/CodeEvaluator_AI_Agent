@@ -2316,7 +2316,8 @@ const server = http.createServer(async (req, res) => {
             tabSwitchFreezeLimit:APP_CONFIG.tabSwitchFreezeLimit,
             autoSaveIntervalMs:  APP_CONFIG.autoSaveIntervalMs,
             instructionReadTimer:APP_CONFIG.instructionReadTimer,
-            primaryAgent:        primaryAgent
+            primaryAgent:        primaryAgent,
+            panelistEmails:      (APP_CONFIG.panelistEmails || []).map(e => e.trim().toLowerCase())
         }));
         return;
     }
@@ -2939,7 +2940,7 @@ const server = http.createServer(async (req, res) => {
                 if (!fs.existsSync(csvDir)) fs.mkdirSync(csvDir, { recursive: true });
                 const csvFile = path.join(csvDir, `${safeName}-performance.csv`);
 
-                const csvHeaders = 'Date,Time,Candidate Name,Candidate EmailId,Location,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken';
+                const csvHeaders = 'Date,Time,Candidate Name,Candidate EmailId,Location,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),Plagiarism (%),Plagiarism Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken';
 
                 let csvContent = '';
                 if (!fs.existsSync(csvFile)) {
@@ -2957,6 +2958,12 @@ const server = http.createServer(async (req, res) => {
                     let status = 'Not Attempted';
                     let agentPercentage = r.agentPercentage || 0;
                     let actualOutput = r.actualOutput || '';
+                    // Handle object type actualOutput
+                    if (typeof actualOutput === 'object' && actualOutput !== null) {
+                        try { actualOutput = JSON.stringify(actualOutput); } catch(e) { actualOutput = ''; }
+                    }
+                    // Clean up any stringified [object Object]
+                    if (String(actualOutput).trim() === '[object Object]') actualOutput = '';
                     let errorMsg = '';
 
                     // Hardcoded output detection
@@ -3037,7 +3044,7 @@ const server = http.createServer(async (req, res) => {
                 for (let qi = 1; qi <= numQuestions; qi++) {
                     perQTabHeaders.push(`Q${qi} Tab Switches`);
                 }
-                const conHeaders = 'Date,Time,Candidate Name,Candidate Emailid,Location,Relevant Experience (Years),Language Preferred,Correct Programs,Test Execution Score (%),AI Code Review Score (%),AI Likelihood Avg (%),AI Likelihood Max (%),' + perQTabHeaders.join(',') + ',Total Tab Switches,Total Time Taken';
+                const conHeaders = 'Date,Time,Candidate Name,Candidate Emailid,Location,Relevant Experience (Years),Language Preferred,Correct Programs,Test Execution Score (%),Agent Score (%),Plagiarism Avg (%),Plagiarism Max (%),' + perQTabHeaders.join(',') + ',Total Tab Switches,Total Time Taken';
 
                 let consolidatedContent = '';
                 if (!fs.existsSync(consolidatedFile)) {
@@ -3105,7 +3112,7 @@ const server = http.createServer(async (req, res) => {
                                 const remaining = hasLangCol ? restFields : fields.slice(5);
                                 const oldTabSwitches = remaining.length > 5 ? remaining[remaining.length - 2] : '';
                                 const oldTotalTime = remaining.length > 5 ? remaining[remaining.length - 1] : '';
-                                const coreFields = remaining.slice(0, 5); // Correct,TestExec,AIReview,AIAvg,AIMax
+                                const coreFields = remaining.slice(0, 5); // Correct,TestExec,Agent,AIAvg,AIMax
 
                                 // Insert empty per-Q tab switch columns, then Total Tab Switches, then Total Time
                                 const emptyQCols = new Array(targetQCount).fill('');
@@ -3121,7 +3128,7 @@ const server = http.createServer(async (req, res) => {
                 }
 
                 const testExecScore = totalPrograms > 0 ? Math.round((correctCount / totalPrograms) * 100) : 0;
-                const aiReviewScore = agentAnalysis ? agentAnalysis.averagePercentage : 0;
+                const agentScore = agentAnalysis ? agentAnalysis.averagePercentage : 0;
                 const aiAvg = aiLikelihood ? aiLikelihood.average : 0;
                 const aiMax = aiLikelihood ? aiLikelihood.highest : 0;
 
@@ -3148,7 +3155,7 @@ const server = http.createServer(async (req, res) => {
                     escapeCsvField(langDisplay),
                     escapeCsvField(`${correctCount}/${totalPrograms}`),
                     escapeCsvField(testExecScore),
-                    escapeCsvField(aiReviewScore),
+                    escapeCsvField(agentScore),
                     escapeCsvField(aiAvg),
                     escapeCsvField(aiMax),
                     ...perQTabValues,
@@ -3240,6 +3247,428 @@ const server = http.createServer(async (req, res) => {
                 res.end(JSON.stringify({ error: 'Failed to save result' }));
             }
         });
+        return;
+    }
+
+    // --- Panelist: Get Daily Summary & Candidates ---
+    if (pathname === '/api/panelist/daily-summary' && req.method === 'GET') {
+        try {
+            const date = new URL(req.url, 'http://localhost').searchParams.get('date');
+            const csvDir = path.join(__dirname, '../results/csv');
+            const csvFile = path.join(csvDir, `all-candidates-summary-${date}.csv`);
+            const resultsDir = path.join(__dirname, '../results/json');
+            
+            // If CSV doesn't exist, return empty
+            if (!fs.existsSync(csvFile)) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    date,
+                    totalCandidates: 0,
+                    candidates: []
+                }));
+                return;
+            }
+            
+            const content = fs.readFileSync(csvFile, 'utf-8');
+            const lines = content.trim().split('\n');
+            
+            if (lines.length < 2) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    date,
+                    totalCandidates: 0,
+                    candidates: []
+                }));
+                return;
+            }
+            
+            const headers = parseCsvRow(lines[0]).map(h => h.trim());
+            const candidates = [];
+            
+            // Get all result files for this date
+            const resultFiles = fs.existsSync(resultsDir) ? fs.readdirSync(resultsDir) : [];
+            
+            // Parse each row
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCsvRow(lines[i]);
+                const row = {};
+                headers.forEach((h, idx) => {
+                    row[h] = (values[idx] || '').trim().replace(/^"|"$/g, '');
+                });
+                
+                // Find matching result file for this candidate
+                const candidateName = row['Candidate Name'] || '';
+                const candidateDate = row['Date'] || date;
+                let matchingFile = null;
+                
+                // Search for result file matching this candidate and date
+                for (const file of resultFiles) {
+                    if (file.includes(candidateName) && file.includes(candidateDate)) {
+                        matchingFile = file.replace('.json', '');
+                        break;
+                    }
+                }
+                
+                // Fallback to first matching file by candidate name and date
+                if (!matchingFile) {
+                    for (const file of resultFiles) {
+                        const fileDate = file.match(/(\d{4})-(\d{2})-(\d{2})/);
+                        if (fileDate && file.includes(candidateName) && fileDate[0] === candidateDate) {
+                            matchingFile = file.replace('.json', '');
+                            break;
+                        }
+                    }
+                }
+                
+                // Map CSV fields to API response
+                const candidate = {
+                    sessionId: matchingFile || `${candidateName}-${candidateDate}`,
+                    name: row['Candidate Name'] || 'Unknown',
+                    email: row['Candidate Emailid'] || 'unknown@example.com',
+                    location: row['Location'] || 'N/A',
+                    experience: row['Relevant Experience (Years)'] || 'N/A',
+                    language: row['Language Preferred'] || 'N/A',
+                    correctPrograms: row['Correct Programs'] || '0/0',
+                    testScore: row['Test Execution Score (%)'] || '0',
+                    agentScore: row['Agent Score (%)'] || row['AI Code Review Score (%)'] || '0',
+                    aiLikelihoodAvg: row['Plagiarism Avg (%)'] || row['AI Likelihood Avg (%)'] || '0',
+                    aiLikelihoodMax: row['Plagiarism Max (%)'] || row['AI Likelihood Max (%)'] || '0',
+                    q1TabSwitches: row['Q1 Tab Switches'] || '0',
+                    q2TabSwitches: row['Q2 Tab Switches'] || '0',
+                    totalTabSwitches: row['Total Tab Switches'] || '0',
+                    totalTime: row['Total Time Taken'] || '0:00',
+                    submittedAt: row['Date'] && row['Time'] ? `${row['Date']} ${row['Time']}` : 'N/A'
+                };
+                
+                // Calculate overall score as average of test and agent scores
+                const testScore = parseInt(candidate.testScore) || 0;
+                const aiScore = parseInt(candidate.agentScore) || 0;
+                candidate.score = Math.round((testScore + aiScore) / 2);
+                
+                candidates.push(candidate);
+            }
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                date,
+                totalCandidates: candidates.length,
+                candidates: candidates
+            }));
+        } catch (error) {
+            console.error('Panelist daily summary error:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: error.message }));
+        }
+        return;
+    }
+
+    // --- Panelist: Get Candidate Session Details ---
+    if (pathname.match(/^\/api\/panelist\/candidate-session\/[^/]+$/) && req.method === 'GET') {
+        try {
+            const sessionId = pathname.split('/').pop();
+            const resultsDir = path.join(__dirname, '../results/json');
+            
+            if (!fs.existsSync(resultsDir)) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Session not found' }));
+                return;
+            }
+            
+            const files = fs.readdirSync(resultsDir);
+            let sessionData = null;
+            let fileName = null;
+            
+            for (const file of files) {
+                // Match by filename (sessionId is the filename without .json)
+                if (file.replace('.json', '') === sessionId) {
+                    try {
+                        const filePath = path.join(resultsDir, file);
+                        const content = fs.readFileSync(filePath, 'utf8');
+                        sessionData = JSON.parse(content);
+                        fileName = file;
+                        break;
+                    } catch (e) {
+                        // Skip invalid files
+                    }
+                }
+            }
+            
+            if (!sessionData) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Session not found' }));
+                return;
+            }
+            
+            // Calculate overall score from results
+            let totalScore = 0;
+            let resultCount = 0;
+            if (sessionData.results && Array.isArray(sessionData.results)) {
+                sessionData.results.forEach(q => {
+                    if (q.agentPercentage !== undefined) {
+                        totalScore += q.agentPercentage;
+                        resultCount++;
+                    }
+                });
+            }
+            const overallScore = resultCount > 0 ? Math.round(totalScore / resultCount) : 0;
+            
+            // Transform data for panelist view
+            const response = {
+                sessionId: sessionId,
+                candidateId: sessionData.email,
+                candidateName: sessionData.personName,
+                candidateEmail: sessionData.email,
+                overallScore: overallScore,
+                totalTime: sessionData.totalTime || 'N/A',
+                tabSwitches: sessionData.tabSwitches || 0,
+                completionPercentage: sessionData.programsCompleted && sessionData.totalPrograms ? 
+                    Math.round((sessionData.programsCompleted / sessionData.totalPrograms) * 100) : 0,
+                questions: (sessionData.results || []).map(q => {
+                    let actualOut = q.actualOutput || '';
+                    if (typeof actualOut === 'object') {
+                        try { actualOut = JSON.stringify(actualOut); } catch(e) { actualOut = ''; }
+                    }
+                    return {
+                        questionId: q.questionId,
+                        questionTitle: q.title,
+                        status: q.agentPercentage >= 75 ? 'correct' : 'incorrect',
+                        agentScore: Math.round(q.agentPercentage || 0),
+                        language: q.language,
+                        timeTaken: q.questionTimeSpent ? Math.round(q.questionTimeSpent / 60) + ' min' : 'N/A',
+                        submittedCode: q.code || '',
+                        expectedOutput: q.expectedOutput || '',
+                        actualOutput: actualOut
+                    };
+                })
+            };
+            
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(response));
+        } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: error.message }));
+        }
+        return;
+    }
+
+    // --- Panelist: Export Daily Summary as CSV ---
+    if (pathname.match(/^\/api\/panelist\/export-csv/) && req.method === 'GET') {
+        try {
+            const url = new URL(req.url, 'http://localhost');
+            const date = url.searchParams.get('date');
+            const resultsDir = path.join(__dirname, '../results/json');
+            
+            if (!fs.existsSync(resultsDir)) {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('No results found');
+                return;
+            }
+            
+            const files = fs.readdirSync(resultsDir);
+            const candidates = [];
+            
+            files.forEach(file => {
+                try {
+                    const dateMatch = file.match(/(\d{4})-(\d{2})-(\d{2})/);
+                    if (!dateMatch) return;
+                    
+                    const fileDate = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+                    if (fileDate === date) {
+                        const filePath = path.join(resultsDir, file);
+                        const content = fs.readFileSync(filePath, 'utf8');
+                        const data = JSON.parse(content);
+                        
+                        // Calculate average score
+                        let totalScore = 0, qCount = 0;
+                        if (data.results && Array.isArray(data.results)) {
+                            data.results.forEach(q => {
+                                if (q.agentPercentage !== undefined) {
+                                    totalScore += q.agentPercentage;
+                                    qCount++;
+                                }
+                            });
+                        }
+                        const avgScore = qCount > 0 ? Math.round(totalScore / qCount) : 0;
+                        
+                        // Extract full timestamp from filename
+                        const timestampMatch = file.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})/);
+                        let submittedAt = fileDate;
+                        if (timestampMatch) {
+                            const [, year, month, day, hours, minutes, seconds] = timestampMatch;
+                            const dateObj = new Date(year, month - 1, day, hours, minutes, seconds);
+                            submittedAt = dateObj.toLocaleString('en-US', {
+                                month: 'numeric',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: true
+                            });
+                        }
+                        
+                        candidates.push({
+                            name: data.personName || 'Unknown',
+                            email: data.email || 'unknown@example.com',
+                            score: avgScore,
+                            submittedAt: submittedAt
+                        });
+                    }
+                } catch (e) {
+                    // Skip invalid files
+                }
+            });
+            
+            // Generate CSV
+            let csv = 'Candidate Name,Email,Score,Date & Time\n';
+            candidates.forEach(c => {
+                csv += `"${c.name}","${c.email}",${c.score},"${c.submittedAt}"\n`;
+            });
+            
+            res.writeHead(200, {
+                'Content-Type': 'text/csv',
+                'Content-Disposition': `attachment; filename="candidates-${date}.csv"`
+            });
+            res.end(csv);
+        } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error generating CSV: ' + error.message);
+        }
+        return;
+    }
+
+    // --- Panelist: Export Daily Summary as PDF ---
+    if (pathname.match(/^\/api\/panelist\/export-pdf/) && req.method === 'GET') {
+        try {
+            const url = new URL(req.url, 'http://localhost');
+            const date = url.searchParams.get('date');
+            const resultsDir = path.join(__dirname, '../results/json');
+            
+            if (!fs.existsSync(resultsDir)) {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('No results found');
+                return;
+            }
+            
+            const files = fs.readdirSync(resultsDir);
+            const candidates = [];
+            
+            files.forEach(file => {
+                try {
+                    const dateMatch = file.match(/(\d{4})-(\d{2})-(\d{2})/);
+                    if (!dateMatch) return;
+                    
+                    const fileDate = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+                    if (fileDate === date) {
+                        const filePath = path.join(resultsDir, file);
+                        const content = fs.readFileSync(filePath, 'utf8');
+                        const data = JSON.parse(content);
+                        
+                        // Calculate average score
+                        let totalScore = 0, qCount = 0;
+                        if (data.results && Array.isArray(data.results)) {
+                            data.results.forEach(q => {
+                                if (q.agentPercentage !== undefined) {
+                                    totalScore += q.agentPercentage;
+                                    qCount++;
+                                }
+                            });
+                        }
+                        const avgScore = qCount > 0 ? Math.round(totalScore / qCount) : 0;
+                        
+                        // Extract full timestamp from filename
+                        const timestampMatch = file.match(/(\d{4})-(\d{2})-(\d{2})T(\d{2})-(\d{2})-(\d{2})/);
+                        let submittedAt = fileDate;
+                        if (timestampMatch) {
+                            const [, year, month, day, hours, minutes, seconds] = timestampMatch;
+                            const dateObj = new Date(year, month - 1, day, hours, minutes, seconds);
+                            submittedAt = dateObj.toLocaleString('en-US', {
+                                month: 'numeric',
+                                day: 'numeric',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                                hour12: true
+                            });
+                        }
+                        
+                        candidates.push({
+                            name: data.personName || 'Unknown',
+                            email: data.email || 'unknown@example.com',
+                            score: avgScore,
+                            submittedAt: submittedAt
+                        });
+                    }
+                } catch (e) {
+                    // Skip invalid files
+                }
+            });
+            
+            // Generate simple HTML report (can be printed as PDF)
+            let html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Candidates Report - ${date}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #667eea; color: white; }
+        tr:hover { background-color: #f5f5f5; }
+        .score-high { color: green; font-weight: bold; }
+        .score-medium { color: orange; font-weight: bold; }
+        .score-low { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Candidates Report - ${date}</h1>
+    <p><strong>Total Candidates:</strong> ${candidates.length}</p>
+    <p><strong>Average Score:</strong> ${candidates.length > 0 ? Math.round(candidates.reduce((a, c) => a + c.score, 0) / candidates.length) : 0}%</p>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Candidate Name</th>
+                <th>Email</th>
+                <th>Score</th>
+                <th>Date & Time</th>
+            </tr>
+        </thead>
+        <tbody>
+`;
+            
+            candidates.forEach((c, idx) => {
+                const scoreClass = c.score >= 75 ? 'score-high' : c.score >= 50 ? 'score-medium' : 'score-low';
+                html += `
+            <tr>
+                <td>${idx + 1}</td>
+                <td>${c.name}</td>
+                <td>${c.email}</td>
+                <td class="${scoreClass}">${c.score}%</td>
+                <td>${c.submittedAt}</td>
+            </tr>
+`;
+            });
+            
+            html += `
+        </tbody>
+    </table>
+</body>
+</html>
+`;
+            
+            res.writeHead(200, {
+                'Content-Type': 'text/html',
+                'Content-Disposition': `attachment; filename="candidates-${date}.html"`
+            });
+            res.end(html);
+        } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error generating PDF: ' + error.message);
+        }
         return;
     }
 

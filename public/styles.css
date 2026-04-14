@@ -1282,3 +1282,87 @@ body {
 .feedback-status.sending {
     color: #FF9800;
 }
+
+/* Role Selection Modal */
+.role-selection-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    flex-direction: column;
+}
+
+.role-selection-modal.hidden {
+    display: none !important;
+}
+
+.modal-role-selection {
+    background: white;
+    padding: 50px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-role-selection h2 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+.role-btn {
+    display: block;
+    width: 100%;
+    padding: 25px;
+    margin: 15px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.role-btn small {
+    display: block;
+    font-size: 13px;
+    margin-top: 5px;
+    opacity: 0.8;
+}
+
+.candidate-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.candidate-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.panelist-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.panelist-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+}
+
+.logout-link {
+    background: #e0e0e0;
+    color: #333;
+    margin-top: 30px;
+}
+
+.logout-link:hover {
+    background: #c0c0c0;
+}

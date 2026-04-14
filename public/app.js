@@ -588,7 +588,6 @@ async function fetchTotalQuestionCount() {
     try {
         const data = await apiCall('GET', '/api/questions');
         totalAvailableQuestions = data.questions.length;
-        document.getElementById('totalQuestionsInfo').textContent = `Total available questions: ${totalAvailableQuestions}`;
     } catch (err) {
         console.error('Failed to fetch question count:', err);
     }
@@ -640,8 +639,24 @@ document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
         sessionStorage.setItem('authToken', authToken);
         sessionStorage.setItem('authEmail', authEmail);
         
+        // Store candidate info for panelist access
+        localStorage.setItem('candidateId', email);
+        localStorage.setItem('candidateName', email);
+        // Create a sessionId for panelist dashboard
+        const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('sessionId', sessionId);
+        
         await fetchTotalQuestionCount();
-        showStep(2);
+        await loadPanelistEmails();
+        
+        // Show role selection only for panelist-authorized emails
+        if (isPanelistEmail(email)) {
+            document.getElementById('roleSelectionModal').classList.remove('hidden');
+        } else {
+            // Non-admin users go straight to candidate dashboard
+            showStep(2);
+        }
+        
         showToast('Login successful', 'success');
     } catch (err) {
         document.getElementById('loginStatus').textContent = `Error: ${err.message}`;
@@ -853,7 +868,7 @@ function updateInstructionsDisplay() {
     }
     const line6 = document.getElementById('instructionLine6');
     if (line6) {
-        line6.innerHTML = `The <strong>AI Code Review Score</strong> is calculated <strong>only in ${langDisplay}</strong> for all questions.`;
+        line6.innerHTML = `The <strong>Agent Score</strong> is calculated <strong>only in ${langDisplay}</strong> for all questions.`;
     }
 }
 
@@ -1132,12 +1147,12 @@ function setupQuestionNavigation() {
             }
         }
     } else {
-        // Last question: Mark Complete + AI Code Review
+        // Last question: Mark Complete + Agent Score
         const markCompleteDisabled = !bulkAnalysisResult
-            ? 'disabled title="Run AI Code Review Score first" style="opacity:0.5;pointer-events:none;cursor:not-allowed;"'
+            ? 'disabled title="Run Agent Score first" style="opacity:0.5;pointer-events:none;cursor:not-allowed;"'
             : '';
         navHtml += `<button class="btn btn-success nav-btn-complete" onclick="completeProgram()" ${markCompleteDisabled}>✓ Mark Complete</button>`;
-        navHtml += `<button class="btn btn-agent-analysis" id="btnAgentAnalysis" onclick="runBulkAnalysis()">📊 AI Code Review Score</button>`;
+        navHtml += `<button class="btn btn-agent-analysis" id="btnAgentAnalysis" onclick="runBulkAnalysis()">📊 Agent Score</button>`;
     }
 
     navHtml += '</div>';
@@ -2070,7 +2085,7 @@ async function runBulkAnalysis() {
 
             // --- Determine the active language for this question ---
             // Use the currently selected language editor for ALL questions uniformly.
-            // Whichever editor the user has open when they click "AI Code Review Score"
+            // Whichever editor the user has open when they click "Agent Score"
             // is the language used to evaluate every question — even if some questions
             // have no code in that language (those will show 0%).
             let activeLanguage = currentLanguage;
@@ -2086,8 +2101,17 @@ async function runBulkAnalysis() {
 
             // Check output for the active language
             const activeOutputObj = outputs[activeLanguage] || '';
-            const activeOutput = (typeof activeOutputObj === 'object' && activeOutputObj.lastRunResult)
-                ? (activeOutputObj.lastRunResult.actualOutput || '') : String(activeOutputObj || '');
+            let activeOutput = '';
+            if (typeof activeOutputObj === 'object' && activeOutputObj !== null) {
+                if (activeOutputObj.lastRunResult) {
+                    activeOutput = activeOutputObj.lastRunResult.actualOutput || '';
+                } else {
+                    try { activeOutput = JSON.stringify(activeOutputObj); } catch(e) { activeOutput = ''; }
+                }
+            } else {
+                activeOutput = String(activeOutputObj || '');
+            }
+            if (activeOutput === '[object Object]') activeOutput = '';
             const activeMatches = outputsMatch(activeOutput, expectedOutput);
 
             if (strictOutputGate && !activeMatches) {
@@ -2165,7 +2189,7 @@ async function runBulkAnalysis() {
             completeBtn.title = 'Submit your results';
         }
         renderBulkAnalysisResults();
-        showToast('AI Code Review complete', 'success');
+        showToast('Agent Score complete', 'success');
     } catch (err) {
         showToast('Bulk analysis error: ' + err.message, 'error');
     } finally {
@@ -2215,10 +2239,10 @@ function renderBulkAnalysisResults() {
     
     // Summary box
     html += `<div class="agent-summary-box">
-        <strong>📊 AI Code Review Score</strong>
+        <strong>📊 Agent Score</strong>
         <p>Questions Analyzed: <strong>${count}</strong> / ${selectedQuestions.length}</p>
         <p>Average Code Correctness: <strong>${avgPct}%</strong></p>
-        <p>🔍 AI Likelihood: <strong style="color:${aiColor}">${avgAI}% (${aiLabel})</strong></p>
+        <p>🔍 Plagiarism: <strong style="color:${aiColor}">${avgAI}% (${aiLabel})</strong></p>
     </div>`;
 
     // Per-question results
@@ -2237,7 +2261,7 @@ function renderBulkAnalysisResults() {
             ${scoredLang ? `<p style="font-size:0.9em; color:#1976D2;">💻 Language: <strong>${escapeHtml(scoredLang)}</strong></p>` : ''}
             ${result.agentUsed ? `<p style="font-size:0.85em; color:#555;">🤖 Agent: <strong>${escapeHtml(result.agentUsed)}</strong></p>` : ''}
             <p>Agent Score: <span style="color:${pctColor}; font-weight:bold;">${result.percentage}%</span></p>
-            <p>🔍 AI Likelihood: <span style="color:${qAiColor}; font-weight:bold;">${likelihood.score}% (${qAiLabel})</span></p>
+            <p>🔍 Plagiarism: <span style="color:${qAiColor}; font-weight:bold;">${likelihood.score}% (${qAiLabel})</span></p>
             ${likelihood.reasons.length > 0 ? `<p style="font-size:0.85em; color:#666; margin:2px 0 0 0;">Reasons: ${likelihood.reasons.join('; ')}</p>` : ''}
             ${result.covered && result.covered.length > 0 ? `<div style="margin:6px 0 2px 0;"><strong style="color:#4CAF50; font-size:0.9em;">✅ Covered:</strong><ul style="margin:2px 0 4px 18px; padding:0; font-size:0.85em; color:#444;">${result.covered.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul></div>` : ''}
             ${result.missed && result.missed.length > 0 ? `<div style="margin:2px 0 6px 0;"><strong style="color:#d32f2f; font-size:0.9em;">❌ Missed:</strong><ul style="margin:2px 0 4px 18px; padding:0; font-size:0.85em; color:#444;">${result.missed.map(m => `<li>${escapeHtml(m)}</li>`).join('')}</ul></div>` : ''}
@@ -2338,7 +2362,7 @@ function lockQuestion() {
             startQuestionTimer();
         } else if (currentQuestionIndex === selectedQuestions.length - 1) {
             // On last question, all timers done
-            showToast('All timers completed! Click 📊 AI Code Review Score', 'warning');
+            showToast('All timers completed! Click 📊 Agent Score', 'warning');
         } else {
             // Not on last question but all timers done — go to last question
             clearInterval(questionTimerInterval);
@@ -2721,7 +2745,7 @@ async function submitAssessment() {
 
     programsCompleted = results.filter(r => r.status === 'completed').length;
 
-    // Calculate AI likelihoods
+    // Calculate Plagiarism scores
     const aiLikelihoods = selectedQuestions.map((q, idx) => {
         const javaCode = codeState[`q${q.id}-java`] || '';
         const pythonCode = codeState[`q${q.id}-python`] || '';
@@ -2747,13 +2771,13 @@ async function submitAssessment() {
     }
     const avgAgentPct = analyzedCount > 0 ? Math.round(totalAgentPct / analyzedCount) : 0;
 
-    // Compute AI likelihood stats
+    // Compute Plagiarism stats
     const aiScores = aiLikelihoods.map(l => l.score || 0);
     const avgAI = aiScores.length > 0 ? Math.round(aiScores.reduce((a, b) => a + b, 0) / aiScores.length) : 0;
     const maxAI = Math.max(...aiScores, 0);
 
     // Build per-question result objects with full data
-    // Use the LAST language used for AI Code Review per question (savedAgentLanguages)
+    // Use the LAST language used for Agent Score per question (savedAgentLanguages)
     // and pull actual output from outputState for that specific language so the
     // Candidate Performance tab reflects the reviewed language, not just the last run.
     const fullResults = selectedQuestions.map((q, idx) => {
@@ -2774,8 +2798,17 @@ async function submitAssessment() {
         // Pull actual output for the AI-reviewed language from outputState
         const qOutputState = outputState[`q${q.id}`] || {};
         const langOutputObj = qOutputState[lang] || '';
-        const langActualOutput = (typeof langOutputObj === 'object' && langOutputObj.lastRunResult)
-            ? (langOutputObj.lastRunResult.actualOutput || '') : String(langOutputObj || '');
+        let langActualOutput = '';
+        if (typeof langOutputObj === 'object' && langOutputObj !== null) {
+            if (langOutputObj.lastRunResult) {
+                langActualOutput = langOutputObj.lastRunResult.actualOutput || '';
+            } else {
+                try { langActualOutput = JSON.stringify(langOutputObj); } catch(e) { langActualOutput = ''; }
+            }
+        } else {
+            langActualOutput = String(langOutputObj || '');
+        }
+        if (langActualOutput === '[object Object]') langActualOutput = '';
 
         // Determine completion status based on the AI-reviewed language's output
         const expectedOutput = r.expectedOutput || extractExpectedOutput(q);
@@ -2863,171 +2896,7 @@ async function submitAssessment() {
 }
 
 function displayResults(aiLikelihoods) {
-    const correctCount = results.filter(r => r.status === 'completed').length;
-    const attemptedCount = results.filter((r, idx) => {
-        const q = selectedQuestions[idx];
-        const code = codeState[`q${q.id}-${r.language}`] || codeState[`q${q.id}-java`] || '';
-        return code.trim().length > 50;
-    }).length;
-    const completionPercent = Math.round((correctCount / totalPrograms) * 100);
-
-    // AI likelihood stats
-    const aiScores = aiLikelihoods.map(l => l.score || 0);
-    const avgAI = aiScores.length > 0 ? Math.round(aiScores.reduce((a, b) => a + b, 0) / aiScores.length) : 0;
-    const maxAI = Math.max(...aiScores, 0);
-    const aiColor = avgAI >= 50 ? '#d32f2f' : avgAI >= 25 ? '#FF9800' : '#4CAF50';
-    const aiLabel = avgAI >= 50 ? 'High' : avgAI >= 25 ? 'Medium' : 'Low';
-
-    // Agent analysis stats
-    let analyzedCount = 0;
-    let totalAgentPct = 0;
-    if (bulkAnalysisResult) {
-        for (const q of selectedQuestions) {
-            const r = bulkAnalysisResult[q.id];
-            if (r) { analyzedCount++; totalAgentPct += (r.percentage || 0); }
-        }
-    }
-    const avgAgentPct = analyzedCount > 0 ? Math.round(totalAgentPct / analyzedCount) : 0;
-
-    // Set score
-    document.getElementById('finalScore').textContent = `${correctCount}/${totalPrograms}`;
-
-    // Build dynamic content
-    let html = '<div style="text-align:left; max-width:500px; margin:0 auto;">';
-
-    // 1. Completion box
-    html += `<div class="agent-summary-box">
-        <strong>📊 Completion: ${completionPercent}%</strong>
-        <p>Correct: <strong>${correctCount}</strong> / ${totalPrograms} | Attempted: <strong>${attemptedCount}</strong> / ${totalPrograms}</p>
-    </div>`;
-
-    // 2. Tab switch warning (conditional)
-    if (tabSwitchCount > 0) {
-        html += `<div class="agent-summary-box" style="border-left: 4px solid #f44336;">
-            <strong>⚠️ Tab Switch Warning</strong>
-            <p>Tab changed: <strong style="color:#d32f2f;">${tabSwitchCount}</strong> time(s)</p>
-        </div>`;
-    }
-
-    // Removed Agent Usage Summary box
-
-    // 4. AI-Generated Code Likelihood
-    html += `<div class="agent-summary-box" style="border-left: 4px solid ${aiColor};">
-        <strong>🔍 AI-Generated Code Likelihood</strong>
-        <p>Highest: <strong style="color:${aiColor};">${maxAI}%</strong> | Average: <strong style="color:${aiColor};">${avgAI}% (${aiLabel})</strong></p>
-        <p style="font-size:0.85em; color:#b0b0b0;">Based on typing patterns, paste detection, and tab-switch behavior</p>
-    </div>`;
-
-    // 5. AI Code Review Score
-    if (bulkAnalysisResult && analyzedCount > 0) {
-        html += `<div class="agent-summary-box">
-            <strong>📊 AI Code Review Score</strong>
-            <p>Questions Analyzed: <strong>${analyzedCount}</strong> / ${totalPrograms}</p>
-            <p>Average Code Correctness: <strong>${avgAgentPct}%</strong></p>
-        </div>`;
-    } else {
-        html += `<div class="agent-summary-box" style="border-left: 4px solid #999;">
-            <strong>📊 AI Code Review Score</strong>
-            <p>Agent Score: <strong style="color:#999;">N/A</strong></p>
-            <p style="font-size:0.85em; color:#b0b0b0;">AI Code Review was not run. Click "AI Code Review Score" on the last question to get agent scores.</p>
-        </div>`;
-    }
-
-    // 5b. Per-Question Time Summary
-    const formatTimeDisplay = (sec) => {
-        const m = Math.floor(sec / 60);
-        const s = sec % 60;
-        if (m > 0 && s > 0) return `${m}min ${s}sec`;
-        if (m > 0) return `${m}min`;
-        return `${s}sec`;
-    };
-    html += `<div class="agent-summary-box" style="border-left: 4px solid #2196F3;">
-        <strong>⏱️ Per-Question Time Spent</strong>`;
-    selectedQuestions.forEach((q, idx) => {
-        const qDifficulty = (q.difficulty || '').toLowerCase();
-        const qTotalAllotted = CONFIG.questionTimeLimits[qDifficulty] || CONFIG.defaultTimeLimit;
-        const qTimeSpent = questionCompletionTimes[q.id] !== undefined
-            ? questionCompletionTimes[q.id]
-            : (qTotalAllotted - (questionTimeLeft[q.id] || 0));
-        html += `<p>Question ${idx + 1}: completed in <strong style="color:#2196F3;">${formatTimeDisplay(qTimeSpent)}</strong></p>`;
-    });
-    html += `</div>`;
-
-    // 6. Per-question results
-    results.forEach((r, idx) => {
-        const q = selectedQuestions[idx];
-        const agentResult = bulkAnalysisResult ? (bulkAnalysisResult[q.id] || null) : null;
-
-        // Use the language from the bulk analysis result (which respects the editor the user
-        // had selected when clicking "AI Code Review Score"). Fall back to own detection.
-        let lang;
-        if (agentResult && agentResult.language) {
-            lang = agentResult.language;
-        } else {
-            lang = currentLanguage.toUpperCase();
-        }
-        const langKey = lang.toLowerCase();
-        const code = codeState[`q${q.id}-${langKey}`] || '';
-        const likelihood = aiLikelihoods[idx] || { score: 0, reasons: [] };
-        const attempted = code.trim().length > 50;
-        const agentPct = agentResult ? (agentResult.percentage || 0) : (r.agentScore !== null ? r.agentScore : null);
-
-        // Status — override based on agent review result for the evaluated language
-        const agentNoCode = agentResult && agentResult.percentage === 0 && (agentResult.explanation || '').toLowerCase().includes('no code written');
-        let statusText, statusColor;
-        if (agentNoCode) { statusText = 'No Code in ' + lang; statusColor = '#d32f2f'; }
-        else if (agentPct !== null && agentPct > 0 && r.status === 'completed') { statusText = 'Correct'; statusColor = '#4CAF50'; }
-        else if (r.status === 'completed' && !agentResult) { statusText = 'Correct'; statusColor = '#4CAF50'; }
-        else if (attempted) { statusText = 'Incorrect'; statusColor = '#d32f2f'; }
-        else { statusText = 'Not Attempted'; statusColor = '#d32f2f'; }
-
-        // Validation message
-        let validationMsg = '';
-        if (agentNoCode) validationMsg = '✗ No code written in ' + lang;
-        else if (r.status === 'completed') validationMsg = '✓ Output matches expected';
-        else if (r.errorMessage) validationMsg = '✗ ' + r.errorMessage;
-        else if (attempted) validationMsg = '✗ Output does not match';
-
-        // Agent score color
-        let agentColor = '#999';
-        if (agentPct !== null && agentPct !== undefined) {
-            agentColor = agentPct >= 70 ? '#4CAF50' : agentPct >= 40 ? '#FF9800' : '#d32f2f';
-        }
-
-        // AI likelihood color
-        const qAiColor = likelihood.score >= 50 ? '#d32f2f' : likelihood.score >= 25 ? '#FF9800' : '#4CAF50';
-        const qAiLabel = likelihood.score >= 50 ? 'High' : likelihood.score >= 25 ? 'Medium' : 'Low';
-
-        // Per-question time spent
-        const qDifficulty2 = (q.difficulty || '').toLowerCase();
-        const qTotalAllotted2 = CONFIG.questionTimeLimits[qDifficulty2] || CONFIG.defaultTimeLimit;
-        const qTimeSpent2 = questionCompletionTimes[q.id] !== undefined
-            ? questionCompletionTimes[q.id]
-            : (qTotalAllotted2 - (questionTimeLeft[q.id] || 0));
-        const qTimeMin = Math.floor(qTimeSpent2 / 60);
-        const qTimeSec = qTimeSpent2 % 60;
-        const qTimeDisplay = qTimeMin > 0 ? `${qTimeMin}min ${qTimeSec}sec` : `${qTimeSec}sec`;
-
-        html += `<div class="result-item">
-            <strong>${idx + 1}. ${escapeHtml(q.title)}</strong>
-            <p>Status: <strong style="color:${statusColor};">${statusText}</strong></p>
-            <p>Time Spent: <strong style="color:#2196F3;">⏱️ ${qTimeDisplay}</strong></p>
-            <p>Language: <strong>${lang}</strong></p>
-            <div style="margin:4px 0;"><strong>Expected:</strong><pre style="margin:4px 0;background:#1a1a2e;padding:8px;border-radius:4px;border-left:3px solid #2196F3;white-space:pre-wrap;font-family:monospace;font-size:0.85em;color:#e0e0e0;">${escapeHtml(r.expectedOutput || '')}</pre></div>
-            <div style="margin:4px 0;"><strong>Actual:</strong><pre style="margin:4px 0;background:#1a1a2e;padding:8px;border-radius:4px;border-left:3px solid ${r.completed ? '#4CAF50' : '#f44336'};white-space:pre-wrap;font-family:monospace;font-size:0.85em;color:#e0e0e0;">${escapeHtml(r.actualOutput || '')}</pre></div>
-            ${validationMsg ? `<p style=\"font-size:0.9em;color:${r.status === 'completed' ? '#4CAF50' : '#d32f2f'};\">${validationMsg}</p>` : ''}
-            <p>Agent Score: <strong style="color:${agentColor};">${agentPct !== null && agentPct !== undefined ? agentPct + '%' : 'N/A'}</strong></p>
-            ${agentResult && agentResult.covered && agentResult.covered.length > 0 ? `<div style=\"margin:6px 0 2px 0;\"><strong style=\"color:#4CAF50; font-size:0.9em;\">✅ Covered:</strong><ul style=\"margin:2px 0 4px 18px; padding:0; font-size:0.85em; color:#e0e0e0;\">${agentResult.covered.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul></div>` : ''}
-            ${agentResult && agentResult.missed && agentResult.missed.length > 0 ? `<div style=\"margin:2px 0 6px 0;\"><strong style=\"color:#d32f2f; font-size:0.9em;\">❌ Missed:</strong><ul style=\"margin:2px 0 4px 18px; padding:0; font-size:0.85em; color:#e0e0e0;\">${agentResult.missed.map(m => `<li>${escapeHtml(m)}</li>`).join('')}</ul></div>` : ''}
-            ${(!agentResult?.covered?.length && !agentResult?.missed?.length && agentResult && agentResult.explanation) ? `<p class=\"agent-analysis-detail\">${escapeHtml(agentResult.explanation.substring(0, 300))}</p>` : ''}
-            <p>🔍 AI Likelihood: <strong style=\"color:${qAiColor};\">${likelihood.score}% (${qAiLabel})</strong></p>
-            ${likelihood.reasons.length > 0 ? `<p style=\"font-size:0.85em; color:#b0b0b0;\">${likelihood.reasons.join('; ')}</p>` : ''}
-        </div>`;
-    });
-
-    html += '</div>';
-    document.getElementById('resultDetails').innerHTML = html;
-
+    // Simply show the thank-you page — no performance details shown to candidates
     showStep(4);
 }
 
@@ -3098,262 +2967,6 @@ document.getElementById('backHomeBtn').addEventListener('click', () => {
         }
     });
 })();
-
-document.getElementById('viewCodeBtn').addEventListener('click', () => {
-    const timestamp = getISTTimestamp();
-    const safeName = personName.replace(/[^a-zA-Z0-9]/g, '_');
-
-
-    // Compute aggregate AI Code Review stats across all questions
-    let analyzedCount = 0, totalAgentPct = 0;
-    if (bulkAnalysisResult) {
-        for (const qx of selectedQuestions) {
-            const rx = bulkAnalysisResult[qx.id];
-            if (rx) { analyzedCount++; totalAgentPct += (rx.percentage || 0); }
-        }
-    }
-    const avgAgentPct = analyzedCount > 0 ? Math.round(totalAgentPct / analyzedCount) : 0;
-    const correctCount = results.filter(r => r.status === 'completed').length;
-
-    let cardsHtml = '';
-    let textContent = '';
-    textContent += '══════════════════════════════════════════════════════════════\n';
-    textContent += '  CANDIDATE CODE & RESULTS\n';
-    textContent += '══════════════════════════════════════════════════════════════\n\n';
-    textContent += `Candidate:    ${personName}\n`;
-    textContent += `Completed At: ${timestamp}\n`;
-    textContent += `Score:        ${results.filter(r => r.status === 'completed').length}/${totalPrograms}\n`;
-    if (analyzedCount > 0) textContent += `AI Code Review: Analyzed ${analyzedCount} questions, Average Score: ${avgAgentPct}%\n`;
-    textContent += `Experience:   ${experienceRaw} year(s)\n\n`;
-
-    // Loop through ALL questions to build cards and text
-    selectedQuestions.forEach((q, idx) => {
-        const r = results[idx];
-        const preferredLang = lockedLanguage || 'java';
-        const code = codeState[`q${q.id}-${preferredLang}`] || '';
-        const template = preferredLang === 'python' ? buildPythonStarterTemplate()
-                       : preferredLang === 'javascript' ? buildJavaScriptStarterTemplate()
-                       : buildJavaStarterTemplate();
-        const aiLikelihood = computeAILikelihood(q.id, code, template);
-
-        // Use the preferred language; override with saved AI review language if available
-        let lang = savedAgentLanguages[`q${q.id}`] || preferredLang.toUpperCase();
-        // Show the code that was in the editor when AI Code Review was last clicked
-        // Fall back to live codeState for the preferred language
-        let codeToShow = savedAgentCodeForReview[`q${q.id}`] || '';
-        if (!codeToShow) {
-            codeToShow = codeState[`q${q.id}-${preferredLang}`] || '';
-        }
-        const agentResult = bulkAnalysisResult ? (bulkAnalysisResult[q.id] || null) : null;
-        const agentPct = agentResult ? (agentResult.percentage || 0) : (r.agentScore || 0);
-        const attempted = codeToShow.trim().length > 50;
-        const agentNoCode = agentResult && agentResult.percentage === 0 && (agentResult.explanation || '').toLowerCase().includes('no code written');
-        let statusText, statusIcon, statusStyle;
-        if (agentNoCode) { statusText = 'No Code in ' + lang; statusIcon = '⚠️'; statusStyle = 'color:#d32f2f;font-weight:600;'; }
-        else if (agentPct > 0 && r.status === 'completed') { statusText = 'Correct'; statusIcon = '✅'; statusStyle = 'color:#2e7d32;font-weight:600;'; }
-        else if (r.status === 'completed' && !agentResult) { statusText = 'Correct'; statusIcon = '✅'; statusStyle = 'color:#2e7d32;font-weight:600;'; }
-        else if (attempted) { statusText = 'Incorrect'; statusIcon = '❌'; statusStyle = 'color:#d32f2f;font-weight:600;'; }
-        else { statusText = 'Not Attempted'; statusIcon = '⚪'; statusStyle = 'color:#888;font-weight:600;'; }
-        const aiPct = aiLikelihood.score;
-
-        cardsHtml += `<div style="background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                <span style="background:#1a73e8;color:#fff;padding:3px 8px;border-radius:4px;font-size:12px;font-weight:700;">Q${idx + 1}</span>
-                <strong>${q.title}</strong>
-                <span style="${statusStyle}">${statusIcon} ${statusText}</span>
-            </div>
-            <div style="font-size:13px;color:#555;margin-bottom:8px;">Language: ${lang} | Agent Score: ${agentPct}% | AI Likelihood: ${aiPct}%</div>
-            ${q.description ? `<div style="font-size:13px;color:#666;background:#f9f9f9;border-radius:4px;padding:8px;margin-bottom:8px;">${q.description}</div>` : ''}
-            <pre style="background:#1e1e1e;color:#d4d4d4;padding:12px 16px;border-radius:6px;font-size:13px;white-space:pre-wrap;word-break:break-word;overflow-x:auto;">${escapeHtml(codeToShow)}</pre>
-            <div style="display:flex;gap:16px;margin-top:8px;">
-                <div style="flex:1;background:#f5f5f5;border:1px solid #ddd;padding:8px 12px;border-radius:4px;font-size:12px;"><strong>Expected:</strong><pre style="margin:4px 0 0;white-space:pre-wrap;">${escapeHtml(r.expectedOutput || '')}</pre></div>
-                <div style="flex:1;background:#f5f5f5;border:1px solid #ddd;padding:8px 12px;border-radius:4px;font-size:12px;"><strong>Actual:</strong><pre style="margin:4px 0 0;white-space:pre-wrap;">${escapeHtml(r.actualOutput || '')}</pre></div>
-            </div>
-            ${aiLikelihood.reasons.length > 0 ? `<div style="font-size:12px;color:#e65100;background:#fff3e0;border-radius:4px;padding:6px 10px;margin-top:8px;">🔍 AI Detection: ${aiLikelihood.reasons.join('; ')}</div>` : ''}
-            ${agentResult && agentResult.covered && agentResult.covered.length > 0 ? `<div style="margin-top:8px;background:#e8f5e9;border-radius:4px;padding:8px 12px;"><strong style="color:#2e7d32;font-size:0.9em;">✅ Covered:</strong><ul style="margin:4px 0 0 16px;padding:0;font-size:0.85em;color:#333;">${agentResult.covered.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul></div>` : ''}
-            ${agentResult && agentResult.missed && agentResult.missed.length > 0 ? `<div style="margin-top:6px;background:#ffebee;border-radius:4px;padding:8px 12px;"><strong style="color:#c62828;font-size:0.9em;">❌ Missed:</strong><ul style="margin:4px 0 0 16px;padding:0;font-size:0.85em;color:#333;">${agentResult.missed.map(m => `<li>${escapeHtml(m)}</li>`).join('')}</ul></div>` : ''}
-        </div>`;
-
-        // Text content for download
-        textContent += '──────────────────────────────────────────────────────────────\n';
-        textContent += `Q${idx + 1}: ${q.title} — ${statusText}\n`;
-        textContent += '──────────────────────────────────────────────────────────────\n';
-        textContent += `Language: ${lang} | Agent Score: ${agentPct}% | AI Likelihood: ${aiPct}%\n`;
-        if (q.description) textContent += `Description: ${q.description}\n`;
-        textContent += `\nCode:\n${codeToShow}\n\n`;
-        textContent += `Expected Output: ${r.expectedOutput || ''}\n`;
-        textContent += `Actual Output:   ${r.actualOutput || ''}\n`;
-        if (agentResult && agentResult.covered && agentResult.covered.length > 0) {
-            textContent += `\n✅ Covered:\n${agentResult.covered.map(c => `  - ${c}`).join('\n')}\n`;
-        }
-        if (agentResult && agentResult.missed && agentResult.missed.length > 0) {
-            textContent += `\n❌ Missed:\n${agentResult.missed.map(m => `  - ${m}`).join('\n')}\n`;
-        }
-        if (aiLikelihood.reasons.length > 0) textContent += `\nAI Detection Reasons: ${aiLikelihood.reasons.join('; ')}\n`;
-        textContent += '\n';
-    }); // end forEach question
-
-    const pageHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Candidate Code & Results</title>
-<style>
-body{font-family:'Segoe UI',Arial,sans-serif;margin:20px;background:#f5f5f5;color:#333;}
-h2{color:#1a73e8;margin-bottom:5px;}
-.toolbar{display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:20px;}
-.toolbar .subtitle{color:#666;font-size:14px;}
-.download-btn{background:#1a73e8;color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;}
-.download-btn:hover{background:#1558b0;}
-.summary-card{background:#fff;border:2px solid #1a73e8;border-radius:8px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-bottom:20px;}
-.summary-card p{margin:4px 0;font-size:14px;}
-</style></head><body>
-<h2>Candidate Code & Results</h2>
-<div class="toolbar">
-    <span class="subtitle">${safeName} | Completed: ${timestamp}</span>
-    <button class="download-btn" onclick="downloadText()">📄 Download as Text</button>
-</div>
-<div class="summary-card">
-    <p><strong>Candidate:</strong> ${personName}</p>
-    <p><strong>Experience:</strong> ${experienceRaw} year(s)</p>
-    <p><strong>Score:</strong> ${correctCount}/${totalPrograms} correct</p>
-    ${analyzedCount > 0 ? `<p><strong>AI Code Review:</strong> Analyzed ${analyzedCount} questions, Average Score: ${avgAgentPct}%</p>` : ''}
-</div>
-${cardsHtml}
-<script>
-function downloadText(){
-    const text = ${JSON.stringify(textContent)};
-    const blob = new Blob([text], {type:'text/plain'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '${safeName}-code-results.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-}
-</script></body></html>`;
-
-    const win = window.open('', '_blank');
-    win.document.write(pageHtml);
-    win.document.close();
-});
-
-document.getElementById('viewPerformanceBtn').addEventListener('click', () => {
-    const safeName = personName.replace(/[^a-zA-Z0-9]/g, '_');
-    const win = window.open('', '_blank');
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Loading...</title></head><body style="font-family:'Segoe UI',Arial,sans-serif;margin:20px;background:#f5f5f5;"><h2>Loading performance data...</h2></body></html>`);
-    win.document.close();
-
-    apiCall('GET', `/api/candidate-performance?name=${safeName}`).then(data => {
-        const allHeaders = data.headers || [];
-        const allRows = data.rows || [];
-        const displayName = data.candidateName || personName;
-
-        const pageHtml = buildFilterableTablePage({
-            title: `Candidate Performance - ${displayName}`,
-            subtitle: `Total Questions: ${allRows.length}`,
-            headers: allHeaders,
-            rows: allRows,
-            downloadFileName: `${safeName}-performance.csv`,
-            summaryUnit: 'questions'
-        });
-        win.document.open();
-        win.document.write(pageHtml);
-        win.document.close();
-    }).catch(err => {
-        win.document.open();
-        win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Error</title></head><body style="font-family:'Segoe UI',Arial,sans-serif;margin:20px;"><h2 style="color:#d32f2f;">Error loading data</h2><p>${err.message}</p></body></html>`);
-        win.document.close();
-    });
-});
-
-document.getElementById('viewAllCandidatesBtn').addEventListener('click', () => {
-    // Use local date for CSV file name in yyyy-MM-dd format
-    const now = new Date();
-    const pad = n => n.toString().padStart(2, '0');
-    const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-    const win = window.open('', '_blank');
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Loading...</title></head><body style="font-family:'Segoe UI',Arial,sans-serif;margin:20px;background:#f5f5f5;"><h2>Loading all candidates...</h2></body></html>`);
-    win.document.close();
-
-    // Fetch pie chart data and summary table data in parallel (both date-aware)
-    Promise.all([
-        apiCall('GET', `/api/pie-chart-data?date=${dateStr}`).catch(() => ({ counts: {} })),
-        apiCall('GET', `/api/all-candidates-summary?date=${dateStr}`)
-    ]).then(([pieData, tableData]) => {
-        const allHeaders = tableData.headers || [];
-        const allRows = tableData.rows || [];
-        const counts = pieData.counts || {};
-
-        // Build pie chart HTML dynamically from API data
-        const pieLabels = Object.keys(counts).sort((a, b) => {
-            const [an] = a.split('/').map(Number);
-            const [bn] = b.split('/').map(Number);
-            return bn - an;
-        });
-        const pieValues = pieLabels.map(l => counts[l]);
-        const pieColors = pieLabels.map(l => {
-            const [n, t] = l.split('/').map(Number);
-            if (n === t) return '#4CAF50';
-            if (n === 0) return '#F44336';
-            return '#FFC107';
-        });
-
-        let pieChartHtml = '';
-        if (pieLabels.length > 0) {
-            pieChartHtml = `<div style="text-align:center;margin:20px 0 10px;"><h3 style="color:#333;margin:0 0 10px;">📊 Completion Overview — ${dateStr}</h3></div>`
-                + '<div style="width: 350px; height: 350px; margin: 0 auto;">\n'
-                + '  <canvas id="allCandidatesPieChart"></canvas>\n'
-                + '</div>\n'
-                + '<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>\n'
-                + '<script>\n'
-                + '(function() {\n'
-                + '  var ctx = document.getElementById("allCandidatesPieChart").getContext("2d");\n'
-                + '  new Chart(ctx, {\n'
-                + '    type: "pie",\n'
-                + '    data: {\n'
-                + '      labels: ' + JSON.stringify(pieLabels) + ',\n'
-                + '      datasets: [{\n'
-                + '        data: ' + JSON.stringify(pieValues) + ',\n'
-                + '        backgroundColor: ' + JSON.stringify(pieColors) + ',\n'
-                + '        borderWidth: 1\n'
-                + '      }]\n'
-                + '    },\n'
-                + '    options: {\n'
-                + '      responsive: false,\n'
-                + '      plugins: {\n'
-                + '        legend: { position: "bottom" },\n'
-                + '        title: { display: true, text: "Candidates by Completion (' + dateStr + ')" },\n'
-                + '        tooltip: {\n'
-                + '          callbacks: {\n'
-                + '            label: function(context) {\n'
-                + '              var label = context.label || "";\n'
-                + '              var value = context.parsed;\n'
-                + '              return label + ": " + value + " candidate" + (value === 1 ? "" : "s");\n'
-                + '            }\n'
-                + '          }\n'
-                + '        }\n'
-                + '      }\n'
-                + '    }\n'
-                + '  });\n'
-                + '})();\n'
-                + '<\/script>\n';
-        }
-
-        let pageHtml = pieChartHtml;
-        pageHtml += buildFilterableTablePage({
-            title: 'All Candidates Summary',
-            subtitle: `Date: ${dateStr} | Total Candidates: ${allRows.length}`,
-            headers: allHeaders,
-            rows: allRows,
-            downloadFileName: `all-candidates-summary-${dateStr}.csv`,
-            summaryUnit: 'candidates'
-        });
-        win.document.open();
-        win.document.write(pageHtml);
-        win.document.close();
-    }).catch(err => {
-        win.document.open();
-        win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Error</title></head><body style="font-family:'Segoe UI',Arial,sans-serif;margin:20px;"><h2 style="color:#d32f2f;">Error loading data</h2><p>${err.message}</p></body></html>`);
-        win.document.close();
-    });
-});
 
 // ==================== FILTERABLE TABLE BUILDER ====================
 function buildFilterableTablePage(opts) {
@@ -3790,6 +3403,65 @@ function initDraggableTimer() {
 window.addEventListener('beforeunload', (e) => {
     if (!assessmentSubmitted && currentQuestionIndex < totalPrograms && totalPrograms > 0) {
         e.returnValue = 'Your assessment progress may be lost.';
+    }
+});
+
+// Admin/Panelist whitelist — loaded dynamically from /api/config (data/config.js)
+let PANELIST_EMAILS = [];
+
+async function loadPanelistEmails() {
+    if (PANELIST_EMAILS.length > 0) return; // already loaded
+    try {
+        const cfg = await apiCall('GET', '/api/config');
+        PANELIST_EMAILS = (cfg.panelistEmails || []).map(e => e.trim().toLowerCase());
+    } catch (err) {
+        console.error('Failed to load panelist emails:', err);
+    }
+}
+
+function isPanelistEmail(email) {
+    return PANELIST_EMAILS.includes((email || '').trim().toLowerCase());
+}
+
+// Role Selection Functions
+function goToCandidateDashboard() {
+    document.getElementById('roleSelectionModal').classList.add('hidden');
+    showStep(2);
+}
+
+function goToPanelistDashboard() {
+    window.location.href = '/public/panelist.html';
+}
+
+function logoutRole() {
+    localStorage.removeItem('candidateId');
+    localStorage.removeItem('sessionId');
+    localStorage.removeItem('candidateName');
+    localStorage.removeItem('testStartTime');
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('authEmail');
+    document.getElementById('roleSelectionModal').classList.add('hidden');
+    document.getElementById('emailForm').style.display = 'block';
+    document.getElementById('otpForm').style.display = 'none';
+    document.getElementById('emailInput').value = '';
+    document.getElementById('otpInput').value = '';
+    document.getElementById('loginStatus').textContent = '';
+    showStep(0);
+}
+
+// Suppress known browser extension errors
+window.addEventListener('error', (event) => {
+    if (event.message && event.message.includes('message channel closed')) {
+        event.preventDefault();
+        return true;
+    }
+});
+
+// Suppress unhandled promise rejections for known browser extension errors
+window.addEventListener('unhandledrejection', (event) => {
+    if (event.reason && event.reason.message && event.reason.message.includes('message channel closed')) {
+        event.preventDefault();
+        return true;
     }
 });
 

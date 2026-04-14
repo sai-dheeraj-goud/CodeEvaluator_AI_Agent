@@ -7,7 +7,16 @@
 // ====================================================================
 
 module.exports = {
-
+    // ================================================================
+    //  PANELIST / ADMIN ACCESS CONTROL
+    // ================================================================
+    // Only these email addresses can see the Panel button and access
+    // the Panelist Dashboard. All other users go straight to the
+    // Candidate test. Add or remove emails here as needed.
+    panelistEmails: [
+        'dheeraj.sai171998@gmail.com',
+        'dheeraj.sai17@gmail.com'
+    ],
     // ================================================================
     //  SERVER-SIDE SETTINGS (used by src/server.js)
     // ================================================================

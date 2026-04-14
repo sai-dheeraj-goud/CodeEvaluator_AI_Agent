@@ -123,7 +123,7 @@
     {
       "id": 13,
       "title": "Armstrong Number Check",
-      "description": "Write a program to check if 153 is an Armstrong number. An Armstrong number of 3 digits equals the sum of cubes of its digits (1³ + 5³ + 3³ = 153).",
+      "description": "Write a program to check if 153 is an Armstrong number. An Armstrong number of 3 digits equals the sum of cubes of its digits (1\u00c2\u00b3 + 5\u00c2\u00b3 + 3\u00c2\u00b3 = 153).",
       "example": "Input: 153\nOutput: 153 is an Armstrong number",
       "difficulty": "moderate",
       "javaTemplate": "public class Solution {\n    public static void main(String[] args) {\n        int n = 153, original = 153, sum = 0;\n        int digits = String.valueOf(n).length();\n        int temp = n;\n        while (temp > 0) {\n            int d = temp % 10;\n            sum += Math.pow(d, digits);\n            temp /= 10;\n        }\n        System.out.println(n + (sum == original ? \" is an Armstrong number\" : \" is not an Armstrong number\"));\n    }\n}",
@@ -222,26 +222,6 @@
     },
     {
       "id": 23,
-      "title": "Star Pyramid Pattern",
-      "description": "Write a program to print a right-aligned star pyramid pattern with 5 rows.",
-      "example": "Output:\n    *\n   * *\n  * * *\n * * * *\n* * * * *",
-      "difficulty": "moderate",
-      "javaTemplate": "public class Solution {\n    public static void main(String[] args) {\n        int n = 5;\n        for (int i = 1; i <= n; i++) {\n            for (int j = n - i; j > 0; j--) System.out.print(\" \");\n            for (int j = 1; j <= i; j++) {\n                if (j > 1) System.out.print(\" \");\n                System.out.print(\"*\");\n            }\n            System.out.println();\n        }\n    }\n}",
-      "pythonTemplate": "n = 5\nfor i in range(1, n + 1):\n    print(' ' * (n - i) + ' '.join(['*'] * i))",
-      "javascriptTemplate": "const n = 5;\nfor (let i = 1; i <= n; i++) {\n    let row = \" \".repeat(n - i);\n    for (let j = 1; j <= i; j++) {\n        if (j > 1) row += \" \";\n        row += \"*\";\n    }\n    console.log(row);\n}"
-    },
-    {
-      "id": 24,
-      "title": "Reverse Characters of Each Word",
-      "description": "Write a program to reverse the characters of each word in a string without changing word positions.",
-      "example": "Input: i love programming\nOutput: i evol gnimmargorp",
-      "difficulty": "moderate",
-      "javaTemplate": "public class Solution {\n    public static void main(String[] args) {\n        String s = \"i love programming\";\n        String[] words = s.split(\" \");\n        StringBuilder result = new StringBuilder();\n        for (int i = 0; i < words.length; i++) {\n            if (i > 0) result.append(\" \");\n            result.append(new StringBuilder(words[i]).reverse());\n        }\n        System.out.println(result.toString());\n    }\n}",
-      "pythonTemplate": "s = \"i love programming\"\nprint(' '.join(w[::-1] for w in s.split()))",
-      "javascriptTemplate": "const s = \"i love programming\";\nconsole.log(s.split(\" \").map(w => w.split(\"\").reverse().join(\"\")).join(\" \"));"
-    },
-    {
-      "id": 25,
       "title": "Second Largest Number in Array",
       "description": "Write a program to find the second largest number in an array.",
       "example": "Input: {106, 14, 46, 47, 94, 52, 86, 36, 99, 101}\nOutput: 101",
@@ -251,7 +231,7 @@
       "javascriptTemplate": "const arr = [106, 14, 46, 47, 94, 52, 86, 36, 99, 101];\nconst sorted = [...new Set(arr)].sort((a, b) => b - a);\nconsole.log(sorted[1]);"
     },
     {
-      "id": 26,
+      "id": 24,
       "title": "Word Frequency in String",
       "description": "Write a program to find the frequency of each word in a string. Print each word and its count.",
       "example": "Input: i love programming love\nOutput: i=1, love=2, programming=1",
@@ -261,7 +241,7 @@
       "javascriptTemplate": "const s = \"i love programming love\";\nconst map = {};\nfor (const w of s.split(\" \")) map[w] = (map[w] || 0) + 1;\nconsole.log(Object.entries(map).map(([k, v]) => k + \"=\" + v).join(\", \"));"
     },
     {
-      "id": 27,
+      "id": 25,
       "title": "Character Frequency in String",
       "description": "Write a program to find the frequency of each non-space character in the string \"i love programming love\". Print each character with its count.",
       "example": "Input: i love programming love\nOutput: i=2, l=2, o=3, v=2, e=2, p=1, r=2, g=2, a=1, m=2, n=1",
@@ -271,7 +251,7 @@
       "javascriptTemplate": "const s = \"i love programming love\";\nconst map = {};\nfor (const c of s) {\n    if (c !== \" \") map[c] = (map[c] || 0) + 1;\n}\nconsole.log(Object.entries(map).map(([k, v]) => k + \"=\" + v).join(\", \"));"
     },
     {
-      "id": 28,
+      "id": 26,
       "title": "Sum of Odd and Even Numbers",
       "description": "Write a program to calculate the sum of all odd numbers and sum of all even numbers in a list.",
       "example": "Input: [2, 3, 4, 5]\nOutput: Even Sum = 6, Odd Sum = 8",
@@ -281,7 +261,7 @@
       "javascriptTemplate": "const list = [2, 3, 4, 5];\nlet evenSum = 0, oddSum = 0;\nfor (const n of list) {\n    if (n % 2 === 0) evenSum += n;\n    else oddSum += n;\n}\nconsole.log(\"Even Sum = \" + evenSum + \", Odd Sum = \" + oddSum);"
     },
     {
-      "id": 29,
+      "id": 27,
       "title": "Second Smallest and Second Largest",
       "description": "Write a program to find the second smallest and second largest numbers in an array.",
       "example": "Input: {2, 6, 10, 55, 32, 45}\nOutput: Second Smallest - 6, Second Largest - 45",
@@ -291,7 +271,7 @@
       "javascriptTemplate": "const arr = [2, 6, 10, 55, 32, 45];\nconst sorted = [...new Set(arr)].sort((a, b) => a - b);\nconsole.log(\"Second Smallest - \" + sorted[1] + \", Second Largest - \" + sorted[sorted.length - 2]);"
     },
     {
-      "id": 30,
+      "id": 28,
       "title": "Second Smallest/Largest with Index",
       "description": "Write a program to find the second smallest and second largest number along with their index positions in the original array.",
       "example": "Input: {2, 6, 10, 55, 32, 45}\nOutput: Second Smallest - 6 (index 1), Second Largest - 45 (index 5)",
@@ -301,7 +281,7 @@
       "javascriptTemplate": "const arr = [2, 6, 10, 55, 32, 45];\nconst sorted = [...new Set(arr)].sort((a, b) => a - b);\nconst secSmall = sorted[1], secLarge = sorted[sorted.length - 2];\nconsole.log(\"Second Smallest - \" + secSmall + \" (index \" + arr.indexOf(secSmall) + \"), Second Largest - \" + secLarge + \" (index \" + arr.indexOf(secLarge) + \")\");"
     },
     {
-      "id": 31,
+      "id": 29,
       "title": "Find Median of Array",
       "description": "Write a program to find the median of an unsorted array.",
       "example": "Input: {12, 3, 5, 7, 4, 19, 26}\nOutput: 7",
@@ -311,7 +291,7 @@
       "javascriptTemplate": "const arr = [12, 3, 5, 7, 4, 19, 26];\narr.sort((a, b) => a - b);\nconst mid = Math.floor(arr.length / 2);\nif (arr.length % 2 === 0) console.log((arr[mid - 1] + arr[mid]) / 2);\nelse console.log(arr[mid]);"
     },
     {
-      "id": 32,
+      "id": 30,
       "title": "Sort Array Ascending and Descending",
       "description": "Write a program to sort an array in both ascending (increment) and descending (decrement) order.",
       "example": "Input: {2, 5, 1, 7, 30, 12, 19}\nOutput:\nIncrement Order - {1, 2, 5, 7, 12, 19, 30}\nDecrement Order - {30, 19, 12, 7, 5, 2, 1}",
@@ -321,7 +301,7 @@
       "javascriptTemplate": "const arr = [2, 5, 1, 7, 30, 12, 19];\nconst asc = [...arr].sort((a, b) => a - b);\nconsole.log(\"Increment Order - [\" + asc.join(\", \") + \"]\");\nconst desc = [...arr].sort((a, b) => b - a);\nconsole.log(\"Decrement Order - [\" + desc.join(\", \") + \"]\");"
     },
     {
-      "id": 33,
+      "id": 31,
       "title": "Find All Unique/Non-Repeating Elements",
       "description": "Write a program to find all elements that appear exactly once (non-repeating) in an array.",
       "example": "Input: {10, 5, 33, 5, 11, 10, 6}\nOutput: 33, 11, 6",
@@ -331,7 +311,7 @@
       "javascriptTemplate": "const arr = [10, 5, 33, 5, 11, 10, 6];\nconst counts = {};\nfor (const n of arr) counts[n] = (counts[n] || 0) + 1;\nconst unique = arr.filter(n => counts[n] === 1);\nconsole.log(unique.join(\", \"));"
     },
     {
-      "id": 34,
+      "id": 32,
       "title": "Sort Words by Length",
       "description": "Write a program to sort words in a sentence by their length (shortest first). Words of same length maintain original order.",
       "example": "Input: He is doing a wonderful job at coding\nOutput: a at He is job doing coding wonderful",
@@ -341,7 +321,7 @@
       "javascriptTemplate": "const s = \"He is doing a wonderful job at coding\";\nconst words = s.split(\" \");\nwords.sort((a, b) => a.length - b.length);\nconsole.log(words.join(\" \"));"
     },
     {
-      "id": 35,
+      "id": 33,
       "title": "Pangram Check",
       "description": "Write a program to check if a sentence is a pangram (contains every letter of the English alphabet at least once). Print \"Pangram\" or \"Not a Pangram\".",
       "example": "Input: The quick brown fox jumps over the lazy dog\nOutput: Pangram",
@@ -351,7 +331,7 @@
       "javascriptTemplate": "const s = \"The quick brown fox jumps over the lazy dog\";\nconst chars = new Set(s.toLowerCase().split(\"\").filter(c => c >= \"a\" && c <= \"z\"));\nconsole.log(chars.size === 26 ? \"Pangram\" : \"Not a Pangram\");"
     },
     {
-      "id": 36,
+      "id": 34,
       "title": "Count Non-Space Characters",
       "description": "Write a program to count the total number of non-space characters in a string.",
       "example": "Input: This is a string\nOutput: 13",
@@ -361,7 +341,7 @@
       "javascriptTemplate": "const s = \"This is a string\";\nlet count = 0;\nfor (const c of s) { if (c !== \" \") count++; }\nconsole.log(count);"
     },
     {
-      "id": 37,
+      "id": 35,
       "title": "Swap Two Words Using StringBuilder",
       "description": "Write a program to swap two words in a string using StringBuilder.",
       "example": "Input: Hello World\nOutput: World Hello",
@@ -371,7 +351,7 @@
       "javascriptTemplate": "const s = \"Hello World\";\nconst words = s.split(\" \");\nconsole.log(words[1] + \" \" + words[0]);"
     },
     {
-      "id": 38,
+      "id": 36,
       "title": "Prime Number Check",
       "description": "Write a program to check whether the given number 29 is prime or not. Print \"Prime\" or \"Not Prime\".",
       "example": "Input: 29\nOutput: Prime",
@@ -381,7 +361,7 @@
       "javascriptTemplate": "const n = 29;\nlet isPrime = n > 1;\nfor (let i = 2; i <= Math.sqrt(n); i++) {\n    if (n % i === 0) { isPrime = false; break; }\n}\nconsole.log(isPrime ? \"Prime\" : \"Not Prime\");"
     },
     {
-      "id": 39,
+      "id": 37,
       "title": "Expand Compressed String",
       "description": "Write a program to expand a compressed string where each letter is followed by its count.",
       "example": "Input: a2b3c4\nOutput: aabbbcccc",
@@ -391,7 +371,7 @@
       "javascriptTemplate": "const s = \"a2b3c4\";\nlet result = \"\";\nfor (let i = 0; i < s.length; i += 2) {\n    result += s[i].repeat(parseInt(s[i + 1]));\n}\nconsole.log(result);"
     },
     {
-      "id": 40,
+      "id": 38,
       "title": "First Non-Repeating Character",
       "description": "Write a program to find the first non-repeating character in a given string.",
       "example": "Input: GeeksForGeeks\nOutput: F",
@@ -401,7 +381,7 @@
       "javascriptTemplate": "const s = \"GeeksForGeeks\";\nconst map = {};\nfor (const c of s) map[c] = (map[c] || 0) + 1;\nfor (const c of s) {\n    if (map[c] === 1) { console.log(c); break; }\n}"
     },
     {
-      "id": 41,
+      "id": 39,
       "title": "Filter Words Containing Substring",
       "description": "Write a program that filters a list of words and keeps only those containing the substring \"ed\".",
       "example": "Input: [Need, Used, Java, Selenium, Red, Read]\nOutput: [Need, Used, Red]",
@@ -411,7 +391,7 @@
       "javascriptTemplate": "const words = [\"Need\", \"Used\", \"Java\", \"Selenium\", \"Red\", \"Read\"];\nconst result = words.filter(w => w.toLowerCase().includes(\"ed\"));\nconsole.log(JSON.stringify(result));"
     },
     {
-      "id": 42,
+      "id": 40,
       "title": "Power Function Implementation",
       "description": "Write a program to implement pow(x, n) which calculates x raised to the power n.",
       "example": "Input: x = 2, n = 10\nOutput: 1024",
@@ -421,7 +401,7 @@
       "javascriptTemplate": "const x = 2, n = 10;\nlet result = 1;\nfor (let i = 0; i < n; i++) result *= x;\nconsole.log(result);"
     },
     {
-      "id": 43,
+      "id": 41,
       "title": "Convert HashMap to ArrayList",
       "description": "Write a program to convert a HashMap's keys and values into separate ArrayLists and print them.",
       "example": "Input: {vishal=10, sachin=30, vaibhav=20}\nOutput:\nThe Keys of the Map are [vaibhav, vishal, sachin]\nThe Values of the Map are [20, 10, 30]",
@@ -431,7 +411,7 @@
       "javascriptTemplate": "const map = { vishal: 10, sachin: 30, vaibhav: 20 };\nconsole.log(\"The Keys of the Map are [\" + Object.keys(map).join(\", \") + \"]\");\nconsole.log(\"The Values of the Map are [\" + Object.values(map).join(\", \") + \"]\");"
     },
     {
-      "id": 44,
+      "id": 42,
       "title": "Print 1 to 100 Without Loops",
       "description": "Write a program to print numbers from 1 to 100 without using any loop (for/while/do-while). Use recursion.",
       "example": "Output: 1 2 3 4 ... 99 100",
@@ -441,7 +421,7 @@
       "javascriptTemplate": "function printNumbers(n) {\n    if (n > 100) return;\n    process.stdout.write(n + (n < 100 ? \" \" : \"\\n\"));\n    printNumbers(n + 1);\n}\nprintNumbers(1);"
     },
     {
-      "id": 45,
+      "id": 43,
       "title": "Remove Leading/Trailing Spaces",
       "description": "Write a program to remove all leading, trailing spaces and tabs from a string, and also remove all internal spaces.",
       "example": "Input: \"  Automation  Testing\\t\"\nOutput: AutomationTesting",
@@ -451,7 +431,7 @@
       "javascriptTemplate": "const s = \"  Automation  Testing\\t\";\nconsole.log(s.replace(/\\s+/g, \"\"));"
     },
     {
-      "id": 46,
+      "id": 44,
       "title": "Reverse Words at Odd Positions",
       "description": "Write a program to reverse only the words at positions 1 and 3 (0-based) in a sentence, keeping other words unchanged.",
       "example": "Input: I am a Automation tester\nOutput: I ma a noitamotuA tester",
@@ -461,7 +441,7 @@
       "javascriptTemplate": "const s = \"I am a Automation tester\";\nconst words = s.split(\" \");\nconst positions = [1, 3];\nfor (const pos of positions) {\n    if (pos < words.length) words[pos] = words[pos].split(\"\").reverse().join(\"\");\n}\nconsole.log(words.join(\" \"));"
     },
     {
-      "id": 47,
+      "id": 45,
       "title": "Check Arrays Have Same Elements",
       "description": "Write a program that checks if two arrays contain the same unique elements (regardless of duplicates or order).",
       "example": "Input:\na1 = {1,2,3,2,1}\na2 = {1,2,3}\na3 = {1,2,3,4}\nOutput:\n(a1, a2) - true\n(a1, a3) - false",
@@ -471,7 +451,7 @@
       "javascriptTemplate": "const a1 = [1,2,3,2,1];\nconst a2 = [1,2,3];\nconst a3 = [1,2,3,4];\nconst setsEqual = (x, y) => {\n    const sx = new Set(x), sy = new Set(y);\n    return sx.size === sy.size && [...sx].every(v => sy.has(v));\n};\nconsole.log(\"(a1, a2) - \" + setsEqual(a1, a2));\nconsole.log(\"(a1, a3) - \" + setsEqual(a1, a3));"
     },
     {
-      "id": 48,
+      "id": 46,
       "title": "Sort HashMap by Value",
       "description": "Write a program to sort a HashMap by its values in ascending order and print the sorted entries.",
       "example": "Input: {Math=98, Data Structure=85, Database=91}\nOutput:\nKey = Data Structure, Value = 85\nKey = Database, Value = 91\nKey = Math, Value = 98",
@@ -481,7 +461,7 @@
       "javascriptTemplate": "const map = { Math: 98, \"Data Structure\": 85, Database: 91 };\nObject.entries(map).sort((a, b) => a[1] - b[1]).forEach(([k, v]) => {\n    console.log(\"Key = \" + k + \", Value = \" + v);\n});"
     },
     {
-      "id": 49,
+      "id": 47,
       "title": "Merge Two Unsorted Arrays - Sorted, No Duplicates",
       "description": "Write a program to merge two unsorted arrays into a single sorted array without duplicates.",
       "example": "Input: a = {4, 2, 5, 1}, b = {8, 1, 9, 5}\nOutput: [1, 2, 4, 5, 8, 9]",
@@ -491,7 +471,7 @@
       "javascriptTemplate": "const a = [4, 2, 5, 1];\nconst b = [8, 1, 9, 5];\nconst merged = [...new Set([...a, ...b])].sort((x, y) => x - y);\nconsole.log(JSON.stringify(merged));"
     },
     {
-      "id": 50,
+      "id": 48,
       "title": "Count Vowels and Consonants",
       "description": "Write a program to count the total number of vowels and consonants in a string (ignoring non-alphabetic characters).",
       "example": "Input: HelloWorld\nOutput: vowels count: 3\nconsonants: 7",
@@ -501,7 +481,7 @@
       "javascriptTemplate": "const s = \"HelloWorld\";\nlet vowels = 0, consonants = 0;\nfor (const c of s.toLowerCase()) {\n    if (/[a-z]/.test(c)) {\n        if (\"aeiou\".includes(c)) vowels++;\n        else consonants++;\n    }\n}\nconsole.log(\"vowels count: \" + vowels);\nconsole.log(\"consonants: \" + consonants);"
     },
     {
-      "id": 51,
+      "id": 49,
       "title": "Pangram Sentence Check",
       "description": "Write a program to check if the sentence is a pangram. A pangram contains every letter of the English alphabet (a-z) at least once.",
       "example": "Input: the quick brown fox jumps over the lazy dog\nOutput: Pangram",
@@ -509,6 +489,16 @@
       "javaTemplate": "import java.util.*;\npublic class Solution {\n    public static void main(String[] args) {\n        String s = \"the quick brown fox jumps over the lazy dog\";\n        Set<Character> chars = new HashSet<>();\n        for (char c : s.toLowerCase().toCharArray()) {\n            if (c >= 'a' && c <= 'z') chars.add(c);\n        }\n        System.out.println(chars.size() == 26 ? \"Pangram\" : \"Not a Pangram\");\n    }\n}",
       "pythonTemplate": "s = \"the quick brown fox jumps over the lazy dog\"\nimport string\nprint(\"Pangram\" if set(string.ascii_lowercase).issubset(set(s.lower())) else \"Not a Pangram\")",
       "javascriptTemplate": "const s = \"the quick brown fox jumps over the lazy dog\";\nconst chars = new Set(s.toLowerCase().split(\"\").filter(c => c >= \"a\" && c <= \"z\"));\nconsole.log(chars.size === 26 ? \"Pangram\" : \"Not a Pangram\");"
+    },
+    {
+      "id": 50,
+      "title": "Reverse Characters of Each Word",
+      "description": "Write a program to reverse the characters of each word in a string without changing word positions.",
+      "example": "Input: i love programming\nOutput: i evol gnimmargorp",
+      "difficulty": "moderate",
+      "javaTemplate": "public class Solution {\n    public static void main(String[] args) {\n        String s = \"i love programming\";\n        String[] words = s.split(\" \");\n        StringBuilder result = new StringBuilder();\n        for (int i = 0; i < words.length; i++) {\n            if (i > 0) result.append(\" \");\n            result.append(new StringBuilder(words[i]).reverse());\n        }\n        System.out.println(result.toString());\n    }\n}",
+      "pythonTemplate": "s = \"i love programming\"\nprint(' '.join(w[::-1] for w in s.split()))",
+      "javascriptTemplate": "const s = \"i love programming\";\nconsole.log(s.split(\" \").map(w => w.split(\"\").reverse().join(\"\")).join(\" \"));"
     }
   ]
 }

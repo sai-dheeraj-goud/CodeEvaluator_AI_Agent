@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panelist Dashboard</title>
+    <link rel="stylesheet" href="panelist-styles.css">
+</head>
+<body>
+    <!-- Check if user is logged in -->
+    <script>
+        (async function() {
+            const candidateId = localStorage.getItem('candidateId');
+            const sessionId = localStorage.getItem('sessionId');
+            if (!candidateId || !sessionId) {
+                window.location.href = '/public/index.html';
+                return;
+            }
+            try {
+                const res = await fetch('/api/config');
+                const cfg = await res.json();
+                const allowed = (cfg.panelistEmails || []).map(e => e.trim().toLowerCase());
+                if (!allowed.includes((candidateId || '').trim().toLowerCase())) {
+                    window.location.href = '/public/index.html';
+                }
+            } catch (err) {
+                window.location.href = '/public/index.html';
+            }
+        })();
+    </script>
+
+    <div class="panelist-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>📊 Panel</h1>
+            </div>
+            <div class="header-right">
+                <span id="userName">Welcome, Admin</span>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </div>
+        </header>
+
+        <!-- Date Filter -->
+        <div class="filter-section">
+            <label for="dateFilter">Select Date:</label>
+            <input type="date" id="dateFilter" />
+            <button onclick="loadData()" class="btn-primary">Show</button>
+            <button onclick="downloadCSV()" class="btn-secondary">📥 Download as CSV</button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="card">
+                <h3>Total Candidates</h3>
+                <p id="totalCandidates" class="number">0</p>
+            </div>
+            <div class="card">
+                <h3>Excellent (75-100%)</h3>
+                <p id="excellentCount" class="number">0/0</p>
+            </div>
+            <div class="card">
+                <h3>Good (50-74%)</h3>
+                <p id="goodCount" class="number">0/0</p>
+            </div>
+            <div class="card">
+                <h3>Average (25-49%)</h3>
+                <p id="averageCount" class="number">0/0</p>
+            </div>
+            <div class="card">
+                <h3>Poor (0-24%)</h3>
+                <p id="poorCount" class="number">0/0</p>
+            </div>
+        </div>
+
+        <!-- Candidates List -->
+        <div class="candidates-section">
+            <div class="section-header">
+                <h2>Candidates Attended</h2>
+
+            </div>
+
+            <!-- Table View -->
+            <div id="tableView" class="view-container">
+                <div class="filter-summary" id="filterSummary" style="display:none;">
+                    <span id="filterSummaryText"></span>
+                    <button class="clear-filters-btn" onclick="clearAllFilters()">✕ Clear All Filters</button>
+                </div>
+                <table class="candidates-table">
+                    <thead>
+                        <tr id="tableHeaderRow">
+                            <th data-col="0">#</th>
+                            <th data-col="1">Candidate Name <button class="col-filter-btn" onclick="toggleFilter(1,event)">▼</button><div class="col-filter-dropdown" id="cfd-1"></div></th>
+                            <th data-col="2">Email <button class="col-filter-btn" onclick="toggleFilter(2,event)">▼</button><div class="col-filter-dropdown" id="cfd-2"></div></th>
+                            <th data-col="3">Location <button class="col-filter-btn" onclick="toggleFilter(3,event)">▼</button><div class="col-filter-dropdown" id="cfd-3"></div></th>
+                            <th data-col="4">Experience (Yrs) <button class="col-filter-btn" onclick="toggleFilter(4,event)">▼</button><div class="col-filter-dropdown" id="cfd-4"></div></th>
+                            <th data-col="5">Language <button class="col-filter-btn" onclick="toggleFilter(5,event)">▼</button><div class="col-filter-dropdown" id="cfd-5"></div></th>
+                            <th data-col="6">Programs Completed <button class="col-filter-btn" onclick="toggleFilter(6,event)">▼</button><div class="col-filter-dropdown" id="cfd-6"></div></th>
+                            <th data-col="7">Test Score (%) <button class="col-filter-btn" onclick="toggleFilter(7,event)">▼</button><div class="col-filter-dropdown" id="cfd-7"></div></th>
+                            <th data-col="8">Agent Score (%) <button class="col-filter-btn" onclick="toggleFilter(8,event)">▼</button><div class="col-filter-dropdown" id="cfd-8"></div></th>
+                            <th data-col="9">Plagiarism Avg (%) <button class="col-filter-btn" onclick="toggleFilter(9,event)">▼</button><div class="col-filter-dropdown" id="cfd-9"></div></th>
+                            <th data-col="10">Plagiarism Max (%) <button class="col-filter-btn" onclick="toggleFilter(10,event)">▼</button><div class="col-filter-dropdown" id="cfd-10"></div></th>
+                            <th data-col="11">Total Tab Switches <button class="col-filter-btn" onclick="toggleFilter(11,event)">▼</button><div class="col-filter-dropdown" id="cfd-11"></div></th>
+                            <th data-col="12">Total Time <button class="col-filter-btn" onclick="toggleFilter(12,event)">▼</button><div class="col-filter-dropdown" id="cfd-12"></div></th>
+                            <th data-col="13">Submitted At <button class="col-filter-btn" onclick="toggleFilter(13,event)">▼</button><div class="col-filter-dropdown" id="cfd-13"></div></th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidatesBody">
+                        <tr>
+                            <td colspan="15" style="text-align: center; padding: 20px;">
+                                Loading candidates...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Modal for Results & Code -->
+    <div id="resultModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Candidate Results</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- Candidate Info -->
+                <div class="candidate-info-section">
+                    <h3>Candidate Information</h3>
+                    <div class="info-grid">
+                        <p><strong>Experience:</strong> <span id="modalExperience">N/A</span> years</p>
+                        <p><strong>Location:</strong> <span id="modalLocation">N/A</span></p>
+                        <p><strong>Preferred Language:</strong> <span id="modalLanguage">N/A</span></p>
+                        <p><strong>Programs Completed:</strong> <span id="modalPrograms">0</span>/<span id="modalTotalPrograms">0</span></p>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="session-summary">
+                    <h3>Performance Summary</h3>
+                    <p><strong>Overall Score:</strong> <span id="modalScore">0%</span></p>
+                    <p><strong>Total Time:</strong> <span id="modalTime">0 min</span></p>
+                    <p><strong>Tab Switches:</strong> <span id="modalTabSwitches">0</span></p>
+                    <p><strong>Completion:</strong> <span id="modalCompletion">0%</span></p>
+                </div>
+
+                <!-- Questions -->
+                <div id="questionsContainer"></div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="btn-secondary">Close</button>
+                <button onclick="downloadSessionReport()" class="btn-primary">Download Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Code Viewer -->
+    <div id="codeModal" class="modal" style="display: none;">
+        <div class="modal-content code-modal-content">
+            <div class="modal-header">
+                <h2 id="codeModalTitle">Code Viewer</h2>
+                <span class="close" onclick="closeCodeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="code-section">
+                    <h3>Submitted Code</h3>
+                    <pre id="submittedCodeBlock"><code id="submittedCode"></code></pre>
+                </div>
+                <div class="output-comparison">
+                    <div class="output-section">
+                        <h3>Expected Output</h3>
+                        <pre id="expectedOutputBlock"><code id="expectedOutput"></code></pre>
+                    </div>
+                    <div class="output-section">
+                        <h3>Actual Output</h3>
+                        <pre id="actualOutputBlock"><code id="actualOutput"></code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeCodeModal()" class="btn-secondary">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Feedback Widget -->
+    <div id="feedbackWidget" class="feedback-widget">
+        <div class="feedback-toggle" id="feedbackToggle" title="Send Feedback">
+            <svg class="feedback-icon-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="28" height="28">
+                <rect rx="8" ry="8" width="48" height="48" fill="#8B0000"/>
+                <rect x="8" y="13" width="32" height="22" rx="3" ry="3" fill="#fff"/>
+                <path d="M8 13l16 12 16-12" fill="none" stroke="#8B0000" stroke-width="2.5" stroke-linejoin="round"/>
+            </svg>
+            <span class="feedback-label">Feedback</span>
+        </div>
+        <div class="feedback-form-container hidden" id="feedbackFormContainer">
+            <textarea id="feedbackText" class="feedback-textarea" placeholder="Write your feedback or query here..." rows="4"></textarea>
+            <div class="feedback-actions">
+                <button id="submitFeedbackBtn" class="btn-primary feedback-submit-btn">Submit</button>
+                <button id="cancelFeedbackBtn" class="btn-secondary feedback-cancel-btn">Cancel</button>
+            </div>
+            <div id="feedbackStatus" class="feedback-status"></div>
+        </div>
+    </div>
+
+    <script src="panelist.js"></script>
+</body>
+</html>
