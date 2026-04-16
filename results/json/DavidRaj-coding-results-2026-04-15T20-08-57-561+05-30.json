@@ -1,0 +1,92 @@
+{
+  "personName": "DavidRaj",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Indore",
+  "experienceYears": "9",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 15,
+      "title": "Remove Duplicates from Unsorted Array",
+      "description": "Write a program to remove duplicate numbers from an unsorted array while maintaining original order.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "[1, 5, 3, 2, 7]",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 11
+    },
+    {
+      "questionId": 37,
+      "title": "Expand Compressed String",
+      "description": "Write a program to expand a compressed string where each letter is followed by its count.",
+      "completed": true,
+      "language": "java",
+      "code": "public class ExpandString {\n\n    public static void main(String[] args) {\n        // Static input\n        String input = \"a2b3c4\";\n        StringBuilder output = new StringBuilder();\n\n        for (int i = 0; i < input.length(); i += 2) {\n            char ch = input.charAt(i);              // character\n            int count = input.charAt(i + 1) - '0';  // convert char digit to int\n\n            // Append character 'count' times\n            for (int j = 0; j < count; j++) {\n                output.append(ch);\n            }\n        }\n\n        System.out.println(output.toString());\n    }\n}",
+      "expectedOutput": "aabbbcccc",
+      "actualOutput": "aabbbcccc",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 85,
+      "agentSuggestion": "Good solution. Has output statement; Logic aligns well with reference solution; Correctly initializes input data from problem; Has iteration/recursion logic. Minor: Output format may not match expected.",
+      "agentCovered": [
+        "Has output statement",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper loop bounds",
+        "Proper variable usage"
+      ],
+      "agentMissed": [
+        "Output format may not match expected"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 475 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 81
+    }
+  ],
+  "tabSwitchCount": 1,
+  "totalTimeTaken": 93,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 43
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 15,
+        "title": "Remove Duplicates from Unsorted Array",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      },
+      {
+        "questionId": 37,
+        "title": "Expand Compressed String",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 475 characters of changes"
+        ]
+      }
+    ]
+  }
+}

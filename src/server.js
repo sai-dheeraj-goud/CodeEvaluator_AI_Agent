@@ -171,6 +171,102 @@ function getISTTimestamp() {
     return `${ist.getFullYear()}-${pad(ist.getMonth()+1)}-${pad(ist.getDate())}T${pad(ist.getHours())}:${pad(ist.getMinutes())}:${pad(ist.getSeconds())}-${pad(ist.getMilliseconds(),3)}+05:30`;
 }
 
+// ==================== PANELIST EMAIL WHITELIST ====================
+const PANELIST_EMAILS_CSV_PATH = path.join(__dirname, '..', APP_CONFIG.panelistEmailsCsvPath || './data/panelist-emails.csv');
+let authorizedPanelistEmails = new Set();
+
+function loadPanelistEmails() {
+    try {
+        if (!fs.existsSync(PANELIST_EMAILS_CSV_PATH)) {
+            console.warn(`\u26a0 Panelist emails CSV not found: ${PANELIST_EMAILS_CSV_PATH}`);
+            return;
+        }
+        const raw = fs.readFileSync(PANELIST_EMAILS_CSV_PATH, 'utf-8');
+        const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        const emails = lines.slice(1)
+            .map(line => {
+                const field = line.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase();
+                return field;
+            })
+            .filter(e => e && e.includes('@'));
+        authorizedPanelistEmails = new Set(emails);
+        console.log(`\u2713 Loaded ${authorizedPanelistEmails.size} panelist email(s) from CSV`);
+    } catch (err) {
+        console.error('\u2717 Failed to load panelist emails CSV:', err.message);
+    }
+}
+loadPanelistEmails();
+
+// Watch panelist CSV for changes and auto-reload
+try {
+    fs.watchFile(PANELIST_EMAILS_CSV_PATH, { interval: 5000 }, () => {
+        console.log('\u21bb Panelist emails CSV changed \u2014 reloading...');
+        loadPanelistEmails();
+    });
+} catch (e) {}
+
+function isPanelistEmailServer(email) {
+    return authorizedPanelistEmails.has((email || '').trim().toLowerCase());
+}
+
+// ==================== CANDIDATE EMAIL WHITELIST ====================
+const CANDIDATE_EMAIL_VERIFICATION = APP_CONFIG.candidateEmailVerification !== false;
+const CANDIDATE_EMAILS_CSV_PATH = path.join(__dirname, '..', APP_CONFIG.candidateEmailsCsvPath || './data/candidate-emails.csv');
+let authorizedCandidateEmails = new Set();
+const loggedInCandidates = new Set(); // tracks emails that have already completed OTP verification
+const submittedCandidates = new Set(); // tracks emails that have submitted/completed their assessment
+
+function loadCandidateEmails() {
+    try {
+        if (!CANDIDATE_EMAIL_VERIFICATION) {
+            console.log('⚠ Candidate email verification is DISABLED (open access)');
+            return;
+        }
+        if (!fs.existsSync(CANDIDATE_EMAILS_CSV_PATH)) {
+            console.warn(`⚠ Candidate emails CSV not found: ${CANDIDATE_EMAILS_CSV_PATH}`);
+            return;
+        }
+        const raw = fs.readFileSync(CANDIDATE_EMAILS_CSV_PATH, 'utf-8');
+        const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        // Skip header row (first line)
+        const emails = lines.slice(1)
+            .map(line => {
+                // Handle CSV with or without quotes; take first column
+                const field = line.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase();
+                return field;
+            })
+            .filter(e => e && e.includes('@'));
+        authorizedCandidateEmails = new Set(emails);
+        console.log(`✓ Loaded ${authorizedCandidateEmails.size} authorized candidate email(s) from CSV`);
+    } catch (err) {
+        console.error('✗ Failed to load candidate emails CSV:', err.message);
+    }
+}
+loadCandidateEmails();
+
+// Watch CSV for changes and auto-reload
+try {
+    fs.watchFile(CANDIDATE_EMAILS_CSV_PATH, { interval: 5000 }, () => {
+        console.log('↻ Candidate emails CSV changed — reloading...');
+        loadCandidateEmails();
+    });
+} catch (e) {}
+
+function isCandidateAuthorized(email) {
+    if (!CANDIDATE_EMAIL_VERIFICATION) return true; // open access
+    return authorizedCandidateEmails.has(email.trim().toLowerCase());
+}
+
+function hasCandidateAlreadyLoggedIn(email) {
+    // Only block if the candidate has SUBMITTED their assessment
+    // Allow re-login for active sessions (page reload, network issues)
+    return submittedCandidates.has(email.trim().toLowerCase());
+}
+
+function markCandidateLoggedIn(email) {
+    loggedInCandidates.add(email.trim().toLowerCase());
+}
+
 // ==================== IN-MEMORY STORES ====================
 const rateLimitStore = new Map();
 const otpStore = new Map();
@@ -1394,7 +1490,7 @@ function scoreStructure(code, language, difficulty) {
         else issues.push('Missing or incorrect main method');
         const methodCount = (code.match(/(?:public|private|static)\s+\w+\s+\w+\s*\(/g) || []).length;
         if (methodCount > 1) { points += 3; strengths.push('Modular design with helper methods'); }
-        else if (methodCount === 1) { points += isSimple ? 2 : 1; }
+        else if (methodCount === 1) { points += 2; strengths.push('Clean single-method solution'); }
         const varDecls = (code.match(/(int|String|long|double|float|boolean|char|List|Map|Set|Array)\s+\w+/g) || []).length;
         if (varDecls >= 3) { points += 3; strengths.push('Proper variable declarations'); }
         else if (varDecls >= 1) { points += isSimple ? 2 : 1; }
@@ -1775,8 +1871,9 @@ function scoreEdgeCases(code, language, title, difficulty) {
         if (hasNoneCheck) { guardPts += 2; strengths.push('None safety checks'); }
         if (hasEmptyCheck) { guardPts += 1; }
     }
-    // For simple problems with fixed inputs, give partial credit even without guards
-    if (guardPts === 0 && isSimple) guardPts = 1;
+    // For simple/moderate problems with fixed inputs, give partial credit even without guards
+    if (guardPts === 0 && isSimple) guardPts = 2;
+    else if (guardPts === 0) guardPts = 2; // Assessment problems have fixed inputs — guards are optional
     points += Math.min(3, guardPts);
 
     // 2. Error handling (0-3 pts)
@@ -1797,8 +1894,10 @@ function scoreEdgeCases(code, language, title, difficulty) {
         if (hasTryExcept && hasSpecificExcept) { errorPts += 3; strengths.push('Proper error handling with specific exceptions'); }
         else if (hasTryExcept) { errorPts += 2; if (/except\s*:/.test(code)) issues.push('Bare except — catch specific exceptions'); }
     }
-    // For simple fixed-input problems, give partial credit
-    if (errorPts === 0 && isSimple) errorPts = 1;
+    // For simple/moderate fixed-input problems, give partial credit
+    // Assessment problems have fixed inputs — try-catch is unnecessary overhead
+    if (errorPts === 0 && isSimple) errorPts = 2;
+    else if (errorPts === 0) errorPts = 2; // Fixed-input problems don't need error handling
     points += Math.min(3, errorPts);
 
     // 3. Boundary awareness (0-2 pts)
@@ -2182,6 +2281,27 @@ const server = http.createServer(async (req, res) => {
                     return;
                 }
 
+                // --- Panelist emails bypass candidate checks ---
+                const isPanelist = isPanelistEmailServer(email);
+
+                if (!isPanelist) {
+                    // Check if candidate email is authorized (CSV whitelist)
+                    if (!isCandidateAuthorized(email)) {
+                        console.log(`✗ Unauthorized candidate email blocked: ${email}`);
+                        res.writeHead(403, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'You are not authorized to access this page' }));
+                        return;
+                    }
+
+                    // Check if candidate has already logged in before
+                    if (hasCandidateAlreadyLoggedIn(email)) {
+                        console.log(`✗ Duplicate login attempt blocked: ${email}`);
+                        res.writeHead(403, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'You are not authorized to access this page for 2nd time' }));
+                        return;
+                    }
+                }
+
                 if (!checkOTPRateLimit(email)) {
                     res.writeHead(429, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: 'Rate limit exceeded' }));
@@ -2240,6 +2360,13 @@ const server = http.createServer(async (req, res) => {
                 const token = generateSessionToken();
                 sessionStore.set(token, { email, createdAt: Date.now() });
                 otpStore.delete(email);
+
+                // Mark candidate as logged in (panelists are excluded)
+                const isPanelistUser = isPanelistEmailServer(email);
+                if (!isPanelistUser) {
+                    markCandidateLoggedIn(email);
+                    console.log(`✓ Candidate marked as logged in: ${email}`);
+                }
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ token, email }));
@@ -2317,7 +2444,78 @@ const server = http.createServer(async (req, res) => {
             autoSaveIntervalMs:  APP_CONFIG.autoSaveIntervalMs,
             instructionReadTimer:APP_CONFIG.instructionReadTimer,
             primaryAgent:        primaryAgent,
-            panelistEmails:      (APP_CONFIG.panelistEmails || []).map(e => e.trim().toLowerCase())
+            panelistEmails:      Array.from(authorizedPanelistEmails),
+            candidateEmailVerification: CANDIDATE_EMAIL_VERIFICATION
+        }));
+        return;
+    }
+
+    // --- Candidate Email Management (for panelists) ---
+    if (pathname === '/api/candidate-emails' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            enabled: CANDIDATE_EMAIL_VERIFICATION,
+            count: authorizedCandidateEmails.size,
+            emails: Array.from(authorizedCandidateEmails),
+            loggedIn: Array.from(loggedInCandidates),
+            submitted: Array.from(submittedCandidates)
+        }));
+        return;
+    }
+
+    if (pathname === '/api/candidate-emails/reset-login' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { email } = JSON.parse(body);
+                if (email) {
+                    loggedInCandidates.delete(email.trim().toLowerCase());
+                    submittedCandidates.delete(email.trim().toLowerCase());
+                    console.log(`✓ Login reset for candidate: ${email}`);
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: `Login reset for ${email}` }));
+                } else {
+                    loggedInCandidates.clear();
+                    submittedCandidates.clear();
+                    console.log('✓ All candidate login records cleared');
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ message: 'All login records cleared' }));
+                }
+            } catch (err) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Invalid request' }));
+            }
+        });
+        return;
+    }
+
+    if (pathname === '/api/candidate-emails/reload' && req.method === 'POST') {
+        loadCandidateEmails();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            message: 'Candidate emails reloaded',
+            count: authorizedCandidateEmails.size
+        }));
+        return;
+    }
+
+    // --- Panelist Email Management ---
+    if (pathname === '/api/panelist-emails' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            count: authorizedPanelistEmails.size,
+            emails: Array.from(authorizedPanelistEmails)
+        }));
+        return;
+    }
+
+    if (pathname === '/api/panelist-emails/reload' && req.method === 'POST') {
+        loadPanelistEmails();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            message: 'Panelist emails reloaded',
+            count: authorizedPanelistEmails.size
         }));
         return;
     }
@@ -2907,6 +3105,12 @@ const server = http.createServer(async (req, res) => {
                 const { personName, email, location, experienceYears, preferredLanguage, programsCompleted, totalPrograms,
                         results, tabSwitchCount, totalTimeTaken, agentAnalysis, aiLikelihood } = data;
 
+                // Mark candidate as submitted — blocks future re-login
+                if (email) {
+                    submittedCandidates.add(email.trim().toLowerCase());
+                    console.log(`✓ Candidate assessment submitted: ${email}`);
+                }
+
                 const safeName = (personName || 'unknown').replace(/[^a-zA-Z0-9]/g, '_');
                 const today = getISTTimestamp().split('T')[0];
                 const time = getISTTimestamp().split('T')[1].split('+')[0];
@@ -3365,7 +3569,7 @@ const server = http.createServer(async (req, res) => {
     // --- Panelist: Get Candidate Session Details ---
     if (pathname.match(/^\/api\/panelist\/candidate-session\/[^/]+$/) && req.method === 'GET') {
         try {
-            const sessionId = pathname.split('/').pop();
+            const sessionId = decodeURIComponent(pathname.split('/').pop());
             const resultsDir = path.join(__dirname, '../results/json');
             
             if (!fs.existsSync(resultsDir)) {
@@ -3418,9 +3622,19 @@ const server = http.createServer(async (req, res) => {
                 candidateId: sessionData.email,
                 candidateName: sessionData.personName,
                 candidateEmail: sessionData.email,
+                experience: sessionData.experienceYears || 'N/A',
+                location: sessionData.location || 'N/A',
+                language: sessionData.preferredLanguage || 'N/A',
+                programsCompleted: sessionData.programsCompleted || 0,
+                totalPrograms: sessionData.totalPrograms || 0,
                 overallScore: overallScore,
-                totalTime: sessionData.totalTime || 'N/A',
-                tabSwitches: sessionData.tabSwitches || 0,
+                totalTime: (() => {
+                    const sec = Number(sessionData.totalTimeTaken) || 0;
+                    const m = Math.floor(sec / 60);
+                    const s = sec % 60;
+                    return `${m}:${String(s).padStart(2, '0')}`;
+                })(),
+                tabSwitches: sessionData.tabSwitchCount || 0,
                 completionPercentage: sessionData.programsCompleted && sessionData.totalPrograms ? 
                     Math.round((sessionData.programsCompleted / sessionData.totalPrograms) * 100) : 0,
                 questions: (sessionData.results || []).map(q => {
@@ -3433,6 +3647,11 @@ const server = http.createServer(async (req, res) => {
                         questionTitle: q.title,
                         status: q.agentPercentage >= 75 ? 'correct' : 'incorrect',
                         agentScore: Math.round(q.agentPercentage || 0),
+                        agentSuggestion: q.agentSuggestion || '',
+                        agentCovered: q.agentCovered || [],
+                        agentMissed: q.agentMissed || [],
+                        aiLikelihood: q.aiLikelihood || 0,
+                        aiReasons: q.aiReasons || [],
                         language: q.language,
                         timeTaken: q.questionTimeSpent ? Math.round(q.questionTimeSpent / 60) + ' min' : 'N/A',
                         submittedCode: q.code || '',

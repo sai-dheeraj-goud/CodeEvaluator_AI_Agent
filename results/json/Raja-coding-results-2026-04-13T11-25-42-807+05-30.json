@@ -1,0 +1,90 @@
+{
+  "personName": "Raja",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Bangalore",
+  "experienceYears": "6",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 23,
+      "title": "First and Last Position of Element",
+      "description": "Write a program to find the first and last position (0-based index) of a given element in a sorted array. If not found, print \"Element not found\".",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "1, 4",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 13
+    },
+    {
+      "questionId": 27,
+      "title": "Word Frequency in String",
+      "description": "Write a program to find the frequency of each word in a string. Print each word and its count.",
+      "completed": true,
+      "language": "java",
+      "code": "import java.util.HashMap;\nimport java.util.Map;\n\npublic class WordFrequency {\n    public static void main(String[] args) {\n        // Static input\n        String input = \"i love programming love\";\n\n        // Split the string into words\n        String[] words = input.split(\" \");\n\n        // Map to store word frequencies\n        HashMap<String, Integer> wordCount = new HashMap<>();\n\n        // Count frequency of each word\n        for (String word : words) {\n            wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);\n        }\n\n        // Print result\n        for (Map.Entry<String, Integer> entry : wordCount.entrySet()) {\n            System.out.print(entry.getKey() + \"=\" + entry.getValue()+\", \");\n        }\n    }\n}",
+      "expectedOutput": "i=1, love=2, programming=1",
+      "actualOutput": "love=2, i=1, programming=1,",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 87,
+      "agentSuggestion": "Good solution. Has output statement; Output format matches expected pattern; Logic aligns well with reference solution; Correctly initializes input data from problem. Minor: none.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Uses enhanced iteration"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 614 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 96
+    }
+  ],
+  "tabSwitchCount": 1,
+  "totalTimeTaken": 112,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 44
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 23,
+        "title": "First and Last Position of Element",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      },
+      {
+        "questionId": 27,
+        "title": "Word Frequency in String",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 614 characters of changes"
+        ]
+      }
+    ]
+  }
+}

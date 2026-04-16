@@ -1,0 +1,90 @@
+{
+  "personName": "valid",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Hyderabad",
+  "experienceYears": "6",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 26,
+      "title": "Word Frequency in String",
+      "description": "Write a program to find the frequency of each word in a string. Print each word and its count.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.HashMap;\nimport java.util.Map;\n\npublic class WordFrequency {\n    public static void main(String[] args) {\n\n        // Static input\n        String input = \"i love programming love\";\n\n        // Split the string into words\n        String[] words = input.split(\"\\\\s+\");\n\n        // HashMap to store word counts\n        HashMap<String, Integer> wordCount = new HashMap<>();\n\n        // Count frequency\n        for (String word : words) {\n            wordCount.put(word, wordCount1);\n        }\n\n        // Print result\n        for (Map.Entry<String, Integer> entry : wordCount.entrySet()) {\n            System.out.println(entry.getKey() + \"=\" + entry.getValue());\n        }\n    }\n}",
+      "expectedOutput": "i=1, love=2, programming=1",
+      "actualOutput": "[object Object]",
+      "validationMessage": "WordFrequency.java:18: error: cannot find symbol\r\n            wordCount.put(word, wordCount1);\r\n                                ^\r\n  symbol:   variable wordCount1\r\n  location: class WordFrequency\r\n1 error",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "Output does not match expected for JAVA. Please run your code first.",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 576 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 142
+    },
+    {
+      "questionId": 21,
+      "title": "Remove Duplicates Without HashSet",
+      "description": "Write a program to remove duplicates from an array without using HashSet.",
+      "completed": true,
+      "language": "java",
+      "code": "public class RemoveDuplicates {\n    public static void main(String[] args) {\n\n        // Static input\n        int[] arr = {2, 4, 4, 5, 6, 7, 8, 5};\n        int n = arr.length;\n\n        // Temporary array to store unique elements\n        int[] temp = new int[n];\n        int newIndex = 0;\n\n        // Remove duplicates using nested loops\n        for (int i = 0; i < n; i++) {\n            boolean isDuplicate = false;\n\n            for (int j = 0; j < newIndex; j++) {\n                if (arr[i] == temp[j]) {\n                    isDuplicate = true;\n                    break;\n                }\n            }\n\n            if (!isDuplicate) {\n                temp[newIndex++] = arr[i];\n            }\n        }\n\n        // Print result\n        System.out.print(\"{\");\n        for (int i = 0; i < newIndex; i++) {\n            System.out.print(temp[i]);\n            if (i < newIndex - 1) {\n                System.out.print(\", \");\n            }\n        }\n        System.out.println(\"}\");\n    }\n}",
+      "expectedOutput": "{2, 4, 5, 6, 7, 8}",
+      "actualOutput": "{2, 4, 5, 6, 7, 8}",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 83,
+      "agentSuggestion": "Good solution. Has output statement; Output format matches expected pattern; Logic aligns well with reference solution; Correctly initializes input data from problem. Minor: none.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper loop bounds"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 847 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 201
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 344,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 42
+  },
+  "aiLikelihood": {
+    "average": 80,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 26,
+        "title": "Word Frequency in String",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 576 characters of changes"
+        ]
+      },
+      {
+        "questionId": 21,
+        "title": "Remove Duplicates Without HashSet",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 847 characters of changes"
+        ]
+      }
+    ]
+  }
+}

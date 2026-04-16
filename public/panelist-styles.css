@@ -137,6 +137,26 @@ body {
     background: #0b7dda;
 }
 
+.btn-agent-score {
+    background: #ff9800;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-agent-score:hover {
+    background: #e68900;
+}
+
+.question-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
 /* Summary Cards */
 .summary-cards {
     display: grid;
@@ -152,6 +172,44 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    border: 2px solid transparent;
+    user-select: none;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card:active {
+    transform: translateY(0);
+}
+
+.card.card-active {
+    border-color: #667eea;
+    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+}
+
+.card.card-active[data-filter="excellent"] {
+    border-color: #28a745;
+    box-shadow: 0 4px 14px rgba(40, 167, 69, 0.3);
+}
+
+.card.card-active[data-filter="good"] {
+    border-color: #ffc107;
+    box-shadow: 0 4px 14px rgba(255, 193, 7, 0.3);
+}
+
+.card.card-active[data-filter="average"] {
+    border-color: #fd7e14;
+    box-shadow: 0 4px 14px rgba(253, 126, 20, 0.3);
+}
+
+.card.card-active[data-filter="poor"] {
+    border-color: #dc3545;
+    box-shadow: 0 4px 14px rgba(220, 53, 69, 0.3);
 }
 
 .card h3 {
@@ -182,6 +240,27 @@ body {
 #poorCount {
     color: #dc3545 !important;
 }
+
+/* Score filter label shown in section header */
+.score-filter-label {
+    font-size: 0.6em;
+    font-weight: normal;
+    color: #fff;
+    background: #667eea;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.score-filter-label:empty {
+    display: none;
+}
+
+.score-filter-label.excellent { background: #28a745; }
+.score-filter-label.good { background: #ffc107; color: #333; }
+.score-filter-label.average { background: #fd7e14; }
+.score-filter-label.poor { background: #dc3545; }
 
 /* Candidates Section */
 .candidates-section {
@@ -844,6 +923,141 @@ code {
     font-size: 0.95em !important;
     border-radius: 8px !important;
     cursor: pointer;
+}
+
+/* ==================== Agent Score Modal ==================== */
+.agent-score-modal-content {
+    max-width: 700px;
+}
+
+.agent-detail-header {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.agent-detail-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.agent-detail-row:last-child {
+    border-bottom: none;
+}
+
+.agent-detail-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 140px;
+    font-size: 14px;
+}
+
+.agent-detail-value {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.agent-score-big {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    padding: 2px 12px;
+    border-radius: 6px;
+}
+
+.agent-score-big.score-high {
+    background: #d4edda;
+    color: #155724;
+}
+
+.agent-score-big.score-mid {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.agent-score-big.score-low {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.plag-high {
+    color: #dc3545 !important;
+    font-weight: 700 !important;
+}
+
+.plag-medium {
+    color: #fd7e14 !important;
+    font-weight: 600 !important;
+}
+
+.plag-low {
+    color: #28a745 !important;
+    font-weight: 600 !important;
+}
+
+.agent-detail-section {
+    margin-bottom: 18px;
+    border-radius: 8px;
+    padding: 16px 20px;
+}
+
+.agent-detail-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+    color: #333;
+}
+
+.agent-detail-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.agent-detail-section ul li {
+    padding: 6px 0;
+    font-size: 14px;
+    color: #444;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.agent-detail-section ul li:last-child {
+    border-bottom: none;
+}
+
+.agent-detail-section ul li.empty-list {
+    color: #999;
+    font-style: italic;
+}
+
+.covered-section {
+    background: #f0fff4;
+    border: 1px solid #c6f6d5;
+}
+
+.covered-section h4 {
+    color: #22543d;
+}
+
+.missed-section {
+    background: #fff5f5;
+    border: 1px solid #fed7d7;
+}
+
+.missed-section h4 {
+    color: #742a2a;
+}
+
+.reasons-section {
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+}
+
+.reasons-section h4 {
+    color: #92400e;
 }
 
 .feedback-status {

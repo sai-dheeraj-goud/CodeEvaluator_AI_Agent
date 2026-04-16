@@ -1,0 +1,83 @@
+{
+  "personName": "david1",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Hyderabad",
+  "experienceYears": "6",
+  "preferredLanguage": "python",
+  "programsCompleted": 0,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 19,
+      "title": "Swap Two Numbers Without Third Variable",
+      "description": "Write a program to swap two numbers without using a third variable. Print before and after values.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here",
+      "expectedOutput": "Before swapping: 23 43\nAfter swapping: 43 23",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 6
+    },
+    {
+      "questionId": 16,
+      "title": "Double Each Character",
+      "description": "Write a program to double each character of the given word.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here",
+      "expectedOutput": "aabbcc",
+      "actualOutput": "{\"html\":\"Ready to run...\",\"sectionClass\":\"output-section\",\"validationStatus\":\"\",\"lastRunResult\":null}",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 1
+    }
+  ],
+  "tabSwitchCount": 0,
+  "totalTimeTaken": 8,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 0,
+    "highest": 0,
+    "perQuestion": [
+      {
+        "questionId": 19,
+        "title": "Swap Two Numbers Without Third Variable",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      },
+      {
+        "questionId": 16,
+        "title": "Double Each Character",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

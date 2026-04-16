@@ -51,23 +51,23 @@
 
         <!-- Summary Cards -->
         <div class="summary-cards">
-            <div class="card">
+            <div class="card" onclick="filterByScoreRange('all')" data-filter="all">
                 <h3>Total Candidates</h3>
                 <p id="totalCandidates" class="number">0</p>
             </div>
-            <div class="card">
+            <div class="card" onclick="filterByScoreRange('excellent')" data-filter="excellent">
                 <h3>Excellent (75-100%)</h3>
                 <p id="excellentCount" class="number">0/0</p>
             </div>
-            <div class="card">
+            <div class="card" onclick="filterByScoreRange('good')" data-filter="good">
                 <h3>Good (50-74%)</h3>
                 <p id="goodCount" class="number">0/0</p>
             </div>
-            <div class="card">
+            <div class="card" onclick="filterByScoreRange('average')" data-filter="average">
                 <h3>Average (25-49%)</h3>
                 <p id="averageCount" class="number">0/0</p>
             </div>
-            <div class="card">
+            <div class="card" onclick="filterByScoreRange('poor')" data-filter="poor">
                 <h3>Poor (0-24%)</h3>
                 <p id="poorCount" class="number">0/0</p>
             </div>
@@ -76,7 +76,7 @@
         <!-- Candidates List -->
         <div class="candidates-section">
             <div class="section-header">
-                <h2>Candidates Attended</h2>
+                <h2>Candidates Attended <span id="scoreFilterLabel" class="score-filter-label"></span></h2>
 
             </div>
 
@@ -183,6 +183,22 @@
             </div>
             <div class="modal-footer">
                 <button onclick="closeCodeModal()" class="btn-secondary">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Agent Score Details -->
+    <div id="agentScoreModal" class="modal" style="display: none;">
+        <div class="modal-content agent-score-modal-content">
+            <div class="modal-header">
+                <h2 id="agentScoreModalTitle">Agent Score Details</h2>
+                <span class="close" onclick="closeAgentScoreModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="agentScoreModalBody">
+                <!-- Populated dynamically by viewAgentScore() -->
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeAgentScoreModal()" class="btn-secondary">Back</button>
             </div>
         </div>
     </div>

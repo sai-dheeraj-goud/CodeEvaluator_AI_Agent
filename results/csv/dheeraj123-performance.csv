@@ -1,0 +1,4 @@
+Date,Time,Candidate Name,Candidate EmailId,Location,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
+"2026-04-13","12:53:26-881","dheeraj123","dheeraj.sai171998@gmail.com","Bangalore","5.11","1","Prime Number Check","Not Attempted","JAVASCRIPT","Prime","","0","0","Minimal code written","0","0","1","0:34","0:36"
+"2026-04-13","12:53:26-881","dheeraj123","dheeraj.sai171998@gmail.com","Bangalore","5.11","2","Average of Map Values","Not Attempted","JAVASCRIPT","17.33","","0","0","Minimal code written","0","0","0","0:01","0:36"
+

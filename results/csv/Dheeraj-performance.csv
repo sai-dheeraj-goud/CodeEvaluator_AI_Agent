@@ -1,0 +1,7 @@
+Date,Time,Candidate Name,Candidate EmailId,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
+"2026-04-12","01:27:13-915","Dheeraj","dheeraj.sai171998@gmail.com","8","1","Find All Unique/Non-Repeating Elements","Not Attempted","PYTHON","33, 11, 6","","0","0","Minimal code written","0","0","0","0:06","0:10"
+"2026-04-12","01:27:13-915","Dheeraj","dheeraj.sai171998@gmail.com","8","2","Print 1 to 100 Without Loops","Not Attempted","PYTHON","1 2 3 4 ... 99 100","","0","0","Minimal code written","0","0","0","0:03","0:10"
+"2026-04-13","12:22:46-963","dheeraj","dheeraj.sai171998@gmail.com","Bangalore","4","1","Find Median of Array","Not Attempted","JAVA","7","","0","0","Minimal code written","0","0","0","0:45","0:45"
+
+"2026-04-14","23:18:45-588","Dheeraj","dheeraj.sai171998@gmail.com","Visakhapatnam","6","1","Sort Array Ascending and Descending","Not Attempted","PYTHON","Increment Order - {1, 2, 5, 7, 12, 19, 30} Decrement Order - {30, 19, 12, 7, 5, 2, 1}","","0","0","Minimal code written","0","0","0","0:06","0:08"
+"2026-04-14","23:18:45-588","Dheeraj","dheeraj.sai171998@gmail.com","Visakhapatnam","6","2","Pangram Check","Not Attempted","PYTHON","Pangram","","0","0","Minimal code written","0","0","0","0:01","0:08"

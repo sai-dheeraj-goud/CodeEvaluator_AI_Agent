@@ -4461,3 +4461,474 @@ yuqiioml"
 [2026-04-14T19:18:08.655Z] [LOG] ✓ OTP sent to saidheeraj206@gmail.com via SMTP (port 465)
 [2026-04-14T19:19:01.723Z] [LOG] [JavaScript] Success. Output: ""
 [2026-04-14T19:19:14.389Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-15T14:17:34.376Z] [LOG] ✓ Loaded .env configuration
+[2026-04-15T14:17:34.392Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-15T14:17:34.414Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-15T14:17:34.416Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-15T14:17:34.418Z] [LOG] ✓ IST Timestamp: 2026-04-15T19:47:34-417+05:30
+[2026-04-15T14:17:34.420Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-15T14:17:34.423Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-15T14:17:34.424Z] [LOG]   Claude:  ✗ disabled
+[2026-04-15T14:17:34.426Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-15T14:17:34.429Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-15T14:17:34.431Z] [LOG]   Fallback chain: (none configured)
+[2026-04-15T14:17:34.433Z] [LOG] --------------------------------
+
+[2026-04-15T14:17:34.435Z] [LOG] ✓ Ready for requests
+
+[2026-04-15T14:17:44.293Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-15T14:18:39.445Z] [LOG] ↻ Candidate emails CSV changed — reloading...
+[2026-04-15T14:18:39.448Z] [LOG] ✓ Loaded 3 authorized candidate email(s) from CSV
+[2026-04-15T14:18:54.462Z] [LOG] ↻ Candidate emails CSV changed — reloading...
+[2026-04-15T14:18:54.464Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-15T14:19:14.492Z] [LOG] ↻ Candidate emails CSV changed — reloading...
+[2026-04-15T14:19:14.494Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-15T14:19:57.213Z] [LOG] ✓ Loaded .env configuration
+[2026-04-15T14:19:57.220Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-15T14:19:57.236Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-15T14:19:57.237Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-15T14:19:57.238Z] [LOG] ✓ IST Timestamp: 2026-04-15T19:49:57-238+05:30
+[2026-04-15T14:19:57.240Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-15T14:19:57.241Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-15T14:19:57.242Z] [LOG]   Claude:  ✗ disabled
+[2026-04-15T14:19:57.244Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-15T14:19:57.245Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-15T14:19:57.248Z] [LOG]   Fallback chain: (none configured)
+[2026-04-15T14:19:57.250Z] [LOG] --------------------------------
+
+[2026-04-15T14:19:57.251Z] [LOG] ✓ Ready for requests
+
+[2026-04-15T14:20:12.306Z] [LOG] ✓ OTP sent to saidheeraj206@gmail.com via SMTP (port 465)
+[2026-04-15T14:20:35.012Z] [LOG] ✓ Candidate marked as logged in: saidheeraj206@gmail.com
+[2026-04-15T14:21:23.579Z] [LOG] [JavaScript] Success. Output: ""
+[2026-04-15T14:21:43.113Z] [LOG] ✗ Duplicate login attempt blocked: saidheeraj206@gmail.com
+[2026-04-15T14:22:22.760Z] [LOG] ✗ Unauthorized candidate email blocked: ctsqea260409@gmail.com
+[2026-04-15T14:26:28.100Z] [LOG] ✓ Loaded .env configuration
+[2026-04-15T14:26:28.107Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-15T14:26:28.110Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-15T14:26:28.128Z] [WARN] 
+⚠ Port 3000 is in use, retry 1/3...
+[2026-04-15T14:26:30.132Z] [LOG] ✓ Server socket closed
+[2026-04-15T14:26:30.134Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-15T14:26:30.136Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-15T14:26:30.137Z] [LOG] ✓ IST Timestamp: 2026-04-15T19:56:30-137+05:30
+[2026-04-15T14:26:30.138Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-15T14:26:30.139Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-15T14:26:30.140Z] [LOG]   Claude:  ✗ disabled
+[2026-04-15T14:26:30.141Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-15T14:26:30.142Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-15T14:26:30.143Z] [LOG]   Fallback chain: (none configured)
+[2026-04-15T14:26:30.144Z] [LOG] --------------------------------
+
+[2026-04-15T14:26:30.145Z] [LOG] ✓ Ready for requests
+
+[2026-04-15T14:27:43.157Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-15T14:27:43.160Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-15T14:28:22.101Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-15T14:29:25.846Z] [LOG] [Python] Success (using: python). Output: ""
+[2026-04-15T14:29:37.291Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-15T14:36:00.736Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-15T14:37:28.648Z] [LOG] [Java] Success. Output: ""
+[2026-04-15T14:38:49.014Z] [LOG] [Java] Success. Output: "aabbbcccc"
+[2026-04-15T14:38:52.344Z] [LOG] [Agent] mode=percentage, USE_CLAUDE=false, USE_OLLAMA=false, OPENAI_KEY=not set
+[2026-04-15T14:38:52.346Z] [LOG] [Agent] All AI providers failed or disabled — falling back to Enhanced Rule-Based Scoring Engine
+[2026-04-15T14:38:52.362Z] [LOG] [Agent] Rule-based engine score: 85
+[2026-04-15T14:38:52.364Z] [LOG] [Agent] Result: agent=enhanced-rule-engine, confidence=medium, percentage=85
+[2026-04-15T14:39:09.580Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-15T14:40:29.601Z] [LOG] ✓ OTP sent to dheeraj.sai17@gmail.com via SMTP (port 465)
+[2026-04-15T14:42:09.028Z] [LOG] [JavaScript] Success. Output: "[ 1, 5, 3, 2, 7 ]"
+[2026-04-15T14:42:16.931Z] [LOG] [Agent] mode=percentage, USE_CLAUDE=false, USE_OLLAMA=false, OPENAI_KEY=not set
+[2026-04-15T14:42:16.935Z] [LOG] [Agent] All AI providers failed or disabled — falling back to Enhanced Rule-Based Scoring Engine
+[2026-04-15T14:42:16.948Z] [LOG] [Agent] Rule-based engine score: 86
+[2026-04-15T14:42:16.950Z] [LOG] [Agent] Result: agent=enhanced-rule-engine, confidence=medium, percentage=86
+[2026-04-15T14:43:34.123Z] [LOG] ✓ OTP sent to dheeraj.sai17@gmail.com via SMTP (port 465)
+[2026-04-15T15:02:26.490Z] [LOG] 
+✓ Server SIGINT - closing connections...
+[2026-04-15T15:02:26.495Z] [LOG] ✓ Server socket closed
+[2026-04-15T15:02:26.498Z] [LOG] ✓ Server stopped accepting new connections
+[2026-04-15T15:02:27.009Z] [LOG] ✓ All connections closed - exiting
+[2026-04-15T15:02:45.389Z] [LOG] ✓ Loaded .env configuration
+[2026-04-15T15:02:45.398Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-15T15:02:45.400Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-15T15:02:45.413Z] [WARN] 
+⚠ Port 3000 is in use, retry 1/3...
+[2026-04-15T15:02:47.429Z] [LOG] ✓ Server socket closed
+[2026-04-15T15:02:47.431Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-15T15:02:47.432Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-15T15:02:47.433Z] [LOG] ✓ IST Timestamp: 2026-04-15T20:32:47-433+05:30
+[2026-04-15T15:02:47.434Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-15T15:02:47.435Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-15T15:02:47.436Z] [LOG]   Claude:  ✗ disabled
+[2026-04-15T15:02:47.436Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-15T15:02:47.437Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-15T15:02:47.438Z] [LOG]   Fallback chain: (none configured)
+[2026-04-15T15:02:47.439Z] [LOG] --------------------------------
+
+[2026-04-15T15:02:47.439Z] [LOG] ✓ Ready for requests
+
+[2026-04-15T15:03:06.482Z] [LOG] 
+✓ Server SIGINT - closing connections...
+[2026-04-15T15:03:06.486Z] [LOG] ✓ Server socket closed
+[2026-04-15T15:03:06.487Z] [LOG] ✓ Server stopped accepting new connections
+[2026-04-15T15:03:06.995Z] [LOG] ✓ All connections closed - exiting
+[2026-04-15T15:06:55.282Z] [LOG] ✓ Loaded .env configuration
+[2026-04-15T15:06:55.290Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-15T15:06:55.292Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-15T15:06:55.306Z] [WARN] 
+⚠ Port 3000 is in use, retry 1/3...
+[2026-04-15T15:06:57.311Z] [LOG] ✓ Server socket closed
+[2026-04-15T15:06:57.313Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-15T15:06:57.314Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-15T15:06:57.315Z] [LOG] ✓ IST Timestamp: 2026-04-15T20:36:57-315+05:30
+[2026-04-15T15:06:57.316Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-15T15:06:57.317Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-15T15:06:57.317Z] [LOG]   Claude:  ✗ disabled
+[2026-04-15T15:06:57.318Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-15T15:06:57.319Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-15T15:06:57.319Z] [LOG]   Fallback chain: (none configured)
+[2026-04-15T15:06:57.320Z] [LOG] --------------------------------
+
+[2026-04-15T15:06:57.321Z] [LOG] ✓ Ready for requests
+
+[2026-04-15T15:07:16.409Z] [LOG] 
+✓ Server SIGINT - closing connections...
+[2026-04-15T15:07:16.414Z] [LOG] ✓ Server socket closed
+[2026-04-15T15:07:16.415Z] [LOG] ✓ Server stopped accepting new connections
+[2026-04-15T15:07:16.925Z] [LOG] ✓ All connections closed - exiting
+[2026-04-15T15:07:32.147Z] [LOG] ✓ Loaded .env configuration
+[2026-04-15T15:07:32.156Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-15T15:07:32.159Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-15T15:07:32.173Z] [WARN] 
+⚠ Port 3000 is in use, retry 1/3...
+[2026-04-15T15:07:34.181Z] [LOG] ✓ Server socket closed
+[2026-04-15T15:07:34.183Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-15T15:07:34.184Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-15T15:07:34.185Z] [LOG] ✓ IST Timestamp: 2026-04-15T20:37:34-185+05:30
+[2026-04-15T15:07:34.186Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-15T15:07:34.187Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-15T15:07:34.187Z] [LOG]   Claude:  ✗ disabled
+[2026-04-15T15:07:34.188Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-15T15:07:34.189Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-15T15:07:34.190Z] [LOG]   Fallback chain: (none configured)
+[2026-04-15T15:07:34.191Z] [LOG] --------------------------------
+
+[2026-04-15T15:07:34.192Z] [LOG] ✓ Ready for requests
+
+[2026-04-15T15:08:11.072Z] [LOG] 
+✓ Server SIGINT - closing connections...
+[2026-04-15T15:08:11.076Z] [LOG] ✓ Server socket closed
+[2026-04-15T15:08:11.077Z] [LOG] ✓ Server stopped accepting new connections
+[2026-04-15T15:08:11.580Z] [LOG] ✓ All connections closed - exiting
+[2026-04-16T05:18:04.061Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T05:18:04.073Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-16T05:18:04.076Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T05:18:04.094Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T05:18:04.095Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T05:18:04.096Z] [LOG] ✓ IST Timestamp: 2026-04-16T10:48:04-096+05:30
+[2026-04-16T05:18:04.097Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T05:18:04.097Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T05:18:04.098Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T05:18:04.099Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T05:18:04.101Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T05:18:04.102Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T05:18:04.104Z] [LOG] --------------------------------
+
+[2026-04-16T05:18:04.105Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T05:18:20.500Z] [LOG] 
+✓ Server SIGINT - closing connections...
+[2026-04-16T05:18:20.503Z] [LOG] ✓ Server socket closed
+[2026-04-16T05:18:20.504Z] [LOG] ✓ Server stopped accepting new connections
+[2026-04-16T05:18:21.023Z] [LOG] ✓ All connections closed - exiting
+[2026-04-16T05:23:44.667Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T05:23:44.675Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-16T05:23:44.678Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T05:23:44.692Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T05:23:44.693Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T05:23:44.694Z] [LOG] ✓ IST Timestamp: 2026-04-16T10:53:44-694+05:30
+[2026-04-16T05:23:44.695Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T05:23:44.696Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T05:23:44.697Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T05:23:44.698Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T05:23:44.699Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T05:23:44.700Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T05:23:44.701Z] [LOG] --------------------------------
+
+[2026-04-16T05:23:44.702Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T05:24:01.544Z] [LOG] 
+✓ Server SIGINT - closing connections...
+[2026-04-16T05:24:01.546Z] [LOG] ✓ Server socket closed
+[2026-04-16T05:24:01.547Z] [LOG] ✓ Server stopped accepting new connections
+[2026-04-16T05:24:02.049Z] [LOG] ✓ All connections closed - exiting
+[2026-04-16T05:30:08.637Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T05:30:08.647Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-16T05:30:08.649Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T05:30:08.666Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T05:30:08.668Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T05:30:08.669Z] [LOG] ✓ IST Timestamp: 2026-04-16T11:00:08-669+05:30
+[2026-04-16T05:30:08.670Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T05:30:08.674Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T05:30:08.676Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T05:30:08.677Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T05:30:08.679Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T05:30:08.681Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T05:30:08.682Z] [LOG] --------------------------------
+
+[2026-04-16T05:30:08.684Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T05:30:31.020Z] [LOG] 
+✓ Server SIGINT - closing connections...
+[2026-04-16T05:30:31.025Z] [LOG] ✓ Server socket closed
+[2026-04-16T05:30:31.032Z] [LOG] ✓ Server stopped accepting new connections
+[2026-04-16T05:30:31.529Z] [LOG] ✓ All connections closed - exiting
+[2026-04-16T05:31:21.788Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T05:31:21.796Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-16T05:31:21.799Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T05:31:21.813Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T05:31:21.815Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T05:31:21.816Z] [LOG] ✓ IST Timestamp: 2026-04-16T11:01:21-816+05:30
+[2026-04-16T05:31:21.817Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T05:31:21.818Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T05:31:21.819Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T05:31:21.820Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T05:31:21.821Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T05:31:21.822Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T05:31:21.823Z] [LOG] --------------------------------
+
+[2026-04-16T05:31:21.823Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T05:33:19.301Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T05:33:19.310Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-16T05:33:19.312Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T05:33:19.324Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T05:33:19.325Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T05:33:19.326Z] [LOG] ✓ IST Timestamp: 2026-04-16T11:03:19-326+05:30
+[2026-04-16T05:33:19.327Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T05:33:19.328Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T05:33:19.330Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T05:33:19.331Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T05:33:19.332Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T05:33:19.333Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T05:33:19.333Z] [LOG] --------------------------------
+
+[2026-04-16T05:33:19.334Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T05:34:07.498Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T05:34:07.505Z] [LOG] ✓ Loaded 2 panelist email(s) from CSV
+[2026-04-16T05:34:07.508Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T05:34:07.523Z] [WARN] 
+⚠ Port 3000 is in use, retry 1/3...
+[2026-04-16T05:34:09.541Z] [LOG] ✓ Server socket closed
+[2026-04-16T05:34:09.551Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T05:34:09.558Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T05:34:09.562Z] [LOG] ✓ IST Timestamp: 2026-04-16T11:04:09-562+05:30
+[2026-04-16T05:34:09.573Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T05:34:09.578Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T05:34:09.583Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T05:34:09.585Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T05:34:09.589Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T05:34:09.591Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T05:34:09.596Z] [LOG] --------------------------------
+
+[2026-04-16T05:34:09.601Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T05:34:20.830Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-16T05:36:34.495Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:36:34.498Z] [LOG] ✓ Loaded 3 panelist email(s) from CSV
+[2026-04-16T05:36:37.681Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:36:37.685Z] [LOG] ✓ Loaded 3 panelist email(s) from CSV
+[2026-04-16T05:36:51.528Z] [LOG] ✓ OTP sent to SaiDheeraj.Anthati@cognizant.com via SMTP (port 465)
+[2026-04-16T05:37:19.593Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:37:19.596Z] [LOG] ✓ Loaded 3 panelist email(s) from CSV
+[2026-04-16T05:37:22.728Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:37:22.733Z] [LOG] ✓ Loaded 3 panelist email(s) from CSV
+[2026-04-16T05:37:30.347Z] [LOG] ✗ Unauthorized candidate email blocked: SaiDheeraj.Anthati@cognizant.com
+[2026-04-16T05:37:50.051Z] [LOG] ✓ OTP sent to 845156@cognizant.com via SMTP (port 465)
+[2026-04-16T05:38:20.576Z] [LOG] ✓ OTP sent to 845156@cognizant.com via SMTP (port 465)
+[2026-04-16T05:38:44.680Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:38:44.684Z] [LOG] ✓ Loaded 3 panelist email(s) from CSV
+[2026-04-16T05:38:47.859Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:38:47.862Z] [LOG] ✓ Loaded 3 panelist email(s) from CSV
+[2026-04-16T05:38:54.522Z] [LOG] ✓ OTP sent to SaiDheeraj.Anthati@cognizant.com via SMTP (port 465)
+[2026-04-16T05:46:18.514Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:46:18.517Z] [LOG] ✓ Loaded 22 panelist email(s) from CSV
+[2026-04-16T05:46:20.277Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:46:20.281Z] [LOG] ✓ Loaded 22 panelist email(s) from CSV
+[2026-04-16T05:46:45.310Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:46:45.315Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T05:46:48.557Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:46:48.561Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T05:47:53.625Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:47:53.628Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T05:47:55.393Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T05:47:55.398Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T05:53:18.472Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T05:53:18.479Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T05:53:18.482Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T05:53:18.497Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T05:53:18.498Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T05:53:18.500Z] [LOG] ✓ IST Timestamp: 2026-04-16T11:23:18-499+05:30
+[2026-04-16T05:53:18.501Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T05:53:18.502Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T05:53:18.503Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T05:53:18.504Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T05:53:18.506Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T05:53:18.507Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T05:53:18.508Z] [LOG] --------------------------------
+
+[2026-04-16T05:53:18.508Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T05:53:27.079Z] [LOG] ✗ Unauthorized candidate email blocked: 845156@cognizant.com
+[2026-04-16T05:53:55.697Z] [LOG] ✓ OTP sent to saidheeraj206@gmail.com via SMTP (port 465)
+[2026-04-16T05:54:23.968Z] [LOG] ✓ Candidate marked as logged in: saidheeraj206@gmail.com
+[2026-04-16T05:57:24.576Z] [LOG] [Java] Success. Output: "WorldHello"
+[2026-04-16T05:58:34.002Z] [LOG] [Java] Success. Output: "World Hello"
+[2026-04-16T06:00:40.520Z] [LOG] [Java] Success. Output: "[1, 2, 4, 5, 8, 9]"
+[2026-04-16T06:00:45.838Z] [LOG] [Agent] mode=percentage, USE_CLAUDE=false, USE_OLLAMA=false, OPENAI_KEY=not set
+[2026-04-16T06:00:45.842Z] [LOG] [Agent] All AI providers failed or disabled — falling back to Enhanced Rule-Based Scoring Engine
+[2026-04-16T06:00:45.867Z] [LOG] [Agent] Rule-based engine score: 80
+[2026-04-16T06:00:45.869Z] [LOG] [Agent] Result: agent=enhanced-rule-engine, confidence=medium, percentage=80
+[2026-04-16T06:00:45.877Z] [LOG] [Agent] mode=percentage, USE_CLAUDE=false, USE_OLLAMA=false, OPENAI_KEY=not set
+[2026-04-16T06:00:45.880Z] [LOG] [Agent] All AI providers failed or disabled — falling back to Enhanced Rule-Based Scoring Engine
+[2026-04-16T06:00:45.888Z] [LOG] [Agent] Rule-based engine score: 82
+[2026-04-16T06:00:45.892Z] [LOG] [Agent] Result: agent=enhanced-rule-engine, confidence=medium, percentage=82
+[2026-04-16T06:05:39.180Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T06:05:39.186Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T06:05:39.188Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T06:05:39.205Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T06:05:39.206Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T06:05:39.207Z] [LOG] ✓ IST Timestamp: 2026-04-16T11:35:39-207+05:30
+[2026-04-16T06:05:39.208Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T06:05:39.209Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T06:05:39.212Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T06:05:39.213Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T06:05:39.214Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T06:05:39.215Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T06:05:39.218Z] [LOG] --------------------------------
+
+[2026-04-16T06:05:39.219Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T06:05:48.128Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T06:05:48.137Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T06:05:48.139Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T06:05:48.154Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T06:05:48.155Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T06:05:48.156Z] [LOG] ✓ IST Timestamp: 2026-04-16T11:35:48-156+05:30
+[2026-04-16T06:05:48.157Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T06:05:48.157Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T06:05:48.158Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T06:05:48.159Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T06:05:48.160Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T06:05:48.160Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T06:05:48.161Z] [LOG] --------------------------------
+
+[2026-04-16T06:05:48.162Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T06:13:53.849Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-04-16T06:13:53.853Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T06:16:28.827Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T06:16:28.835Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T06:16:28.837Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T06:16:28.853Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T06:16:28.854Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T06:16:28.855Z] [LOG] ✓ IST Timestamp: 2026-04-16T11:46:28-855+05:30
+[2026-04-16T06:16:28.856Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T06:16:28.858Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T06:16:28.859Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T06:16:28.860Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T06:16:28.862Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T06:16:28.863Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T06:16:28.864Z] [LOG] --------------------------------
+
+[2026-04-16T06:16:28.865Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T06:16:41.227Z] [LOG] ✓ OTP sent to saidheeraj206@gmail.com via SMTP (port 465)
+[2026-04-16T06:16:49.518Z] [LOG] ✓ Candidate marked as logged in: saidheeraj206@gmail.com
+[2026-04-16T06:19:47.459Z] [LOG] [Java] Success. Output: "This is a string"
+[2026-04-16T06:20:08.492Z] [LOG] [Java] Success. Output: "Thisisastring"
+[2026-04-16T06:20:25.005Z] [LOG] [Java] Success. Output: "13"
+[2026-04-16T06:20:30.500Z] [LOG] [Agent] mode=percentage, USE_CLAUDE=false, USE_OLLAMA=false, OPENAI_KEY=not set
+[2026-04-16T06:20:30.504Z] [LOG] [Agent] All AI providers failed or disabled — falling back to Enhanced Rule-Based Scoring Engine
+[2026-04-16T06:20:30.530Z] [LOG] [Agent] Rule-based engine score: 74
+[2026-04-16T06:20:30.536Z] [LOG] [Agent] Result: agent=enhanced-rule-engine, confidence=medium, percentage=74
+[2026-04-16T06:21:37.250Z] [LOG] [Java] Compilation error for SecondCharUppercase
+[2026-04-16T06:21:48.881Z] [LOG] [Java] Success. Output: "MY nAme iS PRaveen"
+[2026-04-16T06:29:41.403Z] [LOG] ✓ OTP sent to saidheeraj206@gmail.com via SMTP (port 465)
+[2026-04-16T06:29:59.465Z] [LOG] ✓ Candidate marked as logged in: saidheeraj206@gmail.com
+[2026-04-16T06:30:50.594Z] [LOG] ✓ OTP sent to saidheeraj206@gmail.com via SMTP (port 465)
+[2026-04-16T06:30:57.713Z] [LOG] ✓ Candidate marked as logged in: saidheeraj206@gmail.com
+[2026-04-16T06:36:06.167Z] [LOG] ✓ Loaded .env configuration
+[2026-04-16T06:36:06.181Z] [LOG] ✓ Loaded 24 panelist email(s) from CSV
+[2026-04-16T06:36:06.186Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
+[2026-04-16T06:36:06.211Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-04-16T06:36:06.213Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-04-16T06:36:06.214Z] [LOG] ✓ IST Timestamp: 2026-04-16T12:06:06-214+05:30
+[2026-04-16T06:36:06.215Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-04-16T06:36:06.216Z] [LOG]   Gemini:  ✗ disabled
+[2026-04-16T06:36:06.217Z] [LOG]   Claude:  ✗ disabled
+[2026-04-16T06:36:06.219Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-04-16T06:36:06.221Z] [LOG]   Ollama:  ✗ disabled
+[2026-04-16T06:36:06.224Z] [LOG]   Fallback chain: (none configured)
+[2026-04-16T06:36:06.227Z] [LOG] --------------------------------
+
+[2026-04-16T06:36:06.231Z] [LOG] ✓ Ready for requests
+
+[2026-04-16T06:36:20.283Z] [LOG] ✓ OTP sent to saidheeraj206@gmail.com via SMTP (port 465)
+[2026-04-16T06:36:27.939Z] [LOG] ✓ Candidate marked as logged in: saidheeraj206@gmail.com
+[2026-04-16T06:36:40.138Z] [LOG] [Java] Success. Output: ""
+[2026-04-16T06:36:47.055Z] [LOG] ✓ Candidate assessment submitted: saidheeraj206@gmail.com
+[2026-04-16T06:36:51.418Z] [LOG] ✗ Duplicate login attempt blocked: saidheeraj206@gmail.com
+[2026-04-16T06:37:11.172Z] [LOG] ↻ Candidate emails CSV changed — reloading...
+[2026-04-16T06:37:11.176Z] [LOG] ✓ Loaded 3 authorized candidate email(s) from CSV
+[2026-04-16T06:45:02.888Z] [LOG] ✗ Unauthorized candidate email blocked: saidheeraj206@gmail.com
+[2026-04-16T06:45:17.065Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-16T06:46:23.389Z] [LOG] [Java] Success. Output: ""
+[2026-04-16T06:46:27.365Z] [LOG] ✓ Candidate assessment submitted: dheeraj.sai171998@gmail.com
+[2026-04-16T06:46:37.983Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-16T06:51:21.904Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-16T06:52:01.283Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-04-16T06:52:17.977Z] [LOG] ✓ Candidate assessment submitted: dheeraj.sai171998@gmail.com
+[2026-04-16T06:53:18.685Z] [LOG] ✓ OTP sent to dheeraj.sai1798@gmail.com via SMTP (port 465)
+[2026-04-16T06:54:40.591Z] [LOG] ✓ Candidate marked as logged in: dheeraj.sai1798@gmail.com
+[2026-04-16T06:55:30.550Z] [LOG] [JavaScript] Success. Output: ""
+[2026-04-16T06:55:50.316Z] [LOG] ✓ OTP sent to dheeraj.sai1798@gmail.com via SMTP (port 465)
+[2026-04-16T06:55:58.724Z] [LOG] ✓ Candidate marked as logged in: dheeraj.sai1798@gmail.com
+[2026-04-16T06:56:25.450Z] [LOG] ✓ Candidate assessment submitted: dheeraj.sai1798@gmail.com
+[2026-04-16T06:56:44.428Z] [LOG] ✗ Duplicate login attempt blocked: dheeraj.sai1798@gmail.com
+[2026-04-16T07:04:52.966Z] [LOG] ✗ Duplicate login attempt blocked: dheeraj.sai1798@gmail.com
+[2026-04-16T07:05:05.415Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)

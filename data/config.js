@@ -10,13 +10,27 @@ module.exports = {
     // ================================================================
     //  PANELIST / ADMIN ACCESS CONTROL
     // ================================================================
-    // Only these email addresses can see the Panel button and access
-    // the Panelist Dashboard. All other users go straight to the
-    // Candidate test. Add or remove emails here as needed.
-    panelistEmails: [
-        'dheeraj.sai171998@gmail.com',
-        'dheeraj.sai17@gmail.com'
-    ],
+    // Only emails listed in this CSV file can see the Panel button and
+    // access the Panelist Dashboard. All other users go straight to the
+    // Candidate test. Add or remove emails in the CSV file as needed.
+    // The CSV must have a header row with "email" as the column name.
+    // (Relative to the project root)
+    panelistEmailsCsvPath: './data/panelist-emails.csv',
+    // ================================================================
+    //  CANDIDATE EMAIL VERIFICATION
+    // ================================================================
+    // When enabled, only emails listed in the CSV file can access the
+    // candidate assessment. If a candidate has already logged in and
+    // verified OTP once, they will be blocked from a second attempt.
+    //   true  → only CSV-listed emails can take the test (recommended)
+    //   false → any email can take the test (open access)
+    candidateEmailVerification: false,
+
+    // Path to the CSV file containing authorized candidate emails.
+    // The CSV must have a header row with "email" as the column name.
+    // (Relative to the project root)
+    candidateEmailsCsvPath: './data/candidate-emails.csv',
+
     // ================================================================
     //  SERVER-SIDE SETTINGS (used by src/server.js)
     // ================================================================
@@ -72,7 +86,7 @@ module.exports = {
 
     // --- Tab Switch Freeze ---
     // Lock and auto-submit assessment after this many tab switches
-    tabSwitchFreezeLimit: 5,
+    tabSwitchFreezeLimit: 3,
 
     // --- Auto-Save Interval (in milliseconds) ---
     autoSaveIntervalMs: 30000, // 30 seconds

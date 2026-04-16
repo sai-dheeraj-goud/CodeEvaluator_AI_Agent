@@ -1,0 +1,52 @@
+{
+  "personName": "Dheeraj12",
+  "email": "dheeraj.sai171998@gmail.com",
+  "experienceYears": "4",
+  "preferredLanguage": "java",
+  "programsCompleted": 0,
+  "totalPrograms": 1,
+  "results": [
+    {
+      "questionId": 17,
+      "title": "Double Each Character",
+      "description": "Write a program to double each character of the given word.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "aabbcc",
+      "actualOutput": "[object Object]",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 6
+    }
+  ],
+  "tabSwitchCount": 0,
+  "totalTimeTaken": 6,
+  "agentAnalysis": {
+    "analyzedCount": 1,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 0,
+    "highest": 0,
+    "perQuestion": [
+      {
+        "questionId": 17,
+        "title": "Double Each Character",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

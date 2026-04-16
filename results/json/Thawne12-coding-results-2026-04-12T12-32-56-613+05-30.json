@@ -1,0 +1,95 @@
+{
+  "personName": "Thawne12",
+  "email": "dheeraj.sai171998@gmail.com",
+  "experienceYears": "9",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 5,
+      "title": "Leap Year Check",
+      "description": "Write a program to check whether the given year 2024 is a leap year or not. Print \"Leap Year\" or \"Not a Leap Year\".",
+      "completed": true,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        int i=2024;\n        if((i%4==0||i%100==0)||i%400==0)\n            System.out.println(\"Leap Year\");\n        else\n            System.out.println(\"Not Leap Year\");\n    }\n}",
+      "expectedOutput": "Leap Year",
+      "actualOutput": "Leap Year",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 81,
+      "agentSuggestion": "Good solution. Has output statement; Output format matches expected pattern; Logic aligns well with reference solution; Correctly initializes input data from problem. Minor: none.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Uses appropriate operators",
+        "Proper class definition"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 15,
+      "aiReasons": [
+        "4 long pauses detected (avg 5s)",
+        "Rhythmic pause pattern detected (CV=0.23) — consistent read-type-read cycle from external device",
+        "Strictly linear code entry (0.8% back-jumps) — code written top-to-bottom like transcription",
+        "Near-zero mouse activity during typing (0 moves / 128 keystrokes) — eyes likely on external device"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 107
+    },
+    {
+      "questionId": 31,
+      "title": "Second Smallest/Largest with Index",
+      "description": "Write a program to find the second smallest and second largest number along with their index positions in the original array.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "Second Smallest - 6 (index 1), Second Largest - 45 (index 5)",
+      "actualOutput": "Leap Year",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 16
+    }
+  ],
+  "tabSwitchCount": 0,
+  "totalTimeTaken": 124,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 41
+  },
+  "aiLikelihood": {
+    "average": 8,
+    "highest": 15,
+    "perQuestion": [
+      {
+        "questionId": 5,
+        "title": "Leap Year Check",
+        "score": 15,
+        "reasons": [
+          "4 long pauses detected (avg 5s)",
+          "Rhythmic pause pattern detected (CV=0.23) — consistent read-type-read cycle from external device",
+          "Strictly linear code entry (0.8% back-jumps) — code written top-to-bottom like transcription",
+          "Near-zero mouse activity during typing (0 moves / 128 keystrokes) — eyes likely on external device"
+        ]
+      },
+      {
+        "questionId": 31,
+        "title": "Second Smallest/Largest with Index",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

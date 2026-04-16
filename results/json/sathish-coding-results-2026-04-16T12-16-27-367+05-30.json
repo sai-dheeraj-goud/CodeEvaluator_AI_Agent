@@ -1,0 +1,83 @@
+{
+  "personName": "sathish",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Indore",
+  "experienceYears": "6.3",
+  "preferredLanguage": "java",
+  "programsCompleted": 0,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 10,
+      "title": "Find Duplicate Characters in String",
+      "description": "Write a program to find and print all duplicate characters in a string along with their count.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "r=2, g=2, m=2",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 6
+    },
+    {
+      "questionId": 14,
+      "title": "Find Palindrome Substrings",
+      "description": "Write a program to find all palindrome substrings (length >= 3) in the given string. If none found, print \"no palindrome substrings found\".",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "aba, hcch",
+      "actualOutput": "{\"html\":\"Ready to run...\",\"sectionClass\":\"output-section\",\"validationStatus\":\"\",\"lastRunResult\":null}",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 1
+    }
+  ],
+  "tabSwitchCount": 0,
+  "totalTimeTaken": 7,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 0,
+    "highest": 0,
+    "perQuestion": [
+      {
+        "questionId": 10,
+        "title": "Find Duplicate Characters in String",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      },
+      {
+        "questionId": 14,
+        "title": "Find Palindrome Substrings",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

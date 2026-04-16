@@ -1,0 +1,83 @@
+{
+  "personName": "Dheeraj1",
+  "email": "dheeraj.sai17@gmail.com",
+  "location": "Gurugram",
+  "experienceYears": "5.11",
+  "preferredLanguage": "java",
+  "programsCompleted": 0,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 12,
+      "title": "Duplicate Characters in List of Strings",
+      "description": "Write a program to find duplicate characters across a list of strings [\"hello\", \"world\"]. Print the duplicate characters sorted alphabetically.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "l, o",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 13
+    },
+    {
+      "questionId": 22,
+      "title": "First and Last Position of Element",
+      "description": "Write a program to find the first and last position (0-based index) of a given element in a sorted array. If not found, print \"Element not found\".",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "1, 4",
+      "actualOutput": "[object Object]",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 4
+    }
+  ],
+  "tabSwitchCount": 0,
+  "totalTimeTaken": 17,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 0,
+    "highest": 0,
+    "perQuestion": [
+      {
+        "questionId": 12,
+        "title": "Duplicate Characters in List of Strings",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      },
+      {
+        "questionId": 22,
+        "title": "First and Last Position of Element",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

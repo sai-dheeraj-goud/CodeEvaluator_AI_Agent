@@ -1,0 +1,92 @@
+{
+  "personName": "dheeraj56",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Noida",
+  "experienceYears": "5.11",
+  "preferredLanguage": "python",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 35,
+      "title": "Pangram Check",
+      "description": "Write a program to check if a sentence is a pangram (contains every letter of the English alphabet at least once). Print \"Pangram\" or \"Not a Pangram\".",
+      "completed": true,
+      "language": "python",
+      "code": "# Static input\nsentence = \"The quick brown fox jumps over the lazy dog\"\n\n# Convert to lowercase and remove spaces\nsentence = sentence.lower()\n\n# Set of letters in the sentence\nletters = set()\n\nfor char in sentence:\n    if char.isalpha():\n        letters.add(char)\n\n# Check pangram condition\nif len(letters) == 26:\n    print(\"Pangram\")\nelse:\n    print(\"Not a Pangram\")",
+      "expectedOutput": "Pangram",
+      "actualOutput": "Pangram",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 84,
+      "agentSuggestion": "Good solution. Has output statement; Output format matches expected pattern; Logic aligns well with reference solution; Correctly initializes input data from problem. Minor: Consider using functions for modularity.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper variable usage"
+      ],
+      "agentMissed": [
+        "Consider using functions for modularity"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 342 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 47
+    },
+    {
+      "questionId": 25,
+      "title": "Second Largest Number in Array",
+      "description": "Write a program to find the second largest number in an array.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here",
+      "expectedOutput": "101",
+      "actualOutput": "[object Object]",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 64
+    }
+  ],
+  "tabSwitchCount": 1,
+  "totalTimeTaken": 111,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 42
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 35,
+        "title": "Pangram Check",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 342 characters of changes"
+        ]
+      },
+      {
+        "questionId": 25,
+        "title": "Second Largest Number in Array",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

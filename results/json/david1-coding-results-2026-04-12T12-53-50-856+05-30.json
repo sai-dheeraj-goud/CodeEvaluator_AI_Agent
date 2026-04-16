@@ -1,0 +1,52 @@
+{
+  "personName": "david1",
+  "email": "dheeraj.sai171998@gmail.com",
+  "experienceYears": "4",
+  "preferredLanguage": "javascript",
+  "programsCompleted": 0,
+  "totalPrograms": 1,
+  "results": [
+    {
+      "questionId": 7,
+      "title": "Find Positions of Element in Array",
+      "description": "Write a program to find all positions (1-based) of the number 3 in the array {3,5,6,2,7,3}. Print positions in the format \"1st and 6th\".",
+      "completed": false,
+      "language": "javascript",
+      "code": "// Write your solution here\n",
+      "expectedOutput": "1st and 6th",
+      "actualOutput": "[object Object]",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 2
+    }
+  ],
+  "tabSwitchCount": 0,
+  "totalTimeTaken": 2,
+  "agentAnalysis": {
+    "analyzedCount": 1,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 0,
+    "highest": 0,
+    "perQuestion": [
+      {
+        "questionId": 7,
+        "title": "Find Positions of Element in Array",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "personName": "sai",
+  "email": "dheeraj.sai171998@gmail.com",
+  "experienceYears": "8",
+  "preferredLanguage": "python",
+  "programsCompleted": 0,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 2,
+      "title": "Average of Map Values",
+      "description": "Write a program to find the average of all values in a Map. The map contains: A=10, B=19, C=23. Print the average rounded to 2 decimal places.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here\n# Input Map\ndata_map = {'A': 10, 'B': 19, 'C': 23}\n\n# Calculate Average\nif len(data_map) > 0:\n    # Sum all values in the map\n    total_sum = sum(data_map.values())\n    # Count the number of items\n    count = len(data_map)\n    # Calculate and format the average\n    average = total_sum / count\n    print(f\"{average:.2f}\")\nelse:\n    print(\"0.00\")\n# Output: 17.33\n",
+      "expectedOutput": "17.33",
+      "actualOutput": "[object Object]",
+      "validationMessage": "Python interpreter not found. Run setup-runtimes.bat to install portable Python, or install Python on your system.",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "Output does not match expected for PYTHON. Please run your code first.",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 362 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 53
+    },
+    {
+      "questionId": 45,
+      "title": "Print 1 to 100 Without Loops",
+      "description": "Write a program to print numbers from 1 to 100 without using any loop (for/while/do-while). Use recursion.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here",
+      "expectedOutput": "1 2 3 4 ... 99 100",
+      "actualOutput": "[object Object]",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 3
+    }
+  ],
+  "tabSwitchCount": 1,
+  "totalTimeTaken": 56,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 2,
+        "title": "Average of Map Values",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 362 characters of changes"
+        ]
+      },
+      {
+        "questionId": 45,
+        "title": "Print 1 to 100 Without Loops",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

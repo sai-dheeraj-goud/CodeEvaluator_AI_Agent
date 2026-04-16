@@ -1,0 +1,5 @@
+Date,Time,Candidate Name,Candidate EmailId,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
+"2026-04-12","12:52:21-438","david","dheeraj.sai171998@gmail.com","3","1","Star Pyramid Pattern","Not Attempted","PYTHON","*    * *   * * *  * * * * * * * * *","","0","0","Minimal code written","0","0","0","0:04","0:04"
+
+"2026-04-15","19:51:27-846","david","saidheeraj206@gmail.com","Visakhapatnam","8","1","Duplicate Characters in List of Strings","Not Attempted","JAVASCRIPT","l, o","","0","0","Minimal code written","0","0","0","0:08","0:09"
+"2026-04-15","19:51:27-846","david","saidheeraj206@gmail.com","Visakhapatnam","8","2","Check Arrays Have Same Elements","Not Attempted","JAVASCRIPT","(a1, a2) - true (a1, a3) - false","{""html"":""Ready to run..."",""sectionClass"":""output-section"",""validationStatus"":"""",""lastRunResult"":null}","0","0","Minimal code written","0","0","0","0:01","0:09"

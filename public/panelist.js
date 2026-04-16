@@ -1,6 +1,48 @@
 let currentSessionData = null;
 let currentViewType = 'table';
 let allCandidatesData = null;
+let activeScoreFilter = null; // null = show all, 'excellent'|'good'|'average'|'poor'
+
+// ==================== SCORE RANGE FILTER ====================
+const scoreRanges = {
+    excellent: { min: 75, max: 100, label: 'Excellent (75-100%)' },
+    good:      { min: 50, max: 74,  label: 'Good (50-74%)' },
+    average:   { min: 25, max: 49,  label: 'Average (25-49%)' },
+    poor:      { min: 0,  max: 24,  label: 'Poor (0-24%)' }
+};
+
+function filterByScoreRange(range) {
+    // Toggle off if clicking the same card again, or clicking "all"
+    if (range === 'all' || activeScoreFilter === range) {
+        activeScoreFilter = null;
+    } else {
+        activeScoreFilter = range;
+    }
+
+    // Update card visual states
+    document.querySelectorAll('.summary-cards .card').forEach(card => {
+        card.classList.remove('card-active');
+    });
+    if (activeScoreFilter) {
+        const activeCard = document.querySelector(`.card[data-filter="${activeScoreFilter}"]`);
+        if (activeCard) activeCard.classList.add('card-active');
+    }
+
+    // Update section header label
+    const filterLabel = document.getElementById('scoreFilterLabel');
+    if (activeScoreFilter && scoreRanges[activeScoreFilter]) {
+        filterLabel.textContent = scoreRanges[activeScoreFilter].label;
+        filterLabel.className = 'score-filter-label ' + activeScoreFilter;
+    } else {
+        filterLabel.textContent = '';
+        filterLabel.className = 'score-filter-label';
+    }
+
+    // Scroll to the candidates table
+    document.querySelector('.candidates-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    renderFilteredTable();
+}
 
 // ==================== COLUMN FILTER STATE ====================
 const columnFilters = {}; // { colIndex: Set of selected values }
@@ -28,6 +70,14 @@ function getCellValue(c, colIdx) {
 function getFilteredCandidates() {
     if (!allCandidatesData || !allCandidatesData.candidates) return [];
     return allCandidatesData.candidates.filter(c => {
+        // Apply score range filter (from summary cards)
+        if (activeScoreFilter && scoreRanges[activeScoreFilter]) {
+            const range = scoreRanges[activeScoreFilter];
+            const score = parseFloat(c.score) || 0;
+            if (score < range.min || score > range.max) return false;
+        }
+
+        // Apply column filters
         for (const colStr in columnFilters) {
             const col = parseInt(colStr);
             const allowed = columnFilters[col];
@@ -112,6 +162,16 @@ function closeFilter(colIdx) {
 
 function clearAllFilters() {
     for (const key in columnFilters) delete columnFilters[key];
+
+    // Also clear score range filter
+    activeScoreFilter = null;
+    document.querySelectorAll('.summary-cards .card').forEach(card => card.classList.remove('card-active'));
+    const filterLabel = document.getElementById('scoreFilterLabel');
+    if (filterLabel) {
+        filterLabel.textContent = '';
+        filterLabel.className = 'score-filter-label';
+    }
+
     renderFilteredTable();
     updateFilterButtons();
 }
@@ -131,12 +191,13 @@ function updateFilterButtons() {
     });
 
     // Show/hide filter summary bar
-    const activeCount = Object.keys(columnFilters).length;
+    const activeCount = Object.keys(columnFilters).length + (activeScoreFilter ? 1 : 0);
     const summary = document.getElementById('filterSummary');
     if (activeCount > 0) {
         const filtered = getFilteredCandidates();
         const total = allCandidatesData ? allCandidatesData.candidates.length : 0;
-        document.getElementById('filterSummaryText').textContent = `Showing ${filtered.length} of ${total} candidates (${activeCount} filter${activeCount > 1 ? 's' : ''} active)`;
+        const scoreLabel = activeScoreFilter ? ` | ${scoreRanges[activeScoreFilter].label}` : '';
+        document.getElementById('filterSummaryText').textContent = `Showing ${filtered.length} of ${total} candidates (${activeCount} filter${activeCount > 1 ? 's' : ''} active${scoreLabel})`;
         summary.style.display = 'flex';
     } else {
         summary.style.display = 'none';
@@ -278,6 +339,13 @@ async function viewResults(sessionId) {
         // Update modal header
         document.getElementById('modalTitle').textContent = data.candidateName + ' - Results & Code';
         
+        // Update candidate info
+        document.getElementById('modalExperience').textContent = data.experience || 'N/A';
+        document.getElementById('modalLocation').textContent = data.location || 'N/A';
+        document.getElementById('modalLanguage').textContent = data.language || 'N/A';
+        document.getElementById('modalPrograms').textContent = data.programsCompleted || 0;
+        document.getElementById('modalTotalPrograms').textContent = data.totalPrograms || 0;
+        
         // Update summary
         document.getElementById('modalScore').textContent = data.overallScore + '%';
         document.getElementById('modalTime').textContent = data.totalTime;
@@ -298,7 +366,10 @@ async function viewResults(sessionId) {
                     <p><strong>Language:</strong> ${q.language}</p>
                     <p><strong>Time Taken:</strong> ${q.timeTaken}</p>
                 </div>
-                <button onclick="viewCode(${q.questionId})" class="btn-view-code">View Code</button>
+                <div class="question-actions">
+                    <button onclick="viewCode(${q.questionId})" class="btn-view-code">View Code</button>
+                    <button onclick="viewAgentScore(${q.questionId})" class="btn-agent-score">Agent Score</button>
+                </div>
             </div>
         `).join('');
         
@@ -329,6 +400,89 @@ function viewCode(questionId) {
     // Hide result modal, show code modal
     document.getElementById('resultModal').style.display = 'none';
     document.getElementById('codeModal').style.display = 'block';
+}
+
+// View agent score details for a question
+function viewAgentScore(questionId) {
+    const q = currentSessionData.questions.find(qn => qn.questionId === questionId);
+    if (!q) return;
+
+    const modal = document.getElementById('agentScoreModal');
+    document.getElementById('agentScoreModalTitle').textContent = `Q${q.questionId}: ${q.questionTitle}`;
+
+    // Determine plagiarism level label
+    const plag = q.aiLikelihood || 0;
+    let plagLabel = 'Low';
+    let plagClass = 'plag-low';
+    if (plag >= 70) { plagLabel = 'High'; plagClass = 'plag-high'; }
+    else if (plag >= 40) { plagLabel = 'Medium'; plagClass = 'plag-medium'; }
+
+    // Build covered list
+    const coveredHtml = (q.agentCovered && q.agentCovered.length > 0)
+        ? q.agentCovered.map(c => `<li>✅ ${escapeHtml(c)}</li>`).join('')
+        : '<li class="empty-list">No criteria covered</li>';
+
+    // Build missed list
+    const missedHtml = (q.agentMissed && q.agentMissed.length > 0)
+        ? q.agentMissed.map(m => `<li>❌ ${escapeHtml(m)}</li>`).join('')
+        : '<li class="empty-list">None — all criteria covered!</li>';
+
+    // Build plagiarism reasons
+    const reasonsHtml = (q.aiReasons && q.aiReasons.length > 0)
+        ? q.aiReasons.map(r => `<li>⚠️ ${escapeHtml(r)}</li>`).join('')
+        : '<li class="empty-list">No plagiarism signals detected</li>';
+
+    document.getElementById('agentScoreModalBody').innerHTML = `
+        <div class="agent-detail-header">
+            <div class="agent-detail-row">
+                <span class="agent-detail-label">💻 Language:</span>
+                <span class="agent-detail-value">${(q.language || 'N/A').toUpperCase()}</span>
+            </div>
+            <div class="agent-detail-row">
+                <span class="agent-detail-label">🤖 Agent:</span>
+                <span class="agent-detail-value">enhanced-rule-engine</span>
+            </div>
+            <div class="agent-detail-row">
+                <span class="agent-detail-label">Agent Score:</span>
+                <span class="agent-detail-value agent-score-big ${q.agentScore >= 75 ? 'score-high' : q.agentScore >= 50 ? 'score-mid' : 'score-low'}">${q.agentScore}%</span>
+            </div>
+            <div class="agent-detail-row">
+                <span class="agent-detail-label">🔍 Plagiarism:</span>
+                <span class="agent-detail-value ${plagClass}">${plag}% (${plagLabel})</span>
+            </div>
+        </div>
+
+        ${(q.aiReasons && q.aiReasons.length > 0) ? `
+        <div class="agent-detail-section reasons-section">
+            <h4>Reasons</h4>
+            <ul>${reasonsHtml}</ul>
+        </div>` : ''}
+
+        <div class="agent-detail-section covered-section">
+            <h4>✅ Covered</h4>
+            <ul>${coveredHtml}</ul>
+        </div>
+
+        <div class="agent-detail-section missed-section">
+            <h4>❌ Missed</h4>
+            <ul>${missedHtml}</ul>
+        </div>
+    `;
+
+    // Hide result modal, show agent score modal
+    document.getElementById('resultModal').style.display = 'none';
+    modal.style.display = 'block';
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function closeAgentScoreModal() {
+    document.getElementById('agentScoreModal').style.display = 'none';
+    document.getElementById('resultModal').style.display = 'block';
 }
 
 // Download CSV - export table view data matching panel columns

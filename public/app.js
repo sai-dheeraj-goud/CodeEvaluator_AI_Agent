@@ -558,6 +558,8 @@ function saveSession() {
         savedAgentCodeForReview,
         lockedLanguage,
         questionCompletionTimes,
+        questionTimeLeft,
+        totalPrograms,
         bulkAnalysisResult,
         bulkAnalysisRenderedHtml,
         savedAt: Date.now()
@@ -600,6 +602,11 @@ document.getElementById('sendOtpBtn').addEventListener('click', async () => {
         return;
     }
 
+    // Clear previous error styling
+    const loginStatus = document.getElementById('loginStatus');
+    loginStatus.textContent = '';
+    loginStatus.style.color = '#d32f2f';
+
     showLoading(true, 'Sending OTP...');
     try {
         await apiCall('POST', '/api/auth/send-otp', { email });
@@ -609,7 +616,16 @@ document.getElementById('sendOtpBtn').addEventListener('click', async () => {
         document.getElementById('otpInput').focus();
         showToast('OTP sent successfully', 'success');
     } catch (err) {
-        document.getElementById('loginStatus').textContent = `Error: ${err.message}`;
+        const msg = err.message || 'Unknown error';
+        // Show authorization errors prominently
+        if (msg.includes('not authorized')) {
+            loginStatus.innerHTML = `<div style="background:#fff3f3;border:1px solid #d32f2f;border-radius:8px;padding:14px 18px;margin-top:10px;text-align:center;">
+                <span style="font-size:1.5em;">🚫</span><br>
+                <strong style="color:#d32f2f;font-size:1.05em;">${msg}</strong>
+            </div>`;
+        } else {
+            loginStatus.textContent = `Error: ${msg}`;
+        }
     } finally {
         showLoading(false);
     }
@@ -649,6 +665,77 @@ document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
         await fetchTotalQuestionCount();
         await loadPanelistEmails();
         
+        // Check for a saved session matching this email
+        const saved = loadSession();
+        if (saved && saved.authEmail === email && saved.questionTimeLeft) {
+            // Deduct the time that passed while the page was closed
+            const elapsedMs = Date.now() - (saved.savedAt || Date.now());
+            const elapsedSec = Math.floor(elapsedMs / 1000);
+            if (elapsedSec > 0) {
+                const currentQ = saved.selectedQuestions[saved.currentQuestionIndex];
+                if (currentQ && saved.questionTimeLeft[currentQ.id] !== undefined) {
+                    saved.questionTimeLeft[currentQ.id] = Math.max(0, saved.questionTimeLeft[currentQ.id] - elapsedSec);
+                }
+            }
+
+            const totalTimeRemaining = Object.values(saved.questionTimeLeft).reduce((a, b) => a + b, 0);
+            if (totalTimeRemaining > 0) {
+                // Show resume dialog
+                document.getElementById('resumeDialog').classList.remove('hidden');
+                document.getElementById('resumeBtn').onclick = () => {
+                    // Restore all saved state
+                    personName = saved.personName || '';
+                    authToken = result.token;  // use fresh token from this login
+                    authEmail = result.email;
+                    candidateLocation = saved.candidateLocation || '';
+                    experienceYears = saved.experienceYears || 0;
+                    experienceRaw = saved.experienceRaw || '0.0';
+                    currentQuestionIndex = saved.currentQuestionIndex || 0;
+                    selectedQuestions = saved.selectedQuestions || [];
+                    codeState = saved.codeState || {};
+                    outputState = saved.outputState || {};
+                    agentState = saved.agentState || {};
+                    results = saved.results || [];
+                    tabSwitchCount = saved.tabSwitchCount || 0;
+                    totalElapsedSeconds = saved.totalElapsedSeconds || 0;
+                    typingMetrics = saved.typingMetrics || {};
+                    savedAgentPercentages = saved.savedAgentPercentages || {};
+                    savedAgentLanguages = saved.savedAgentLanguages || {};
+                    savedAgentFullResults = saved.savedAgentFullResults || {};
+                    savedAgentCodeSnapshots = saved.savedAgentCodeSnapshots || {};
+                    savedAgentCodeForReview = saved.savedAgentCodeForReview || {};
+                    lockedLanguage = saved.lockedLanguage || null;
+                    questionCompletionTimes = saved.questionCompletionTimes || {};
+                    questionTimeLeft = saved.questionTimeLeft || {};
+                    totalPrograms = saved.totalPrograms || 0;
+                    bulkAnalysisResult = saved.bulkAnalysisResult || null;
+                    bulkAnalysisRenderedHtml = saved.bulkAnalysisRenderedHtml || '';
+                    currentLanguage = lockedLanguage || 'java';
+                    document.getElementById('resumeDialog').classList.add('hidden');
+                    showStep(3);
+                    const totalTimerEl = document.getElementById('totalTimer');
+                    if (totalTimerEl) { totalTimerEl.classList.remove('hidden'); initDraggableTimer(); }
+                    loadQuestion();
+                    startQuestionTimer();
+                    startAutoSave();
+                    startSessionTimer();
+                    calculateTotalTime();
+                };
+                document.getElementById('startFreshBtn').onclick = () => {
+                    clearSession();
+                    document.getElementById('resumeDialog').classList.add('hidden');
+                    showStep(2);
+                };
+                showLoading(false);
+                return; // wait for user choice
+            } else {
+                clearSession(); // timers expired
+            }
+        } else if (saved && saved.authEmail && saved.authEmail !== email) {
+            // Different email — clear the old session
+            clearSession();
+        }
+
         // Show role selection only for panelist-authorized emails
         if (isPanelistEmail(email)) {
             document.getElementById('roleSelectionModal').classList.remove('hidden');
@@ -3285,36 +3372,7 @@ async function init() {
         showToast('Warning: Could not load configuration. Some features may not work correctly.', 'warning');
     }
 
-    // Check for resume
-    const saved = loadSession();
-    if (saved) {
-        document.getElementById('resumeDialog').classList.remove('hidden');
-        document.getElementById('resumeBtn').addEventListener('click', () => {
-            Object.assign(window, saved);
-            currentLanguage = lockedLanguage || 'java';
-            document.getElementById('resumeDialog').classList.add('hidden');
-            showStep(3);
-            
-            // Show total timer and make it draggable
-            const totalTimerEl = document.getElementById('totalTimer');
-            if (totalTimerEl) {
-                totalTimerEl.classList.remove('hidden');
-                initDraggableTimer();
-            }
-            
-            loadQuestion();
-            startQuestionTimer();
-            startAutoSave();
-            startSessionTimer();
-        });
-        document.getElementById('startFreshBtn').addEventListener('click', () => {
-            clearSession();
-            document.getElementById('resumeDialog').classList.add('hidden');
-        });
-    }
-
-    // On page reload, always show email login page (step 0)
-    // Do not auto-login with stored auth on page reload
+    // Always require email login first — resume is offered after OTP verification
     showStep(0);
 }
 
@@ -3402,7 +3460,11 @@ function initDraggableTimer() {
 
 window.addEventListener('beforeunload', (e) => {
     if (!assessmentSubmitted && currentQuestionIndex < totalPrograms && totalPrograms > 0) {
-        e.returnValue = 'Your assessment progress may be lost.';
+        // Save current state so candidate can resume
+        saveCurrentCode();
+        saveCurrentOutputState();
+        saveSession();
+        e.returnValue = 'Your assessment progress will be saved. You can resume when you return.';
     }
 });
 

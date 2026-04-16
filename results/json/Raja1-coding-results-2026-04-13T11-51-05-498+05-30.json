@@ -1,0 +1,100 @@
+{
+  "personName": "Raja1",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Pune",
+  "experienceYears": "8",
+  "preferredLanguage": "javascript",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 6,
+      "title": "Random Generator",
+      "description": "Write a program that generates 5 random integers between 1 and 100 and 1 random string of 8 lowercase characters. Print them each on a separate line.",
+      "completed": false,
+      "language": "javascript",
+      "code": "// Write your solution here\n// Generate and print 5 random integers between 1 and 100\nfor (let i = 0; i < 5; i++) {\n    const randomNumber = Math.floor(Math.random() * 100) + 1;\n    console.log(randomNumber);\n}\n\n// Generate a random 8-character lowercase string\nconst chars = \"abcdefghijklmnopqrstuvwxyz\";\nlet randomString = \"\";\n\nfor (let i = 0; i < 8; i++) {\n    const randomIndex = Math.floor(Math.random() * chars.length);\n    randomString += chars[randomIndex];\n}\n\n// Print the random string\nconsole.log(randomString);",
+      "expectedOutput": "(5 random integers between 1-100, then 1 random 8-char string)\nExample:\n42\n87\n13\n56\n91\nabcdefgh",
+      "actualOutput": "7\n1\n59\n65\n10\nzqgkpqne",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 74,
+      "agentSuggestion": "Partial solution. Has output statement; Output format matches expected pattern; Logic aligns well with reference solution; Has iteration/recursion logic. Issues: Consider using functions for modularity; Code approach may not match the problem requirements.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic aligns well with reference solution",
+        "Has iteration/recursion logic",
+        "Proper loop bounds",
+        "Uses modern const/let declarations"
+      ],
+      "agentMissed": [
+        "Consider using functions for modularity",
+        "Code approach may not match the problem requirements"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 495 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 119
+    },
+    {
+      "questionId": 48,
+      "title": "Check Arrays Have Same Elements",
+      "description": "Write a program that checks if two arrays contain the same unique elements (regardless of duplicates or order).",
+      "completed": true,
+      "language": "javascript",
+      "code": "// Write your solution here\n// Static input arrays\nconst a1 = [1, 2, 3, 2, 1];\nconst a2 = [1, 2, 3];\nconst a3 = [1, 2, 3, 4];\n\n// Function to check same unique elements\nfunction haveSameUniqueElements(arr1, arr2) {\n    const set1 = new Set(arr1);\n    const set2 = new Set(arr2);\n\n    if (set1.size !== set2.size) {\n        return false;\n    }\n\n    for (let value of set1) {\n        if (!set2.has(value)) {\n            return false;\n        }\n    }\n\n    return true;\n}\n\n// Print results\nconsole.log(\"(a1, a2) - \" + haveSameUniqueElements(a1, a2));\nconsole.log(\"(a1, a3) - \" + haveSameUniqueElements(a1, a3));\n",
+      "expectedOutput": "(a1, a2) - true\n(a1, a3) - false",
+      "actualOutput": "(a1, a2) - true\n(a1, a3) - false",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 88,
+      "agentSuggestion": "Good solution. Has output statement; Output format matches expected pattern; Logic aligns well with reference solution; Correctly initializes input data from problem. Minor: none.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Uses modern const/let declarations"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 580 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 135
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 255,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 81
+  },
+  "aiLikelihood": {
+    "average": 80,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 6,
+        "title": "Random Generator",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 495 characters of changes"
+        ]
+      },
+      {
+        "questionId": 48,
+        "title": "Check Arrays Have Same Elements",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 580 characters of changes"
+        ]
+      }
+    ]
+  }
+}

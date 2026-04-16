@@ -1,0 +1,83 @@
+{
+  "personName": "david",
+  "email": "saidheeraj206@gmail.com",
+  "location": "Visakhapatnam",
+  "experienceYears": "8",
+  "preferredLanguage": "javascript",
+  "programsCompleted": 0,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 12,
+      "title": "Duplicate Characters in List of Strings",
+      "description": "Write a program to find duplicate characters across a list of strings [\"hello\", \"world\"]. Print the duplicate characters sorted alphabetically.",
+      "completed": false,
+      "language": "javascript",
+      "code": "// Write your solution here\n",
+      "expectedOutput": "l, o",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 8
+    },
+    {
+      "questionId": 45,
+      "title": "Check Arrays Have Same Elements",
+      "description": "Write a program that checks if two arrays contain the same unique elements (regardless of duplicates or order).",
+      "completed": false,
+      "language": "javascript",
+      "code": "// Write your solution here\n",
+      "expectedOutput": "(a1, a2) - true\n(a1, a3) - false",
+      "actualOutput": "{\"html\":\"Ready to run...\",\"sectionClass\":\"output-section\",\"validationStatus\":\"\",\"lastRunResult\":null}",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 1
+    }
+  ],
+  "tabSwitchCount": 0,
+  "totalTimeTaken": 9,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 0,
+    "highest": 0,
+    "perQuestion": [
+      {
+        "questionId": 12,
+        "title": "Duplicate Characters in List of Strings",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      },
+      {
+        "questionId": 45,
+        "title": "Check Arrays Have Same Elements",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}
