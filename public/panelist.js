@@ -70,10 +70,10 @@ function getCellValue(c, colIdx) {
 function getFilteredCandidates() {
     if (!allCandidatesData || !allCandidatesData.candidates) return [];
     return allCandidatesData.candidates.filter(c => {
-        // Apply score range filter (from summary cards)
+        // Apply score range filter (from summary cards) — based on Agent Score
         if (activeScoreFilter && scoreRanges[activeScoreFilter]) {
             const range = scoreRanges[activeScoreFilter];
-            const score = parseFloat(c.score) || 0;
+            const score = parseFloat(c.agentScore) || 0;
             if (score < range.min || score > range.max) return false;
         }
 
@@ -296,11 +296,11 @@ async function loadData() {
         const data = await response.json();
         allCandidatesData = data;
         
-        // Categorize candidates by score
-        const excellent = data.candidates.filter(c => c.score >= 75).length;
-        const good = data.candidates.filter(c => c.score >= 50 && c.score < 75).length;
-        const average = data.candidates.filter(c => c.score >= 25 && c.score < 50).length;
-        const poor = data.candidates.filter(c => c.score < 25).length;
+        // Categorize candidates by Agent Score
+        const excellent = data.candidates.filter(c => (c.agentScore || 0) >= 75).length;
+        const good = data.candidates.filter(c => (c.agentScore || 0) >= 50 && (c.agentScore || 0) < 75).length;
+        const average = data.candidates.filter(c => (c.agentScore || 0) >= 25 && (c.agentScore || 0) < 50).length;
+        const poor = data.candidates.filter(c => (c.agentScore || 0) < 25).length;
         const total = data.totalCandidates;
         
         // Update summary cards
@@ -309,6 +309,9 @@ async function loadData() {
         document.getElementById('goodCount').textContent = good + '/' + total;
         document.getElementById('averageCount').textContent = average + '/' + total;
         document.getElementById('poorCount').textContent = poor + '/' + total;
+
+        // Render the score distribution pie chart
+        renderScorePieChart(excellent, good, average, poor);
         
         // Update candidates table
         const tbody = document.getElementById('candidatesBody');
@@ -474,6 +477,71 @@ function viewAgentScore(questionId) {
     // Hide result modal, show agent score modal
     document.getElementById('resultModal').style.display = 'none';
     modal.style.display = 'block';
+}
+
+// ==================== SCORE DISTRIBUTION PIE CHART ====================
+function renderScorePieChart(excellent, good, average, poor) {
+    const section = document.getElementById('chartSection');
+    const total = excellent + good + average + poor;
+
+    // Hide the chart if there's no data
+    if (total === 0) {
+        if (section) section.style.display = 'none';
+        return;
+    }
+
+    // Show the chart section
+    if (section) section.style.display = 'block';
+
+    const canvas = document.getElementById('scorePieChart');
+    if (!canvas) return;
+
+    // Destroy any previous chart instance to avoid duplicates
+    if (window.scorePieChartInstance) {
+        window.scorePieChartInstance.destroy();
+    }
+
+    // Build data — only include slices with non-zero values
+    const labels = [];
+    const data = [];
+    const colors = [];
+    if (excellent > 0) { labels.push('Excellent (75-100%)'); data.push(excellent); colors.push('#4CAF50'); }
+    if (good > 0)      { labels.push('Good (50-74%)');       data.push(good);      colors.push('#8BC34A'); }
+    if (average > 0)   { labels.push('Average (25-49%)');    data.push(average);   colors.push('#FFC107'); }
+    if (poor > 0)      { labels.push('Poor (0-24%)');        data.push(poor);      colors.push('#F44336'); }
+
+    const ctx = canvas.getContext('2d');
+    window.scorePieChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: colors,
+                borderColor: '#1a1a1a',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#fff', font: { size: 13 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed;
+                            const percent = ((value / total) * 100).toFixed(1);
+                            return `${context.label}: ${value} candidate${value === 1 ? '' : 's'} (${percent}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 function escapeHtml(text) {

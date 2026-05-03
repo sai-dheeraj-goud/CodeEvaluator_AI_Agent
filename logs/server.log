@@ -5767,7 +5767,151 @@ yuqiioml"
 
 [2026-05-03T11:28:27.533Z] [LOG] ✓ Ready for requests
 
-[2026-05-03T12:13:24.537Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-03T12:13:24.542Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-03T12:13:24.545Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-03T12:13:24.548Z] [LOG] ⚠ Candidate email verification is DISABLED (open access)
+[2026-05-03T14:06:52.816Z] [LOG] ✓ Loaded .env configuration
+[2026-05-03T14:06:52.826Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
+[2026-05-03T14:06:52.828Z] [LOG] ⚠ Candidate email verification is DISABLED (open access)
+[2026-05-03T14:06:52.845Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-05-03T14:06:52.846Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-05-03T14:06:52.847Z] [LOG] ✓ IST Timestamp: 2026-05-03T19:36:52-847+05:30
+[2026-05-03T14:06:52.848Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-05-03T14:06:52.849Z] [LOG]   Gemini:  ✗ disabled
+[2026-05-03T14:06:52.852Z] [LOG]   Claude:  ✗ disabled
+[2026-05-03T14:06:52.855Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-05-03T14:06:52.856Z] [LOG]   Ollama:  ✗ disabled
+[2026-05-03T14:06:52.857Z] [LOG]   Fallback chain: (none configured)
+[2026-05-03T14:06:52.858Z] [LOG] --------------------------------
+
+[2026-05-03T14:06:52.859Z] [LOG] ✓ Ready for requests
+
+[2026-05-03T14:07:05.080Z] [LOG] [sendOTPEmail] Attempting to send OTP to saidheeraj.anthati@cognizant.com
+[2026-05-03T14:07:05.086Z] [LOG] [sendOTPEmail] SMTP attempt 1/3: host=smtp.gmail.com, user=ctsqea260409@gmail.com
+[2026-05-03T14:07:05.090Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsqea260409@gmail.com...
+[2026-05-03T14:07:05.094Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-03T14:07:05.263Z] [LOG] [SMTP-465] TLS secure connection established
+[2026-05-03T14:07:05.266Z] [LOG] [SMTP-465] Session started at step 0
+[2026-05-03T14:07:05.735Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP d2e1a72fcca58-83515acfbcdsm9394569b3a.30 - gsmtp |
+[2026-05-03T14:07:05.738Z] [LOG] [SMTP-465] -> EHLO localhost
+[2026-05-03T14:07:05.989Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.234.76] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
+[2026-05-03T14:07:05.992Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:05.995Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:05.997Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:05.999Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:06.003Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:06.007Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:06.010Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:06.013Z] [LOG] [SMTP-465] -> AUTH LOGIN
+[2026-05-03T14:07:06.262Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
+[2026-05-03T14:07:06.266Z] [LOG] [SMTP-465] -> [base64 username]
+[2026-05-03T14:07:06.513Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
+[2026-05-03T14:07:06.517Z] [LOG] [SMTP-465] -> [base64 password]
+[2026-05-03T14:07:06.862Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
+[2026-05-03T14:07:06.864Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
+[2026-05-03T14:07:07.112Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK d2e1a72fcca58-83515acfbcdsm9394569b3a.30 - gsmtp |
+[2026-05-03T14:07:07.116Z] [LOG] [SMTP-465] -> RCPT TO:<saidheeraj.anthati@cognizant.com>
+[2026-05-03T14:07:07.362Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK d2e1a72fcca58-83515acfbcdsm9394569b3a.30 - gsmtp |
+[2026-05-03T14:07:07.366Z] [LOG] [SMTP-465] -> DATA
+[2026-05-03T14:07:07.694Z] [LOG] [SMTP-465] <- received: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail | 550-5.4.5 sending limits go to | 550 5.4.5  https://support.google.com/a/answer/166852 d2e1a72fcca58-83515acfbcdsm9394569b3a.30 - gsmtp |
+[2026-05-03T14:07:07.701Z] [LOG] [SMTP-465] Socket closed (was at step 7)
+[2026-05-03T14:07:07.704Z] [LOG] [SMTP-465] Session ended: socket closed at step 7
+[2026-05-03T14:07:07.708Z] [LOG] [sendOTPEmail] Trying SMTP port 587 with ctsqea260409@gmail.com...
+[2026-05-03T14:07:08.761Z] [LOG] [SMTP-587] Session started at step 1
+[2026-05-03T14:07:09.008Z] [LOG] [SMTP-587] <- received: 250-smtp.gmail.com at your service, [49.207.234.76] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
+[2026-05-03T14:07:09.010Z] [LOG] [SMTP-587] (skipping continuation line at step 1)
+[2026-05-03T14:07:09.013Z] [LOG] [SMTP-587] (skipping continuation line at step 1)
+[2026-05-03T14:07:09.016Z] [LOG] [SMTP-587] (skipping continuation line at step 1)
+[2026-05-03T14:07:09.019Z] [LOG] [SMTP-587] (skipping continuation line at step 1)
+[2026-05-03T14:07:09.023Z] [LOG] [SMTP-587] (skipping continuation line at step 1)
+[2026-05-03T14:07:09.027Z] [LOG] [SMTP-587] (skipping continuation line at step 1)
+[2026-05-03T14:07:09.031Z] [LOG] [SMTP-587] (skipping continuation line at step 1)
+[2026-05-03T14:07:09.037Z] [LOG] [SMTP-587] -> AUTH LOGIN
+[2026-05-03T14:07:09.286Z] [LOG] [SMTP-587] <- received: 334 VXNlcm5hbWU6 |
+[2026-05-03T14:07:09.288Z] [LOG] [SMTP-587] -> [base64 username]
+[2026-05-03T14:07:09.531Z] [LOG] [SMTP-587] <- received: 334 UGFzc3dvcmQ6 |
+[2026-05-03T14:07:09.534Z] [LOG] [SMTP-587] -> [base64 password]
+[2026-05-03T14:07:09.861Z] [LOG] [SMTP-587] <- received: 235 2.7.0 Accepted |
+[2026-05-03T14:07:09.865Z] [LOG] [SMTP-587] ✓ Authenticated. -> MAIL FROM
+[2026-05-03T14:07:10.115Z] [LOG] [SMTP-587] <- received: 250 2.1.0 OK 41be03b00d2f7-c7ffbc6f063sm7133023a12.20 - gsmtp |
+[2026-05-03T14:07:10.117Z] [LOG] [SMTP-587] -> RCPT TO:<saidheeraj.anthati@cognizant.com>
+[2026-05-03T14:07:10.364Z] [LOG] [SMTP-587] <- received: 250 2.1.5 OK 41be03b00d2f7-c7ffbc6f063sm7133023a12.20 - gsmtp |
+[2026-05-03T14:07:10.366Z] [LOG] [SMTP-587] -> DATA
+[2026-05-03T14:07:10.682Z] [LOG] [SMTP-587] <- received: 550-5.4.5 Daily user sending limit exceeded. For more information on Gmail | 550-5.4.5 sending limits go to | 550 5.4.5  https://support.google.com/a/answer/166852 41be03b00d2f7-c7ffbc6f063sm7133023a12.20 - gsmtp |
+[2026-05-03T14:07:10.686Z] [LOG] [SMTP-587] Socket closed (was at step 7)
+[2026-05-03T14:07:10.688Z] [LOG] [SMTP-587] Session ended: socket closed at step 7
+[2026-05-03T14:07:10.689Z] [LOG] [sendOTPEmail] Account ctsqea260409@gmail.com failed (likely quota). Trying next account...
+[2026-05-03T14:07:10.691Z] [LOG] [sendOTPEmail] SMTP attempt 2/3: host=smtp.gmail.com, user=cognizanttest9871@gmail.com
+[2026-05-03T14:07:10.692Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with cognizanttest9871@gmail.com...
+[2026-05-03T14:07:10.694Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-03T14:07:10.760Z] [LOG] [SMTP-465] TLS secure connection established
+[2026-05-03T14:07:10.763Z] [LOG] [SMTP-465] Session started at step 0
+[2026-05-03T14:07:11.021Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP d9443c01a7336-2b9cae0d97esm75564205ad.48 - gsmtp |
+[2026-05-03T14:07:11.023Z] [LOG] [SMTP-465] -> EHLO localhost
+[2026-05-03T14:07:11.273Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.234.76] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
+[2026-05-03T14:07:11.276Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:11.279Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:11.281Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:11.283Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:11.287Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:11.290Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:11.293Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:07:11.297Z] [LOG] [SMTP-465] -> AUTH LOGIN
+[2026-05-03T14:07:11.546Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
+[2026-05-03T14:07:11.550Z] [LOG] [SMTP-465] -> [base64 username]
+[2026-05-03T14:07:11.797Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
+[2026-05-03T14:07:11.799Z] [LOG] [SMTP-465] -> [base64 password]
+[2026-05-03T14:07:12.191Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
+[2026-05-03T14:07:12.193Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
+[2026-05-03T14:07:12.438Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK d9443c01a7336-2b9cae0d97esm75564205ad.48 - gsmtp |
+[2026-05-03T14:07:12.440Z] [LOG] [SMTP-465] -> RCPT TO:<saidheeraj.anthati@cognizant.com>
+[2026-05-03T14:07:12.685Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK d9443c01a7336-2b9cae0d97esm75564205ad.48 - gsmtp |
+[2026-05-03T14:07:12.687Z] [LOG] [SMTP-465] -> DATA
+[2026-05-03T14:07:13.134Z] [LOG] [SMTP-465] <- received: 354 Go ahead d9443c01a7336-2b9cae0d97esm75564205ad.48 - gsmtp |
+[2026-05-03T14:07:13.136Z] [LOG] [SMTP-465] -> [message body]
+[2026-05-03T14:07:13.941Z] [LOG] [SMTP-465] <- received: 250 2.0.0 OK  1777817234 d9443c01a7336-2b9cae0d97esm75564205ad.48 - gsmtp |
+[2026-05-03T14:07:13.943Z] [LOG] [SMTP-465] -> QUIT
+[2026-05-03T14:07:13.944Z] [LOG] ✓ OTP sent to saidheeraj.anthati@cognizant.com via SMTP (SMTP-465)
+[2026-05-03T14:07:13.945Z] [LOG] [SMTP-465] Session ended: message sent
+[2026-05-03T14:07:14.193Z] [LOG] [SMTP-465] <- received: 221 2.0.0 closing connection d9443c01a7336-2b9cae0d97esm75564205ad.48 - gsmtp |
+[2026-05-03T14:07:14.197Z] [LOG] [SMTP-465] Socket closed (was at step 8)
+[2026-05-03T14:08:46.761Z] [LOG] [Python] Success (using: python). Output: "33, 11, 6"
+[2026-05-03T14:09:16.370Z] [LOG] ✓ Candidate assessment submitted: saidheeraj.anthati@cognizant.com
+[2026-05-03T14:09:49.636Z] [LOG] [sendOTPEmail] Attempting to send OTP to saidheeraj.anthati@cognizant.com
+[2026-05-03T14:09:49.640Z] [LOG] [sendOTPEmail] SMTP attempt 1/3: host=smtp.gmail.com, user=cognizanttest9871@gmail.com
+[2026-05-03T14:09:49.642Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with cognizanttest9871@gmail.com...
+[2026-05-03T14:09:49.644Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-03T14:09:49.723Z] [LOG] [SMTP-465] TLS secure connection established
+[2026-05-03T14:09:49.727Z] [LOG] [SMTP-465] Session started at step 0
+[2026-05-03T14:09:49.979Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP 41be03b00d2f7-c7ffbc6f063sm7136816a12.20 - gsmtp |
+[2026-05-03T14:09:49.983Z] [LOG] [SMTP-465] -> EHLO localhost
+[2026-05-03T14:09:50.237Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.234.76] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
+[2026-05-03T14:09:50.240Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:09:50.243Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:09:50.246Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:09:50.249Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:09:50.252Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:09:50.256Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:09:50.260Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-03T14:09:50.263Z] [LOG] [SMTP-465] -> AUTH LOGIN
+[2026-05-03T14:09:50.515Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
+[2026-05-03T14:09:50.519Z] [LOG] [SMTP-465] -> [base64 username]
+[2026-05-03T14:09:50.769Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
+[2026-05-03T14:09:50.772Z] [LOG] [SMTP-465] -> [base64 password]
+[2026-05-03T14:09:51.149Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
+[2026-05-03T14:09:51.153Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
+[2026-05-03T14:09:51.407Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK 41be03b00d2f7-c7ffbc6f063sm7136816a12.20 - gsmtp |
+[2026-05-03T14:09:51.410Z] [LOG] [SMTP-465] -> RCPT TO:<saidheeraj.anthati@cognizant.com>
+[2026-05-03T14:09:51.660Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK 41be03b00d2f7-c7ffbc6f063sm7136816a12.20 - gsmtp |
+[2026-05-03T14:09:51.664Z] [LOG] [SMTP-465] -> DATA
+[2026-05-03T14:09:52.005Z] [LOG] [SMTP-465] <- received: 354 Go ahead 41be03b00d2f7-c7ffbc6f063sm7136816a12.20 - gsmtp |
+[2026-05-03T14:09:52.012Z] [LOG] [SMTP-465] -> [message body]
+[2026-05-03T14:09:52.815Z] [LOG] [SMTP-465] <- received: 250 2.0.0 OK  1777817393 41be03b00d2f7-c7ffbc6f063sm7136816a12.20 - gsmtp |
+[2026-05-03T14:09:52.817Z] [LOG] [SMTP-465] -> QUIT
+[2026-05-03T14:09:52.820Z] [LOG] ✓ OTP sent to saidheeraj.anthati@cognizant.com via SMTP (SMTP-465)
+[2026-05-03T14:09:52.823Z] [LOG] [SMTP-465] Session ended: message sent
+[2026-05-03T14:09:53.075Z] [LOG] [SMTP-465] <- received: 221 2.0.0 closing connection 41be03b00d2f7-c7ffbc6f063sm7136816a12.20 - gsmtp |
+[2026-05-03T14:09:53.078Z] [LOG] [SMTP-465] Socket closed (was at step 8)
+[2026-05-03T14:25:49.272Z] [LOG] ↻ Candidate emails CSV changed — reloading...
+[2026-05-03T14:25:49.274Z] [LOG] ⚠ Candidate email verification is DISABLED (open access)
+[2026-05-03T14:25:49.276Z] [LOG] ↻ Panelist emails CSV changed — reloading...
+[2026-05-03T14:25:49.280Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV

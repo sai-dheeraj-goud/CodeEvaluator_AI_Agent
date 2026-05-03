@@ -403,13 +403,33 @@ async function sendOTPViaResend(email, otp, apiKey) {
 }
 
 // Gmail API via OAuth2 (HTTPS — works on all cloud platforms, no SMTP port needed)
-async function sendOTPViaGmailAPI(email, otp) {
-    const clientId = process.env.GMAIL_CLIENT_ID || '';
-    const clientSecret = process.env.GMAIL_CLIENT_SECRET || '';
-    const refreshToken = process.env.GMAIL_REFRESH_TOKEN || '';
-    const senderEmail = process.env.GMAIL_API_USER || process.env.GMAIL_SMTP_USER || '';
+// Round-robin index for Gmail API accounts
+let GMAIL_API_INDEX = 0;
 
-    if (!clientId || !clientSecret || !refreshToken || !senderEmail) return false;
+// Get all Gmail API account configs (parsed from semicolon-separated env vars)
+function getAllGmailApiConfigs() {
+    const clientIds = parseList(process.env.GMAIL_CLIENT_ID);
+    const clientSecrets = parseList(process.env.GMAIL_CLIENT_SECRET);
+    const refreshTokens = parseList(process.env.GMAIL_REFRESH_TOKEN);
+    // Sender emails: prefer GMAIL_API_USER, fall back to GMAIL_SMTP_USER
+    const senderEmails = parseList(process.env.GMAIL_API_USER || process.env.GMAIL_SMTP_USER);
+
+    const configs = [];
+    const count = Math.min(clientIds.length, clientSecrets.length, refreshTokens.length, senderEmails.length);
+    for (let i = 0; i < count; i++) {
+        configs.push({
+            clientId: clientIds[i],
+            clientSecret: clientSecrets[i],
+            refreshToken: refreshTokens[i],
+            senderEmail: senderEmails[i]
+        });
+    }
+    return configs;
+}
+
+// Send via Gmail API using a specific account config
+async function sendViaGmailApiAccount(config, email, otp) {
+    const { clientId, clientSecret, refreshToken, senderEmail } = config;
 
     // Step 1: Get access token from refresh token
     const tokenPayload = `client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}&refresh_token=${encodeURIComponent(refreshToken)}&grant_type=refresh_token`;
@@ -440,11 +460,11 @@ async function sendOTPViaGmailAPI(email, otp) {
     });
 
     if (!accessToken) {
-        console.error('[Gmail API] Failed to get access token');
-        return false;
+        console.error(`[Gmail API] Failed to get access token for ${senderEmail}`);
+        return { success: false, quotaExceeded: false };
     }
 
-    // Step 2: Build the email in RFC 2822 format and base64url encode it
+    // Step 2: Build the email
     const rawEmail = [
         `From: "Code Evaluator" <${senderEmail}>`,
         `To: ${email}`,
@@ -479,22 +499,52 @@ async function sendOTPViaGmailAPI(email, otp) {
             res.on('data', chunk => data += chunk);
             res.on('end', () => {
                 if (res.statusCode >= 200 && res.statusCode < 300) {
-                    console.log(`✓ OTP sent to ${email} via Gmail API`);
-                    resolve(true);
+                    console.log(`✓ OTP sent to ${email} via Gmail API (sender: ${senderEmail})`);
+                    resolve({ success: true, quotaExceeded: false });
                 } else {
-                    console.error(`[Gmail API] HTTP ${res.statusCode}: ${data}`);
-                    resolve(false);
+                    // Detect quota errors (429 = rate limit, 403 may also indicate quota)
+                    const isQuotaError = res.statusCode === 429 ||
+                        (res.statusCode === 403 && /quota|limit|rate/i.test(data));
+                    console.error(`[Gmail API] ${senderEmail} -> HTTP ${res.statusCode}: ${data.substring(0, 200)}`);
+                    resolve({ success: false, quotaExceeded: isQuotaError });
                 }
             });
         });
         req.on('error', (err) => {
-            console.error('[Gmail API] Request error:', err.message);
-            resolve(false);
+            console.error(`[Gmail API] ${senderEmail} request error:`, err.message);
+            resolve({ success: false, quotaExceeded: false });
         });
-        req.setTimeout(10000, () => { req.destroy(); resolve(false); });
+        req.setTimeout(10000, () => { req.destroy(); resolve({ success: false, quotaExceeded: false }); });
         req.write(sendPayload);
         req.end();
     });
+}
+
+// Try sending via Gmail API, rotating through all configured accounts on failure
+async function sendOTPViaGmailAPI(email, otp) {
+    const configs = getAllGmailApiConfigs();
+    if (configs.length === 0) return false;
+
+    // Try each account starting from the round-robin index
+    for (let i = 0; i < configs.length; i++) {
+        const idx = (GMAIL_API_INDEX + i) % configs.length;
+        const config = configs[idx];
+        console.log(`[Gmail API] Attempt ${i + 1}/${configs.length} using ${config.senderEmail}`);
+
+        const result = await sendViaGmailApiAccount(config, email, otp);
+        if (result.success) {
+            // Advance index for next call (load balancing)
+            GMAIL_API_INDEX = (idx + 1) % configs.length;
+            return true;
+        }
+
+        if (i < configs.length - 1) {
+            console.log(`[Gmail API] ${config.senderEmail} failed${result.quotaExceeded ? ' (quota)' : ''} — trying next account`);
+        }
+    }
+
+    console.error('[Gmail API] All accounts failed');
+    return false;
 }
 
 async function sendOTPEmail(email, otp) {

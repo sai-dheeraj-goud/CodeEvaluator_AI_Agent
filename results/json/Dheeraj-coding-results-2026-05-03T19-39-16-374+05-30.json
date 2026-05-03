@@ -1,0 +1,83 @@
+{
+  "personName": "Dheeraj",
+  "email": "saidheeraj.anthati@cognizant.com",
+  "location": "Visakhapatnam",
+  "experienceYears": "8",
+  "preferredLanguage": "python",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 31,
+      "title": "Find All Unique/Non-Repeating Elements",
+      "description": "Write a program to find all elements that appear exactly once (non-repeating) in an array.",
+      "completed": true,
+      "language": "python",
+      "code": "# Static input array\narr = [10, 5, 33, 5, 11, 10, 6]\n\n# Dictionary to store frequency\nfreq = {}\n\n# Count frequency of each element\nfor num in arr:\n    freq[num] = freq.get(num, 0) + 1\n\n# Find and print elements that appear exactly once\nresult = [num for num in arr if freq[num] == 1]\n\nprint(*result, sep=\", \")",
+      "expectedOutput": "33, 11, 6",
+      "actualOutput": "33, 11, 6",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 298 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 37
+    },
+    {
+      "questionId": 28,
+      "title": "Second Smallest/Largest with Index",
+      "description": "Write a program to find the second smallest and second largest number along with their index positions in the original array.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here",
+      "expectedOutput": "Second Smallest - 6 (index 1), Second Largest - 45 (index 5)",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 2,
+      "questionTimeSpent": 22
+    }
+  ],
+  "tabSwitchCount": 3,
+  "totalTimeTaken": 59,
+  "agentAnalysis": {
+    "analyzedCount": 0,
+    "averagePercentage": 0
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 31,
+        "title": "Find All Unique/Non-Repeating Elements",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 298 characters of changes"
+        ]
+      },
+      {
+        "questionId": 28,
+        "title": "Second Smallest/Largest with Index",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}
