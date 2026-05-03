@@ -422,10 +422,11 @@ function viewAgentScore(questionId) {
         ? q.agentCovered.map(c => `<li>✅ ${escapeHtml(c)}</li>`).join('')
         : '<li class="empty-list">No criteria covered</li>';
 
-    // Build missed list
-    const missedHtml = (q.agentMissed && q.agentMissed.length > 0)
+    // Build missed list (only if there are missed criteria)
+    const hasMissed = q.agentMissed && q.agentMissed.length > 0;
+    const missedHtml = hasMissed
         ? q.agentMissed.map(m => `<li>❌ ${escapeHtml(m)}</li>`).join('')
-        : '<li class="empty-list">None — all criteria covered!</li>';
+        : '';
 
     // Build plagiarism reasons
     const reasonsHtml = (q.aiReasons && q.aiReasons.length > 0)
@@ -463,10 +464,11 @@ function viewAgentScore(questionId) {
             <ul>${coveredHtml}</ul>
         </div>
 
+        ${hasMissed ? `
         <div class="agent-detail-section missed-section">
             <h4>❌ Missed</h4>
             <ul>${missedHtml}</ul>
-        </div>
+        </div>` : ''}
     `;
 
     // Hide result modal, show agent score modal

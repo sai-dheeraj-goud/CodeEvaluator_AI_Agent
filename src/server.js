@@ -299,20 +299,43 @@ function checkOTPRateLimit(email) {
 }
 
 // ==================== SMTP EMAIL FUNCTIONS ====================
+
+// Parse semicolon-separated values into an array (e.g. "user1@gmail.com;user2@gmail.com")
+function parseList(envValue) {
+    return (envValue || '').split(';').map(s => s.trim()).filter(Boolean);
+}
+
+// Round-robin index for Gmail accounts (in-memory; resets when server restarts)
+let GMAIL_ACCOUNT_INDEX = 0;
+
+// Returns ALL Gmail SMTP configs (one per account). Caller can iterate to retry on quota errors.
+function getAllGmailConfigs() {
+    const users = parseList(process.env.GMAIL_SMTP_USER);
+    const passes = parseList(process.env.GMAIL_SMTP_PASS);
+    const host = process.env.GMAIL_SMTP_HOST || 'smtp.gmail.com';
+    const port = parseInt(process.env.GMAIL_SMTP_PORT || '587');
+    const from = process.env.GMAIL_SMTP_FROM || 'Code Evaluator';
+
+    const configs = [];
+    const count = Math.min(users.length, passes.length);
+    for (let i = 0; i < count; i++) {
+        configs.push({ host, port, user: users[i], pass: passes[i], from });
+    }
+    return configs;
+}
+
 function getSmtpConfig(recipientEmail) {
     // If recipient is Gmail OR default SMTP credentials are empty, use Gmail SMTP
     const defaultSmtpUser = process.env.SMTP_USER || '';
     const defaultSmtpPass = process.env.SMTP_PASS || '';
     const useGmail = recipientEmail.toLowerCase().endsWith('@gmail.com') || !defaultSmtpUser || !defaultSmtpPass;
 
-    if (useGmail && (process.env.GMAIL_SMTP_USER && process.env.GMAIL_SMTP_PASS)) {
-        return {
-            host: process.env.GMAIL_SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.GMAIL_SMTP_PORT || '587'),
-            user: process.env.GMAIL_SMTP_USER,
-            pass: process.env.GMAIL_SMTP_PASS,
-            from: process.env.GMAIL_SMTP_FROM || 'Code Evaluator'
-        };
+    const gmailConfigs = getAllGmailConfigs();
+    if (useGmail && gmailConfigs.length > 0) {
+        // Round-robin: pick the next Gmail account in rotation
+        const config = gmailConfigs[GMAIL_ACCOUNT_INDEX % gmailConfigs.length];
+        GMAIL_ACCOUNT_INDEX = (GMAIL_ACCOUNT_INDEX + 1) % gmailConfigs.length;
+        return config;
     }
     return {
         host: process.env.SMTP_HOST || 'smtp.office365.com',
@@ -475,6 +498,7 @@ async function sendOTPViaGmailAPI(email, otp) {
 }
 
 async function sendOTPEmail(email, otp) {
+    console.log(`[sendOTPEmail] Attempting to send OTP to ${email}`);
     // Try Gmail API first (HTTPS — works on all cloud platforms)
     try {
         const sentGmailApi = await sendOTPViaGmailAPI(email, otp);
@@ -494,88 +518,228 @@ async function sendOTPEmail(email, otp) {
         }
     }
 
-    // Fallback to SMTP
-    const smtpConfig = getSmtpConfig(email);
-    if (!smtpConfig.user || !smtpConfig.pass) {
-        console.log(`[SMTP] No credentials configured. [Console Fallback] OTP for ${email}: ${otp}`);
-        return false;
+    // Fallback to SMTP — try each Gmail account in turn (handles per-account quota limits)
+    const isGmailRecipient = email.toLowerCase().endsWith('@gmail.com');
+    const defaultSmtpUser = process.env.SMTP_USER || '';
+    const defaultSmtpPass = process.env.SMTP_PASS || '';
+    const useGmailPool = isGmailRecipient || !defaultSmtpUser || !defaultSmtpPass;
+
+    let smtpAttempts = [];
+    if (useGmailPool) {
+        const gmailConfigs = getAllGmailConfigs();
+        if (gmailConfigs.length === 0) {
+            console.log(`[SMTP] No Gmail credentials configured. [Console Fallback] OTP for ${email}: ${otp}`);
+            return false;
+        }
+        // Start from the round-robin index, then try the rest as fallback
+        for (let i = 0; i < gmailConfigs.length; i++) {
+            smtpAttempts.push(gmailConfigs[(GMAIL_ACCOUNT_INDEX + i) % gmailConfigs.length]);
+        }
+        // Advance the round-robin index for the next call
+        GMAIL_ACCOUNT_INDEX = (GMAIL_ACCOUNT_INDEX + 1) % gmailConfigs.length;
+    } else {
+        smtpAttempts.push({
+            host: process.env.SMTP_HOST || 'smtp.office365.com',
+            port: parseInt(process.env.SMTP_PORT || '587'),
+            user: defaultSmtpUser,
+            pass: defaultSmtpPass,
+            from: process.env.SMTP_FROM || 'Code Evaluator'
+        });
     }
 
-    const messageBody = [
-        `From: "${smtpConfig.from}" <${smtpConfig.user}>`,
-        `To: ${email}`,
-        `Subject: Your OTP Code`,
-        `MIME-Version: 1.0`,
-        `Content-Type: text/html; charset=UTF-8`,
-        ``,
-        `<html><body><h2>Your OTP Code: ${otp}</h2><p>Expires in 5 minutes.</p></body></html>`
-    ].join('\r\n');
+    for (let i = 0; i < smtpAttempts.length; i++) {
+        const smtpConfig = smtpAttempts[i];
+        console.log(`[sendOTPEmail] SMTP attempt ${i + 1}/${smtpAttempts.length}: host=${smtpConfig.host}, user=${smtpConfig.user}`);
 
-    // Try port 465 (direct SSL) first — some cloud platforms only block 587
-    const sent465 = await sendViaSMTP465(smtpConfig, email, otp, messageBody);
-    if (sent465) return true;
+        const messageBody = [
+            `From: "${smtpConfig.from}" <${smtpConfig.user}>`,
+            `To: ${email}`,
+            `Subject: Your OTP Code`,
+            `MIME-Version: 1.0`,
+            `Content-Type: text/html; charset=UTF-8`,
+            ``,
+            `<html><body><h2>Your OTP Code: ${otp}</h2><p>Expires in 5 minutes.</p></body></html>`
+        ].join('\r\n');
 
-    // Fallback to port 587 (STARTTLS)
-    const sent587 = await sendViaSMTP587(smtpConfig, email, otp, messageBody);
-    if (sent587) return true;
+        // Try port 465 first
+        console.log(`[sendOTPEmail] Trying SMTP port 465 with ${smtpConfig.user}...`);
+        const sent465 = await sendViaSMTP465(smtpConfig, email, otp, messageBody);
+        if (sent465) return true;
+
+        // Fallback to port 587
+        console.log(`[sendOTPEmail] Trying SMTP port 587 with ${smtpConfig.user}...`);
+        const sent587 = await sendViaSMTP587(smtpConfig, email, otp, messageBody);
+        if (sent587) return true;
+
+        if (i < smtpAttempts.length - 1) {
+            console.log(`[sendOTPEmail] Account ${smtpConfig.user} failed (likely quota). Trying next account...`);
+        }
+    }
 
     console.log(`[Console Fallback] OTP for ${email}: ${otp}`);
     return false;
 }
 
+// Helper: check if an SMTP response line is the FINAL line of a multi-line reply.
+// Multi-line replies use "250-..." for continuation and "250 ..." (space) for the last line.
+function isSmtpFinalLine(line) {
+    return /^\d{3} /.test(line) || /^\d{3}$/.test(line);
+}
+
+// Helper: run an SMTP conversation over a socket using a state machine
+function runSmtpSession(activeSocket, smtpConfig, email, messageBody, label, startStep = 0) {
+    return new Promise((resolve) => {
+        let resolved = false;
+        let buffer = '';
+        let step = startStep;
+        const debug = (msg) => console.log(`[${label}] ${msg}`);
+
+        debug(`Session started at step ${startStep}`);
+
+        const done = (success, reason) => {
+            if (!resolved) {
+                resolved = true;
+                debug(`Session ended: ${reason || (success ? 'success' : 'failed')}`);
+                resolve(success);
+            }
+        };
+
+        const onData = (data) => {
+            const text = data.toString();
+            debug(`<- received: ${text.replace(/\r\n/g, ' | ').trim()}`);
+            buffer += text;
+            const lines = buffer.split('\r\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                const code = trimmed.substring(0, 3);
+
+                // For multi-line responses (EHLO at step 1 and step 3 after-TLS), wait for final line
+                if ((step === 1 || step === 3) && !isSmtpFinalLine(trimmed)) {
+                    debug(`(skipping continuation line at step ${step})`);
+                    continue;
+                }
+
+                try {
+                    if (step === 0) { // Greeting (220)
+                        if (code === '220') {
+                            debug(`-> EHLO localhost`);
+                            activeSocket.write('EHLO localhost\r\n');
+                            step = 1;
+                        }
+                    } else if (step === 1) { // EHLO final response (250)
+                        if (code === '250') {
+                            debug(`-> AUTH LOGIN`);
+                            activeSocket.write('AUTH LOGIN\r\n');
+                            step = 2;
+                        }
+                    } else if (step === 2) { // AUTH (334 - send username)
+                        if (code === '334') {
+                            debug(`-> [base64 username]`);
+                            activeSocket.write(Buffer.from(smtpConfig.user.trim()).toString('base64') + '\r\n');
+                            step = 3;
+                        }
+                    } else if (step === 3) { // Username response (334 - send password)
+                        if (code === '334') {
+                            debug(`-> [base64 password]`);
+                            activeSocket.write(Buffer.from(smtpConfig.pass.trim()).toString('base64') + '\r\n');
+                            step = 4;
+                        }
+                    } else if (step === 4) { // Auth result
+                        if (code === '235') {
+                            debug(`✓ Authenticated. -> MAIL FROM`);
+                            activeSocket.write(`MAIL FROM:<${smtpConfig.user}>\r\n`);
+                            step = 5;
+                        } else {
+                            debug(`✗ Auth failed: ${trimmed}`);
+                            activeSocket.end();
+                            done(false, 'auth failed');
+                            return;
+                        }
+                    } else if (step === 5) { // MAIL FROM (250)
+                        if (code === '250') {
+                            debug(`-> RCPT TO:<${email}>`);
+                            activeSocket.write(`RCPT TO:<${email}>\r\n`);
+                            step = 6;
+                        }
+                    } else if (step === 6) { // RCPT TO (250)
+                        if (code === '250') {
+                            debug(`-> DATA`);
+                            activeSocket.write('DATA\r\n');
+                            step = 7;
+                        }
+                    } else if (step === 7) { // DATA (354)
+                        if (code === '354') {
+                            debug(`-> [message body]`);
+                            activeSocket.write(messageBody + '\r\n.\r\n');
+                            step = 8;
+                        }
+                    } else if (step === 8) { // Message accepted (250)
+                        if (code === '250') {
+                            debug(`-> QUIT`);
+                            activeSocket.write('QUIT\r\n');
+                            activeSocket.end();
+                            console.log(`✓ OTP sent to ${email} via SMTP (${label})`);
+                            done(true, 'message sent');
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.error(`[${label}] Error:`, err.message);
+                    activeSocket.destroy();
+                    done(false, 'exception: ' + err.message);
+                    return;
+                }
+            }
+        };
+
+        // Attach listeners synchronously
+        activeSocket.on('data', onData);
+
+        activeSocket.on('error', (err) => {
+            debug(`Socket error: ${err.message}`);
+            done(false, 'socket error: ' + err.message);
+        });
+
+        activeSocket.on('close', () => {
+            debug(`Socket closed (was at step ${step})`);
+            done(false, 'socket closed at step ' + step);
+        });
+    });
+}
+
 // SMTP via port 465 — direct TLS connection (no STARTTLS upgrade needed)
 function sendViaSMTP465(smtpConfig, email, otp, messageBody) {
     return new Promise((resolve) => {
+        let resolved = false;
+        let tlsSocket;
+
         const timeout = setTimeout(() => {
-            console.log(`[SMTP-465] Timeout`);
-            try { tlsSocket.destroy(); } catch (e) {}
-            resolve(false);
+            if (!resolved) {
+                console.log('[SMTP-465] Timeout');
+                resolved = true;
+                try { tlsSocket.destroy(); } catch (e) {}
+                resolve(false);
+            }
         }, 15000);
 
-        let tlsSocket;
         try {
-            tlsSocket = tls.connect(465, smtpConfig.host, { rejectUnauthorized: false }, async () => {
-                try {
-                    await new Promise(r => tlsSocket.once('data', r)); // greeting
-                    tlsSocket.write(`EHLO localhost\r\n`);
-                    await new Promise(r => tlsSocket.once('data', r));
-                    tlsSocket.write(`AUTH LOGIN\r\n`);
-                    await new Promise(r => tlsSocket.once('data', r));
-                    tlsSocket.write(Buffer.from(smtpConfig.user).toString('base64') + '\r\n');
-                    await new Promise(r => tlsSocket.once('data', r));
-                    tlsSocket.write(Buffer.from(smtpConfig.pass).toString('base64') + '\r\n');
-                    const authResp = await new Promise(r => { let d = ''; tlsSocket.once('data', c => { d += c; r(d); }); });
-                    if (!authResp.toString().startsWith('235')) {
-                        console.log(`[SMTP-465] Auth failed`);
-                        tlsSocket.end();
-                        clearTimeout(timeout);
-                        resolve(false);
-                        return;
-                    }
-                    tlsSocket.write(`MAIL FROM:<${smtpConfig.user}>\r\n`);
-                    await new Promise(r => tlsSocket.once('data', r));
-                    tlsSocket.write(`RCPT TO:<${email}>\r\n`);
-                    await new Promise(r => tlsSocket.once('data', r));
-                    tlsSocket.write(`DATA\r\n`);
-                    await new Promise(r => tlsSocket.once('data', r));
-                    tlsSocket.write(messageBody + '\r\n.\r\n');
-                    await new Promise(r => tlsSocket.once('data', r));
-                    tlsSocket.write(`QUIT\r\n`);
-                    tlsSocket.end();
+            console.log(`[SMTP-465] Connecting to ${smtpConfig.host}:465...`);
+            tlsSocket = tls.connect(465, smtpConfig.host, { rejectUnauthorized: false });
+
+            tlsSocket.once('secureConnect', () => {
+                console.log(`[SMTP-465] TLS secure connection established`);
+                runSmtpSession(tlsSocket, smtpConfig, email, messageBody, 'SMTP-465').then((success) => {
                     clearTimeout(timeout);
-                    console.log(`✓ OTP sent to ${email} via SMTP (port 465)`);
-                    resolve(true);
-                } catch (err) {
-                    clearTimeout(timeout);
-                    console.error('[SMTP-465] Error:', err.message);
-                    try { tlsSocket.destroy(); } catch (e) {}
-                    resolve(false);
-                }
+                    if (!resolved) { resolved = true; resolve(success); }
+                });
             });
+
             tlsSocket.on('error', (err) => {
                 clearTimeout(timeout);
-                console.error('[SMTP-465] Connection error:', err.message);
-                resolve(false);
+                if (!resolved) { resolved = true; console.error('[SMTP-465] Connection error:', err.message); resolve(false); }
             });
         } catch (err) {
             clearTimeout(timeout);
@@ -585,64 +749,80 @@ function sendViaSMTP465(smtpConfig, email, otp, messageBody) {
     });
 }
 
-// SMTP via port 587 — STARTTLS
+// SMTP via port 587 — STARTTLS upgrade from plain to TLS
 function sendViaSMTP587(smtpConfig, email, otp, messageBody) {
     return new Promise((resolve) => {
-        const timeout = setTimeout(() => {
-            console.log(`[SMTP-587] Timeout`);
-            try { socket.end(); } catch (e) {}
-            resolve(false);
-        }, 15000);
+        let socket;
+        let resolved = false;
 
-        const socket = net.createConnection(smtpConfig.port, smtpConfig.host, async () => {
-            try {
-                await new Promise(r => socket.once('data', r));
-                socket.write(`EHLO localhost\r\n`);
-                await new Promise(r => socket.once('data', r));
-                socket.write(`STARTTLS\r\n`);
-                await new Promise(r => socket.once('data', r));
-                const tlsSocket = await upgradeToTLS(socket, smtpConfig.host);
-                tlsSocket.write(`EHLO localhost\r\n`);
-                await new Promise(r => tlsSocket.once('data', r));
-                tlsSocket.write(`AUTH LOGIN\r\n`);
-                await new Promise(r => tlsSocket.once('data', r));
-                tlsSocket.write(Buffer.from(smtpConfig.user).toString('base64') + '\r\n');
-                await new Promise(r => tlsSocket.once('data', r));
-                tlsSocket.write(Buffer.from(smtpConfig.pass).toString('base64') + '\r\n');
-                const authResp = await new Promise(r => { let d=''; tlsSocket.once('data', c => { d+=c; r(d); }); });
-                if (!authResp.toString().startsWith('235')) {
-                    console.log(`[SMTP-587] Auth failed`);
-                    tlsSocket.end();
-                    clearTimeout(timeout);
-                    resolve(false);
-                    return;
-                }
-                tlsSocket.write(`MAIL FROM:<${smtpConfig.user}>\r\n`);
-                await new Promise(r => tlsSocket.once('data', r));
-                tlsSocket.write(`RCPT TO:<${email}>\r\n`);
-                await new Promise(r => tlsSocket.once('data', r));
-                tlsSocket.write(`DATA\r\n`);
-                await new Promise(r => tlsSocket.once('data', r));
-                tlsSocket.write(messageBody + '\r\n.\r\n');
-                await new Promise(r => tlsSocket.once('data', r));
-                tlsSocket.write(`QUIT\r\n`);
-                tlsSocket.end();
-                clearTimeout(timeout);
-                console.log(`✓ OTP sent to ${email} via SMTP (port 587)`);
-                resolve(true);
-            } catch (err) {
-                clearTimeout(timeout);
-                console.error('[SMTP-587] Error:', err.message);
-                try { socket.end(); } catch (e) {}
+        const timeout = setTimeout(() => {
+            if (!resolved) {
+                console.log('[SMTP-587] Timeout');
+                resolved = true;
+                try { socket.destroy(); } catch (e) {}
                 resolve(false);
             }
-        });
+        }, 15000);
 
-        socket.on('error', (err) => {
+        try {
+            socket = net.createConnection(smtpConfig.port, smtpConfig.host, () => {});
+
+            let buffer = '';
+            let step = 0; // 0=greeting, 1=EHLO response, 2=STARTTLS response
+
+            socket.on('data', (data) => {
+                buffer += data.toString();
+                const lines = buffer.split('\r\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed) continue;
+                    const code = trimmed.substring(0, 3);
+
+                    if (step === 1 && !isSmtpFinalLine(trimmed)) continue;
+
+                    if (step === 0 && code === '220') {
+                        socket.write('EHLO localhost\r\n');
+                        step = 1;
+                    } else if (step === 1 && code === '250') {
+                        socket.write('STARTTLS\r\n');
+                        step = 2;
+                    } else if (step === 2 && code === '220') {
+                        // CRITICAL FIX: Attach data listener to the NEW tlsSocket (not the old plain socket)
+                        const tlsSocket = tls.connect({ socket: socket, host: smtpConfig.host, rejectUnauthorized: false }, () => {
+                            tlsSocket.write('EHLO localhost\r\n');
+                            // Start auth session at step 1 (we already sent EHLO; next response is 250 EHLO reply)
+                            runSmtpSession(tlsSocket, smtpConfig, email, messageBody, 'SMTP-587', 1).then((success) => {
+                                clearTimeout(timeout);
+                                if (!resolved) { resolved = true; resolve(success); }
+                            });
+                        });
+
+                        tlsSocket.on('error', (err) => {
+                            clearTimeout(timeout);
+                            if (!resolved) { resolved = true; console.error('[SMTP-587] TLS error:', err.message); resolve(false); }
+                        });
+
+                        return; // tlsSocket handles the rest
+                    }
+                }
+            });
+
+            socket.on('error', (err) => {
+                clearTimeout(timeout);
+                if (!resolved) { resolved = true; console.error('[SMTP-587] Connection error:', err.message); resolve(false); }
+            });
+
+            socket.on('close', () => {
+                clearTimeout(timeout);
+                if (!resolved) { resolved = true; resolve(false); }
+            });
+        } catch (err) {
             clearTimeout(timeout);
-            console.error('[SMTP-587] Connection error:', err.message);
+            console.error('[SMTP-587] Failed:', err.message);
             resolve(false);
-        });
+        }
     });
 }
 

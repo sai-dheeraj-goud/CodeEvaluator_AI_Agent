@@ -4932,3 +4932,25 @@ yuqiioml"
 [2026-04-16T06:56:44.428Z] [LOG] ✗ Duplicate login attempt blocked: dheeraj.sai1798@gmail.com
 [2026-04-16T07:04:52.966Z] [LOG] ✗ Duplicate login attempt blocked: dheeraj.sai1798@gmail.com
 [2026-04-16T07:05:05.415Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (port 465)
+[2026-05-03T07:03:29.325Z] [LOG] ✓ Loaded .env configuration
+[2026-05-03T07:03:29.336Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
+[2026-05-03T07:03:29.338Z] [LOG] ⚠ Candidate email verification is DISABLED (open access)
+[2026-05-03T07:03:29.365Z] [LOG] 
+=== Code Evaluator AI Agent ===
+[2026-05-03T07:03:29.366Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-05-03T07:03:29.367Z] [LOG] ✓ IST Timestamp: 2026-05-03T12:33:29-367+05:30
+[2026-05-03T07:03:29.368Z] [LOG] 
+--- AI Provider Configuration ---
+[2026-05-03T07:03:29.369Z] [LOG]   Gemini:  ✗ disabled
+[2026-05-03T07:03:29.370Z] [LOG]   Claude:  ✗ disabled
+[2026-05-03T07:03:29.372Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-05-03T07:03:29.373Z] [LOG]   Ollama:  ✗ disabled
+[2026-05-03T07:03:29.374Z] [LOG]   Fallback chain: (none configured)
+[2026-05-03T07:03:29.375Z] [LOG] --------------------------------
+
+[2026-05-03T07:03:29.376Z] [LOG] ✓ Ready for requests
+
+[2026-05-03T07:04:08.522Z] [LOG] [SMTP-465] Timeout
+[2026-05-03T07:04:23.533Z] [LOG] [SMTP-587] Timeout
+[2026-05-03T07:04:23.534Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 671560
+[2026-05-03T07:04:23.535Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 671560
