@@ -1494,7 +1494,11 @@ function scoreOutputCorrectness(question, code, language, outputMatched = null) 
                 points += 5; strengths.push('Correctly initializes input data from problem');
             } else { points += 3; }
         }
-    } else { points += 3; }
+    } else {
+        // The question itself has no Input: section (e.g. "Print 1 to 100"). Don't
+        // dock points for something the problem doesn't require.
+        points += 5;
+    }
 
     return { points: Math.min(25, points), strengths, issues };
 }
@@ -1631,17 +1635,20 @@ function scoreLogicCorrectness(code, language, title, desc) {
         // Check: Proper loop bounds (no obvious off-by-one)
         const forLoopBounds = code.match(/for\s*\(\s*int\s+\w+\s*=\s*(\d+)\s*;\s*\w+\s*(<|<=|>|>=)\s*[^;]+;/g) || [];
         if (forLoopBounds.length > 0) { semanticPoints += 1; strengths.push('Proper loop bounds'); }
+        else if (hasRecursion || isNoLoopProblem) { semanticPoints += 1; }  // Recursion/no-loop is a valid alternative
 
         // Check: Return values in methods are used
         const nonVoidMethods = (code.match(/(?:public|private|static)\s+(?!void)\w+\s+\w+\s*\(/g) || []).length;
         if (nonVoidMethods > 0) { semanticPoints += 1; strengths.push('Methods return computed values'); }
         else { semanticPoints += 1; }
 
-        // Check: Proper array/collection traversal
+        // Check: Proper array/collection traversal (or recursion as alternative)
         if (/for\s*\(\s*\w+\s+\w+\s*:\s*\w+\s*\)/.test(code) || /\.forEach\s*\(/.test(code) || /\.stream\s*\(/.test(code)) {
             semanticPoints += 1; strengths.push('Uses enhanced iteration');
         } else if (/for\s*\(.*\.length|for\s*\(.*\.size/.test(code)) {
             semanticPoints += 1;
+        } else if (hasRecursion) {
+            semanticPoints += 1;  // Recursion is a perfectly valid traversal pattern
         } else { semanticPoints += 0.5; }
     } else if (isJS) {
         // JavaScript semantic checks
@@ -1690,12 +1697,21 @@ function scoreLogicCorrectness(code, language, title, desc) {
     points += Math.min(6, Math.round(semanticPoints));
 
     // 3. Data handling correctness (0-4 pts)
+    // Count regular variable declarations PLUS method parameters — recursion-style
+    // solutions often pass state through parameters rather than local vars, and
+    // shouldn't be penalised for it.
+    const javaVarMatches = isJava ? (code.match(/(int|String|long|double|boolean|char|float|List|Map|Set|var)\s+\w+/g) || []) : [];
+    const jsVarMatches   = isJS   ? (code.match(/(const|let|var)\s+\w+\s*=/g) || []) : [];
+    const pyVarMatches   = !isJava && !isJS ? (code.match(/\w+\s*=\s*(?!.*print)/g) || []) : [];
     const hasVariables = isJava
-        ? (code.match(/(int|String|long|double|boolean|char|float|List|Map|Set|var)\s+\w+/g) || []).length >= 2
-        : isJS ? (code.match(/(const|let|var)\s+\w+\s*=/g) || []).length >= 2
-        : (code.match(/\w+\s*=\s*(?!.*print)/g) || []).length >= 2;
+        ? javaVarMatches.length >= 2
+        : isJS ? jsVarMatches.length >= 2
+        : pyVarMatches.length >= 2;
     if (hasVariables) { points += 2; strengths.push('Proper variable usage'); }
-    else { points += 1; }
+    else if (isJava && javaVarMatches.length >= 1) {
+        // Single-variable Java code (e.g. recursion parameter) — still valid usage.
+        points += 2; strengths.push('Proper variable usage');
+    } else { points += 1; }
 
     const hasOutput = isJava ? /System\.out\.print/.test(code) : isJS ? /console\.log\s*\(/.test(code) : /\bprint\s*\(/.test(code);
     if (hasOutput) { points += 2; }
@@ -1741,7 +1757,12 @@ function scoreStructure(code, language, difficulty) {
         else if (methodCount === 1) { points += 2; strengths.push('Clean single-method solution'); }
         const varDecls = (code.match(/(int|String|long|double|float|boolean|char|List|Map|Set|Array)\s+\w+/g) || []).length;
         if (varDecls >= 3) { points += 3; strengths.push('Proper variable declarations'); }
-        else if (varDecls >= 1) { points += isSimple ? 2 : 1; }
+        else if (varDecls >= 1) {
+            // Solutions that delegate state to method parameters or recursion legitimately
+            // declare fewer variables — credit them fully when they have multiple methods.
+            points += (methodCount > 1 ? 3 : (isSimple ? 2 : 2));
+            if (methodCount > 1) strengths.push('Proper variable declarations');
+        }
     } else if (language === 'javascript') {
         const hasFunctions = /function\s+\w+\s*\(|=>/.test(code);
         if (hasFunctions) { points += 4; strengths.push('Uses functions for modularity'); }
@@ -1998,11 +2019,13 @@ function scoreCodeQuality(code, language, codeLines, difficulty) {
     let namingScore = 0;
     const meaningfulNames = names.filter(n => n.length > 2 && !/^(i|j|k|n|m|x|y|a|b|c|s|t|_)$/i.test(n));
     if (meaningfulNames.length >= 2) namingScore += 1;
+    else if (meaningfulNames.length >= 1) namingScore += 1;  // Even a single well-named variable counts
 
     // camelCase check for Java, snake_case check for Python
     if (isJava) {
         const camelCaseNames = names.filter(n => n.length > 2 && /^[a-z][a-zA-Z0-9]*$/.test(n));
         if (camelCaseNames.length >= 2) { namingScore += 1; }
+        else if (camelCaseNames.length >= 1) { namingScore += 1; }  // Single camelCase var is still correct convention
         const classNameCheck = (code.match(/class\s+([A-Z]\w*)/g) || []).length > 0;
         if (classNameCheck) { namingScore += 1; }
     } else if (language === 'javascript') {
@@ -2119,9 +2142,9 @@ function scoreEdgeCases(code, language, title, difficulty) {
         if (hasNoneCheck) { guardPts += 2; strengths.push('None safety checks'); }
         if (hasEmptyCheck) { guardPts += 1; }
     }
-    // For simple/moderate problems with fixed inputs, give partial credit even without guards
-    if (guardPts === 0 && isSimple) guardPts = 2;
-    else if (guardPts === 0) guardPts = 2; // Assessment problems have fixed inputs — guards are optional
+    // For simple/moderate problems with fixed inputs, give full credit even without guards —
+    // assessment problems have fixed inputs, so explicit guards are unnecessary overhead.
+    if (guardPts === 0) guardPts = 3;
     points += Math.min(3, guardPts);
 
     // 2. Error handling (0-3 pts)
@@ -2142,10 +2165,8 @@ function scoreEdgeCases(code, language, title, difficulty) {
         if (hasTryExcept && hasSpecificExcept) { errorPts += 3; strengths.push('Proper error handling with specific exceptions'); }
         else if (hasTryExcept) { errorPts += 2; if (/except\s*:/.test(code)) issues.push('Bare except — catch specific exceptions'); }
     }
-    // For simple/moderate fixed-input problems, give partial credit
-    // Assessment problems have fixed inputs — try-catch is unnecessary overhead
-    if (errorPts === 0 && isSimple) errorPts = 2;
-    else if (errorPts === 0) errorPts = 2; // Fixed-input problems don't need error handling
+    // Assessment problems have fixed inputs — try-catch is unnecessary overhead, full credit.
+    if (errorPts === 0) errorPts = 3;
     points += Math.min(3, errorPts);
 
     // 3. Boundary awareness (0-2 pts)
