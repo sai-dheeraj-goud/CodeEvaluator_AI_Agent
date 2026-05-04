@@ -1242,7 +1242,7 @@ def solve():
 // ==================== COMPREHENSIVE CODE EVALUATION ENGINE ====================
 // 7-Category Scoring: Output(25) + Logic(20) + Structure(10) + Relevance(15) + Quality(10) + EdgeCases(10) + Efficiency(10) = 100
 
-function runRuleBasedAgentAssist(question, userCode, language, mode = 'percentage') {
+function runRuleBasedAgentAssist(question, userCode, language, mode = 'percentage', outputMatched = null) {
     const title = (question.title || '').toLowerCase();
     const desc = (question.description || '').toLowerCase();
     const difficulty = (question.difficulty || 'moderate').toLowerCase();
@@ -1269,7 +1269,7 @@ function runRuleBasedAgentAssist(question, userCode, language, mode = 'percentag
     }
 
     // Step 1: Output Correctness (0–25 pts) — Did the code produce the right answer?
-    const outputScore = scoreOutputCorrectness(question, code, language);
+    const outputScore = scoreOutputCorrectness(question, code, language, outputMatched);
     score += outputScore.points;
     strengths.push(...outputScore.strengths);
     issues.push(...outputScore.issues);
@@ -1417,8 +1417,14 @@ function detectHardcodedOutput(code, language) {
 }
 
 // --- Output Correctness scoring (0-25 pts) ---
-// Validates whether the code's logic would produce the correct output
-function scoreOutputCorrectness(question, code, language) {
+// Validates whether the code's logic would produce the correct output.
+// When outputMatched is `true`, the program's actual stdout has already been
+// verified to equal the expected output — that's a runtime fact, far more
+// reliable than the static token-match heuristic below. We trust it and
+// award full credit. When outputMatched is `false`, the program output
+// mismatched and we award no credit. When outputMatched is `null` /
+// `undefined` we have no runtime evidence and fall back to static analysis.
+function scoreOutputCorrectness(question, code, language, outputMatched = null) {
     let points = 0;
     const strengths = [];
     const issues = [];
@@ -1431,22 +1437,34 @@ function scoreOutputCorrectness(question, code, language) {
     else { issues.push('No output statement found'); return { points: 0, strengths, issues }; }
 
     // 2. Output format matches expected pattern (+5)
-    const outputMatch = example.match(/Output:\s*([\s\S]*)$/i);
-    const expectedOutput = outputMatch ? outputMatch[1].trim() : '';
-    if (expectedOutput) {
-        // Check if key values from expected output appear in print statements
-        const expectedTokens = expectedOutput.replace(/[^\w\d.*#@]+/g, ' ').trim().split(/\s+/).filter(t => t.length > 0);
-        const printStatements = language === 'java'
-            ? (code.match(/System\.out\.print(?:ln)?\s*\([^)]*\)/g) || []).join(' ')
-            : language === 'javascript'
-            ? (code.match(/console\.log\s*\([^)]*\)/g) || []).join(' ')
-            : (code.match(/print\s*\([^)]*\)/g) || []).join(' ');
-        const tokenHits = expectedTokens.filter(t => printStatements.includes(t) || code.includes(t)).length;
-        const tokenRatio = expectedTokens.length > 0 ? tokenHits / expectedTokens.length : 0;
-        if (tokenRatio >= 0.5) { points += 5; strengths.push('Output format matches expected pattern'); }
-        else if (tokenRatio > 0) { points += 2; }
-        else { points += 1; issues.push('Output format may not match expected'); }
-    } else { points += 3; }
+    if (outputMatched === true) {
+        // Program actually ran and produced the expected output — trust that.
+        points += 5;
+        strengths.push('Output matches expected');
+    } else if (outputMatched === false) {
+        // Program ran and the output didn't match — don't award the format point.
+        issues.push('Output does not match expected');
+    } else {
+        // No runtime signal — fall back to a token-based static heuristic.
+        // (Note: this can be misleading for programs that compute their output
+        // through logic rather than embedding it as a literal — preserved for
+        // backward compatibility when the caller can't supply outputMatched.)
+        const outputMatch = example.match(/Output:\s*([\s\S]*)$/i);
+        const expectedOutput = outputMatch ? outputMatch[1].trim() : '';
+        if (expectedOutput) {
+            const expectedTokens = expectedOutput.replace(/[^\w\d.*#@]+/g, ' ').trim().split(/\s+/).filter(t => t.length > 0);
+            const printStatements = language === 'java'
+                ? (code.match(/System\.out\.print(?:ln)?\s*\([^)]*\)/g) || []).join(' ')
+                : language === 'javascript'
+                ? (code.match(/console\.log\s*\([^)]*\)/g) || []).join(' ')
+                : (code.match(/print\s*\([^)]*\)/g) || []).join(' ');
+            const tokenHits = expectedTokens.filter(t => printStatements.includes(t) || code.includes(t)).length;
+            const tokenRatio = expectedTokens.length > 0 ? tokenHits / expectedTokens.length : 0;
+            if (tokenRatio >= 0.5) { points += 5; strengths.push('Output format matches expected pattern'); }
+            else if (tokenRatio > 0) { points += 2; }
+            else { points += 1; issues.push('Output format may not match expected'); }
+        } else { points += 3; }
+    }
 
     // 3. Logic alignment with reference template (+10)
     if (template) {
@@ -3903,7 +3921,7 @@ const server = http.createServer(async (req, res) => {
                         } catch (e) { /* use basic question object */ }
                         const ruleResult = runRuleBasedAgentAssist(
                             fullQuestion,
-                            userCode, language, mode
+                            userCode, language, mode, outputMatched
                         );
                         result = {
                             suggestions: [ruleResult.explanation || 'Scored by rule-based engine'],
