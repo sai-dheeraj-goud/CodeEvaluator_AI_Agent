@@ -2682,11 +2682,25 @@ const server = http.createServer(async (req, res) => {
 
     // --- Candidate Email Management (for panelists) ---
     if (pathname === '/api/candidate-emails' && req.method === 'GET') {
+        // Read from CSV file directly so UI shows the actual file contents
+        // (preserves original casing, works regardless of verification flag).
+        let emails = [];
+        try {
+            if (fs.existsSync(CANDIDATE_EMAILS_CSV_PATH)) {
+                const raw = fs.readFileSync(CANDIDATE_EMAILS_CSV_PATH, 'utf-8');
+                const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                emails = lines.slice(1)
+                    .map(line => line.split(',')[0].replace(/^"|"$/g, '').trim())
+                    .filter(e => e && e.includes('@'));
+            }
+        } catch (err) {
+            console.error('Failed to read candidate emails CSV:', err.message);
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             enabled: CANDIDATE_EMAIL_VERIFICATION,
-            count: authorizedCandidateEmails.size,
-            emails: Array.from(authorizedCandidateEmails),
+            count: emails.length,
+            emails: emails,
             loggedIn: Array.from(loggedInCandidates),
             submitted: Array.from(submittedCandidates)
         }));
@@ -2732,10 +2746,23 @@ const server = http.createServer(async (req, res) => {
 
     // --- Panelist Email Management ---
     if (pathname === '/api/panelist-emails' && req.method === 'GET') {
+        // Read from CSV file directly so UI shows original casing.
+        let emails = [];
+        try {
+            if (fs.existsSync(PANELIST_EMAILS_CSV_PATH)) {
+                const raw = fs.readFileSync(PANELIST_EMAILS_CSV_PATH, 'utf-8');
+                const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                emails = lines.slice(1)
+                    .map(line => line.split(',')[0].replace(/^"|"$/g, '').trim())
+                    .filter(e => e && e.includes('@'));
+            }
+        } catch (err) {
+            console.error('Failed to read panelist emails CSV:', err.message);
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
-            count: authorizedPanelistEmails.size,
-            emails: Array.from(authorizedPanelistEmails)
+            count: emails.length,
+            emails: emails
         }));
         return;
     }
@@ -2747,6 +2774,618 @@ const server = http.createServer(async (req, res) => {
             message: 'Panelist emails reloaded',
             count: authorizedPanelistEmails.size
         }));
+        return;
+    }
+
+    // --- Add / Remove Candidate Emails (writes back to CSV) ---
+    if (pathname === '/api/candidate-emails/add' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { email } = JSON.parse(body || '{}');
+                const cleaned = (email || '').trim();
+                const lower = cleaned.toLowerCase();
+                if (!cleaned || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid email address' }));
+                    return;
+                }
+                // Read existing CSV (source of truth, preserves casing)
+                let existingLines = [];
+                let header = 'email';
+                if (fs.existsSync(CANDIDATE_EMAILS_CSV_PATH)) {
+                    const raw = fs.readFileSync(CANDIDATE_EMAILS_CSV_PATH, 'utf-8');
+                    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                    if (lines.length > 0) {
+                        header = lines[0];
+                        existingLines = lines.slice(1);
+                    }
+                }
+                // Duplicate check (case-insensitive)
+                const alreadyExists = existingLines.some(l =>
+                    l.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase() === lower
+                );
+                if (alreadyExists) {
+                    res.writeHead(409, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email already exists' }));
+                    return;
+                }
+                const updatedLines = [header, ...existingLines, cleaned];
+                fs.writeFileSync(CANDIDATE_EMAILS_CSV_PATH, updatedLines.join('\n') + '\n', 'utf-8');
+                authorizedCandidateEmails.add(lower);
+                console.log(`\u2713 Candidate email added: ${cleaned}`);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Candidate email added: ${cleaned}`,
+                    count: existingLines.length + 1
+                }));
+            } catch (err) {
+                console.error('\u2717 Failed to add candidate email:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Failed to add email: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    if (pathname === '/api/candidate-emails/remove' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { email } = JSON.parse(body || '{}');
+                const lower = (email || '').trim().toLowerCase();
+                if (!lower) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email is required' }));
+                    return;
+                }
+                if (!fs.existsSync(CANDIDATE_EMAILS_CSV_PATH)) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Candidate emails CSV not found' }));
+                    return;
+                }
+                const raw = fs.readFileSync(CANDIDATE_EMAILS_CSV_PATH, 'utf-8');
+                const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                if (lines.length === 0) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email not found' }));
+                    return;
+                }
+                const header = lines[0];
+                const dataLines = lines.slice(1);
+                const filtered = dataLines.filter(l =>
+                    l.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase() !== lower
+                );
+                if (filtered.length === dataLines.length) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email not found' }));
+                    return;
+                }
+                fs.writeFileSync(CANDIDATE_EMAILS_CSV_PATH, [header, ...filtered].join('\n') + '\n', 'utf-8');
+                authorizedCandidateEmails.delete(lower);
+                loggedInCandidates.delete(lower);
+                submittedCandidates.delete(lower);
+                console.log(`\u2713 Candidate email removed: ${lower}`);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Candidate email removed: ${lower}`,
+                    count: filtered.length
+                }));
+            } catch (err) {
+                console.error('\u2717 Failed to remove candidate email:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Failed to remove email: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    // --- Bulk Add Candidate Emails (from uploaded CSV/TXT) ---
+    if (pathname === '/api/candidate-emails/bulk-add' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { emails } = JSON.parse(body || '{}');
+                if (!Array.isArray(emails)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Request must include an "emails" array' }));
+                    return;
+                }
+                if (emails.length === 0) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'No emails provided' }));
+                    return;
+                }
+                if (emails.length > 5000) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Too many emails in one request (max 5000)' }));
+                    return;
+                }
+
+                // Read existing CSV
+                let existingLines = [];
+                let header = 'email';
+                if (fs.existsSync(CANDIDATE_EMAILS_CSV_PATH)) {
+                    const raw = fs.readFileSync(CANDIDATE_EMAILS_CSV_PATH, 'utf-8');
+                    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                    if (lines.length > 0) {
+                        header = lines[0];
+                        existingLines = lines.slice(1);
+                    }
+                }
+                const existingLowerSet = new Set(existingLines.map(l =>
+                    l.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase()
+                ));
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const result = { added: [], duplicates: [], invalid: [] };
+                const newLines = [];
+                const seenInBatch = new Set();
+
+                for (const raw of emails) {
+                    const cleaned = String(raw || '').trim();
+                    const lower = cleaned.toLowerCase();
+                    if (!cleaned || !emailRegex.test(cleaned)) {
+                        if (cleaned) result.invalid.push(cleaned);
+                        continue;
+                    }
+                    if (existingLowerSet.has(lower) || seenInBatch.has(lower)) {
+                        result.duplicates.push(cleaned);
+                        continue;
+                    }
+                    seenInBatch.add(lower);
+                    newLines.push(cleaned);
+                    result.added.push(cleaned);
+                    authorizedCandidateEmails.add(lower);
+                }
+
+                if (newLines.length > 0) {
+                    const allLines = [header, ...existingLines, ...newLines];
+                    fs.writeFileSync(CANDIDATE_EMAILS_CSV_PATH, allLines.join('\n') + '\n', 'utf-8');
+                    console.log(`\u2713 Bulk-added ${newLines.length} candidate email(s)`);
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Added ${result.added.length} candidate email(s). ${result.duplicates.length} duplicate(s), ${result.invalid.length} invalid skipped.`,
+                    addedCount: result.added.length,
+                    duplicateCount: result.duplicates.length,
+                    invalidCount: result.invalid.length,
+                    added: result.added,
+                    duplicates: result.duplicates,
+                    invalid: result.invalid,
+                    totalCount: existingLines.length + newLines.length
+                }));
+            } catch (err) {
+                console.error('\u2717 Bulk-add candidate emails failed:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Bulk add failed: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    // --- Bulk Remove Candidate Emails (from uploaded CSV/TXT/XLSX) ---
+    if (pathname === '/api/candidate-emails/bulk-remove' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { emails } = JSON.parse(body || '{}');
+                if (!Array.isArray(emails)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Request must include an "emails" array' }));
+                    return;
+                }
+                if (emails.length === 0) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'No emails provided' }));
+                    return;
+                }
+                if (emails.length > 5000) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Too many emails in one request (max 5000)' }));
+                    return;
+                }
+                if (!fs.existsSync(CANDIDATE_EMAILS_CSV_PATH)) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Candidate emails CSV not found' }));
+                    return;
+                }
+                const raw = fs.readFileSync(CANDIDATE_EMAILS_CSV_PATH, 'utf-8');
+                const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                if (lines.length === 0) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        message: 'No emails to remove (CSV is empty).',
+                        removedCount: 0, notFoundCount: 0, invalidCount: 0,
+                        removed: [], notFound: [], invalid: [],
+                        totalCount: 0
+                    }));
+                    return;
+                }
+                const header = lines[0];
+                const dataLines = lines.slice(1);
+
+                // Build a lookup of {lowercased -> raw line} for the existing CSV
+                const existingByLower = new Map();
+                for (const line of dataLines) {
+                    const e = line.split(',')[0].replace(/^"|"$/g, '').trim();
+                    if (e) existingByLower.set(e.toLowerCase(), line);
+                }
+
+                const result = { removed: [], notFound: [], invalid: [] };
+                const toRemoveLower = new Set();
+                for (const raw of emails) {
+                    const cleaned = String(raw || '').trim();
+                    const lower = cleaned.toLowerCase();
+                    if (!cleaned) continue;
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)) {
+                        result.invalid.push(cleaned);
+                        continue;
+                    }
+                    if (existingByLower.has(lower)) {
+                        if (!toRemoveLower.has(lower)) {
+                            toRemoveLower.add(lower);
+                            result.removed.push(cleaned);
+                        }
+                    } else {
+                        result.notFound.push(cleaned);
+                    }
+                }
+
+                if (toRemoveLower.size > 0) {
+                    const filtered = dataLines.filter(l => {
+                        const e = l.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase();
+                        return !toRemoveLower.has(e);
+                    });
+                    fs.writeFileSync(CANDIDATE_EMAILS_CSV_PATH, [header, ...filtered].join('\n') + '\n', 'utf-8');
+                    for (const lower of toRemoveLower) {
+                        authorizedCandidateEmails.delete(lower);
+                        loggedInCandidates.delete(lower);
+                        submittedCandidates.delete(lower);
+                    }
+                    console.log(`\u2713 Bulk-removed ${toRemoveLower.size} candidate email(s)`);
+                }
+
+                const finalCount = dataLines.length - toRemoveLower.size;
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Removed ${result.removed.length} candidate email(s). ${result.notFound.length} not found, ${result.invalid.length} invalid skipped.`,
+                    removedCount: result.removed.length,
+                    notFoundCount: result.notFound.length,
+                    invalidCount: result.invalid.length,
+                    removed: result.removed,
+                    notFound: result.notFound,
+                    invalid: result.invalid,
+                    totalCount: finalCount
+                }));
+            } catch (err) {
+                console.error('\u2717 Bulk-remove candidate emails failed:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Bulk remove failed: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    // --- Add / Remove Panelist Emails (writes back to CSV) ---
+    if (pathname === '/api/panelist-emails/add' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { email } = JSON.parse(body || '{}');
+                const cleaned = (email || '').trim();
+                const lower = cleaned.toLowerCase();
+                if (!cleaned || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Invalid email address' }));
+                    return;
+                }
+                let existingLines = [];
+                let header = 'email';
+                if (fs.existsSync(PANELIST_EMAILS_CSV_PATH)) {
+                    const raw = fs.readFileSync(PANELIST_EMAILS_CSV_PATH, 'utf-8');
+                    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                    if (lines.length > 0) {
+                        header = lines[0];
+                        existingLines = lines.slice(1);
+                    }
+                }
+                const alreadyExists = existingLines.some(l =>
+                    l.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase() === lower
+                );
+                if (alreadyExists) {
+                    res.writeHead(409, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email already exists' }));
+                    return;
+                }
+                const updatedLines = [header, ...existingLines, cleaned];
+                fs.writeFileSync(PANELIST_EMAILS_CSV_PATH, updatedLines.join('\n') + '\n', 'utf-8');
+                authorizedPanelistEmails.add(lower);
+                console.log(`\u2713 Panelist email added: ${cleaned}`);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Panelist email added: ${cleaned}`,
+                    count: existingLines.length + 1
+                }));
+            } catch (err) {
+                console.error('\u2717 Failed to add panelist email:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Failed to add email: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    if (pathname === '/api/panelist-emails/remove' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { email, requesterEmail } = JSON.parse(body || '{}');
+                const lower = (email || '').trim().toLowerCase();
+                const requester = (requesterEmail || '').trim().toLowerCase();
+                if (!lower) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email is required' }));
+                    return;
+                }
+                // Safety: prevent self-removal (would lose access immediately)
+                if (requester && lower === requester) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        error: 'You cannot remove your own panelist access while logged in.'
+                    }));
+                    return;
+                }
+                if (!fs.existsSync(PANELIST_EMAILS_CSV_PATH)) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Panelist emails CSV not found' }));
+                    return;
+                }
+                const raw = fs.readFileSync(PANELIST_EMAILS_CSV_PATH, 'utf-8');
+                const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                if (lines.length === 0) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email not found' }));
+                    return;
+                }
+                const header = lines[0];
+                const dataLines = lines.slice(1);
+                // Safety: don't allow removing the last panelist
+                if (dataLines.length <= 1) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Cannot remove the last remaining panelist.' }));
+                    return;
+                }
+                const filtered = dataLines.filter(l =>
+                    l.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase() !== lower
+                );
+                if (filtered.length === dataLines.length) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Email not found' }));
+                    return;
+                }
+                fs.writeFileSync(PANELIST_EMAILS_CSV_PATH, [header, ...filtered].join('\n') + '\n', 'utf-8');
+                authorizedPanelistEmails.delete(lower);
+                console.log(`\u2713 Panelist email removed: ${lower}`);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Panelist email removed: ${lower}`,
+                    count: filtered.length
+                }));
+            } catch (err) {
+                console.error('\u2717 Failed to remove panelist email:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Failed to remove email: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    // --- Bulk Add Panelist Emails (from uploaded CSV/TXT) ---
+    if (pathname === '/api/panelist-emails/bulk-add' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { emails } = JSON.parse(body || '{}');
+                if (!Array.isArray(emails)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Request must include an "emails" array' }));
+                    return;
+                }
+                if (emails.length === 0) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'No emails provided' }));
+                    return;
+                }
+                if (emails.length > 5000) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Too many emails in one request (max 5000)' }));
+                    return;
+                }
+
+                let existingLines = [];
+                let header = 'email';
+                if (fs.existsSync(PANELIST_EMAILS_CSV_PATH)) {
+                    const raw = fs.readFileSync(PANELIST_EMAILS_CSV_PATH, 'utf-8');
+                    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                    if (lines.length > 0) {
+                        header = lines[0];
+                        existingLines = lines.slice(1);
+                    }
+                }
+                const existingLowerSet = new Set(existingLines.map(l =>
+                    l.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase()
+                ));
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const result = { added: [], duplicates: [], invalid: [] };
+                const newLines = [];
+                const seenInBatch = new Set();
+
+                for (const raw of emails) {
+                    const cleaned = String(raw || '').trim();
+                    const lower = cleaned.toLowerCase();
+                    if (!cleaned || !emailRegex.test(cleaned)) {
+                        if (cleaned) result.invalid.push(cleaned);
+                        continue;
+                    }
+                    if (existingLowerSet.has(lower) || seenInBatch.has(lower)) {
+                        result.duplicates.push(cleaned);
+                        continue;
+                    }
+                    seenInBatch.add(lower);
+                    newLines.push(cleaned);
+                    result.added.push(cleaned);
+                    authorizedPanelistEmails.add(lower);
+                }
+
+                if (newLines.length > 0) {
+                    const allLines = [header, ...existingLines, ...newLines];
+                    fs.writeFileSync(PANELIST_EMAILS_CSV_PATH, allLines.join('\n') + '\n', 'utf-8');
+                    console.log(`\u2713 Bulk-added ${newLines.length} panelist email(s)`);
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Added ${result.added.length} panelist email(s). ${result.duplicates.length} duplicate(s), ${result.invalid.length} invalid skipped.`,
+                    addedCount: result.added.length,
+                    duplicateCount: result.duplicates.length,
+                    invalidCount: result.invalid.length,
+                    added: result.added,
+                    duplicates: result.duplicates,
+                    invalid: result.invalid,
+                    totalCount: existingLines.length + newLines.length
+                }));
+            } catch (err) {
+                console.error('\u2717 Bulk-add panelist emails failed:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Bulk add failed: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    // --- Bulk Remove Panelist Emails (from uploaded CSV/TXT/XLSX) ---
+    if (pathname === '/api/panelist-emails/bulk-remove' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const { emails, requesterEmail } = JSON.parse(body || '{}');
+                if (!Array.isArray(emails)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Request must include an "emails" array' }));
+                    return;
+                }
+                if (emails.length === 0) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'No emails provided' }));
+                    return;
+                }
+                if (emails.length > 5000) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Too many emails in one request (max 5000)' }));
+                    return;
+                }
+                if (!fs.existsSync(PANELIST_EMAILS_CSV_PATH)) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Panelist emails CSV not found' }));
+                    return;
+                }
+                const requester = (requesterEmail || '').trim().toLowerCase();
+                const raw = fs.readFileSync(PANELIST_EMAILS_CSV_PATH, 'utf-8');
+                const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+                if (lines.length === 0) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        message: 'No emails to remove (CSV is empty).',
+                        removedCount: 0, notFoundCount: 0, invalidCount: 0,
+                        removed: [], notFound: [], invalid: [], skippedSelf: [],
+                        totalCount: 0
+                    }));
+                    return;
+                }
+                const header = lines[0];
+                const dataLines = lines.slice(1);
+
+                const existingByLower = new Map();
+                for (const line of dataLines) {
+                    const e = line.split(',')[0].replace(/^"|"$/g, '').trim();
+                    if (e) existingByLower.set(e.toLowerCase(), line);
+                }
+
+                const result = { removed: [], notFound: [], invalid: [], skippedSelf: [] };
+                const toRemoveLower = new Set();
+
+                for (const raw of emails) {
+                    const cleaned = String(raw || '').trim();
+                    const lower = cleaned.toLowerCase();
+                    if (!cleaned) continue;
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)) {
+                        result.invalid.push(cleaned);
+                        continue;
+                    }
+                    // Safety: never remove the requester's own panelist access
+                    if (requester && lower === requester) {
+                        result.skippedSelf.push(cleaned);
+                        continue;
+                    }
+                    if (existingByLower.has(lower)) {
+                        if (!toRemoveLower.has(lower)) {
+                            toRemoveLower.add(lower);
+                            result.removed.push(cleaned);
+                        }
+                    } else {
+                        result.notFound.push(cleaned);
+                    }
+                }
+
+                // Safety: don't allow this request to wipe out the panelist list entirely
+                const remaining = dataLines.length - toRemoveLower.size;
+                if (remaining < 1) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({
+                        error: 'Refusing to remove the last remaining panelist(s). At least one must stay.'
+                    }));
+                    return;
+                }
+
+                if (toRemoveLower.size > 0) {
+                    const filtered = dataLines.filter(l => {
+                        const e = l.split(',')[0].replace(/^"|"$/g, '').trim().toLowerCase();
+                        return !toRemoveLower.has(e);
+                    });
+                    fs.writeFileSync(PANELIST_EMAILS_CSV_PATH, [header, ...filtered].join('\n') + '\n', 'utf-8');
+                    for (const lower of toRemoveLower) authorizedPanelistEmails.delete(lower);
+                    console.log(`\u2713 Bulk-removed ${toRemoveLower.size} panelist email(s)`);
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Removed ${result.removed.length} panelist email(s). ${result.notFound.length} not found, ${result.invalid.length} invalid skipped.${result.skippedSelf.length ? ' Your own email was skipped for safety.' : ''}`,
+                    removedCount: result.removed.length,
+                    notFoundCount: result.notFound.length,
+                    invalidCount: result.invalid.length,
+                    removed: result.removed,
+                    notFound: result.notFound,
+                    invalid: result.invalid,
+                    skippedSelf: result.skippedSelf,
+                    totalCount: remaining
+                }));
+            } catch (err) {
+                console.error('\u2717 Bulk-remove panelist emails failed:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Bulk remove failed: ' + err.message }));
+            }
+        });
         return;
     }
 

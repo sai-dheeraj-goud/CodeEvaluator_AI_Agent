@@ -1078,3 +1078,411 @@ code {
 .feedback-status.sending {
     color: #FFC107;
 }
+
+/* ==================== Email Manager (Manage Candidate/Panelist Emails) ==================== */
+.btn-manage {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    background: #ff9800;
+    color: white;
+    transition: 0.3s;
+}
+
+.btn-manage:hover {
+    background: #f57c00;
+}
+
+.email-manager-content {
+    max-width: 720px;
+    width: 90%;
+}
+
+.email-add-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.email-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.email-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.email-status {
+    min-height: 22px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    padding: 6px 0;
+}
+
+.email-status.success {
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.email-status.error {
+    color: #c62828;
+    font-weight: 600;
+}
+
+.email-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 0 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.email-list-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.email-search {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    min-width: 240px;
+}
+
+.email-list {
+    max-height: 380px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.email-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+}
+
+.email-row:last-child {
+    border-bottom: none;
+}
+
+.email-row:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.email-row-index {
+    color: #888;
+    font-size: 13px;
+    min-width: 30px;
+    text-align: right;
+}
+
+.email-row-text {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+    word-break: break-all;
+}
+
+.email-row-text em {
+    color: #667eea;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.btn-remove-email {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #f44336;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-remove-email:hover:not(:disabled) {
+    background: #d32f2f;
+}
+
+.btn-remove-email:disabled {
+    background: #bdbdbd;
+    cursor: not-allowed;
+}
+
+.email-empty {
+    text-align: center;
+    color: #888;
+    padding: 30px 10px;
+    margin: 0;
+}
+
+.email-empty.error {
+    color: #c62828;
+}
+
+/* ==================== Email File Upload (CSV / TXT) ==================== */
+.email-upload-row {
+    margin-bottom: 14px;
+}
+
+.upload-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0 10px;
+    color: #888;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.upload-divider::before,
+.upload-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e0e0e0;
+}
+
+.upload-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-select-file {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: #1d77e0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.btn-select-file:hover {
+    background: #1864bc;
+    transform: translateY(-1px);
+}
+
+.btn-select-file svg {
+    flex-shrink: 0;
+}
+
+.file-name-display {
+    flex: 1;
+    min-width: 0;
+    color: #555;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-name-display:empty::before {
+    content: 'No file chosen';
+    color: #999;
+    font-style: italic;
+}
+
+#clearFileBtn {
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.upload-hint {
+    margin: 8px 2px 0;
+    font-size: 12px;
+    color: #888;
+    line-height: 1.4;
+}
+
+/* Push the Manage Emails buttons to the extreme right of the filter bar */
+.filter-section-right {
+    margin-left: auto;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Inside the email manager modal, the Add buttons use the same blue
+   as the "Select a file" button so the controls feel unified. */
+.email-manager-content .email-add-row .btn-primary,
+.email-manager-content .upload-controls .btn-primary {
+    background: #1d77e0;
+}
+.email-manager-content .email-add-row .btn-primary:hover,
+.email-manager-content .upload-controls .btn-primary:hover {
+    background: #1864bc;
+}
+.email-manager-content .upload-controls .btn-primary:disabled {
+    background: #c0c0c0;
+    cursor: not-allowed;
+}
+
+/* ==================== Upload Details Panel (duplicates / invalid) ==================== */
+.upload-details-panel {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: #fafbff;
+    border: 1px solid #e3e7f3;
+    border-radius: 8px;
+}
+
+.upload-details-section {
+    margin-bottom: 14px;
+}
+
+.upload-details-section:last-child {
+    margin-bottom: 0;
+}
+
+.upload-details-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.upload-details-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.upload-details-icon.dup-icon {
+    background: #f59e0b;  /* amber for duplicates */
+}
+
+.upload-details-icon.inv-icon {
+    background: #ef4444;  /* red for invalid */
+}
+
+.upload-details-divider {
+    flex: 1;
+    height: 1px;
+    background: #e3e7f3;
+    margin-left: 6px;
+}
+
+.upload-details-list {
+    margin: 0;
+    padding: 0 0 0 30px;
+    list-style: none;
+    max-height: 160px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #eef0f8;
+    border-radius: 6px;
+}
+
+.upload-details-list li {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #444;
+    border-bottom: 1px solid #f3f5fb;
+    word-break: break-all;
+    list-style: none;
+    margin-left: -30px;
+    padding-left: 12px;
+}
+
+.upload-details-list li:last-child {
+    border-bottom: none;
+}
+
+#duplicateDetailsSection .upload-details-list li {
+    color: #b45309;  /* amber-700 */
+}
+
+#invalidDetailsSection .upload-details-list li {
+    color: #b91c1c;  /* red-700 */
+}
+
+/* Bulk Remove button — sits next to the bulk Add button. Uses a red palette
+   to contrast with the blue Add button so the destructive action is obvious. */
+.btn-bulk-remove {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    background: #dc3545;
+    color: white;
+    transition: 0.2s;
+    flex-shrink: 0;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-bulk-remove:hover:not(:disabled) {
+    background: #b52a37;
+    transform: translateY(-1px);
+}
+
+.btn-bulk-remove:disabled {
+    background: #c0c0c0;
+    cursor: not-allowed;
+}
+
+/* "Not found" details section icon (used when bulk-remove finds entries
+   that aren't in the system). Slate grey to read as informational rather than
+   an error or warning. */
+.upload-details-icon.nf-icon {
+    background: #6b7280;  /* slate-500 */
+}
+
+#notFoundDetailsSection .upload-details-list li {
+    color: #4b5563;  /* slate-700 */
+}
+
+/* Dark shield icon inside the orange "Manage" buttons and modal heading */
+.btn-manage-icon {
+    vertical-align: -3px;
+    margin-right: 2px;
+}
+
+.modal-title-icon {
+    vertical-align: -3px;
+    margin-right: 4px;
+}

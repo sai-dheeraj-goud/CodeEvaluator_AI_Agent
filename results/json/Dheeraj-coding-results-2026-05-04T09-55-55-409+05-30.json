@@ -1,0 +1,92 @@
+{
+  "personName": "Dheeraj",
+  "email": "dheeraj.sai17@gmail.com",
+  "location": "Bangalore",
+  "experienceYears": "6",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 30,
+      "title": "Sort Array Ascending and Descending",
+      "description": "Write a program to sort an array in both ascending (increment) and descending (decrement) order.",
+      "completed": true,
+      "language": "java",
+      "code": "public class SortArray {\n    public static void main(String[] args) {\n\n        // Static input\n        int[] arr = {2, 5, 1, 7, 30, 12, 19};\n        int n = arr.length;\n\n        // Ascending order (Increment)\n        int[] inc = arr.clone();\n        for (int i = 0; i < n - 1; i++) {\n            for (int j = i + 1; j < n; j++) {\n                if (inc[i] > inc[j]) {\n                    int temp = inc[i];\n                    inc[i] = inc[j];\n                    inc[j] = temp;\n                }\n            }\n        }\n\n        System.out.print(\"Increment Order - {\");\n        for (int i = 0; i < n; i++) {\n            System.out.print(inc[i] + (i < n - 1 ? \", \" : \"\"));\n        }\n        System.out.println(\"}\");\n\n        // Descending order (Decrement)\n        int[] dec = arr.clone();\n        for (int i = 0; i < n - 1; i++) {\n            for (int j = i + 1; j < n; j++) {\n                if (dec[i] < dec[j]) {\n                    int temp = dec[i];\n                    dec[i] = dec[j];\n                    dec[j] = temp;\n                }\n            }\n        }\n\n        System.out.print(\"Decrement Order - {\");\n        for (int i = 0; i < n; i++) {\n            System.out.print(dec[i] + (i < n - 1 ? \", \" : \"\"));\n        }\n        System.out.println(\"}\");\n    }\n}",
+      "expectedOutput": "Increment Order - {1, 2, 5, 7, 12, 19, 30}\nDecrement Order - {30, 19, 12, 7, 5, 2, 1}",
+      "actualOutput": "Increment Order - {1, 2, 5, 7, 12, 19, 30}\r\nDecrement Order - {30, 19, 12, 7, 5, 2, 1}",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 84,
+      "agentSuggestion": "Good solution. Has output statement; Output format matches expected pattern; Logic partially aligns with reference; Correctly initializes input data from problem. Minor: none.",
+      "agentCovered": [
+        "Has output statement",
+        "Output format matches expected pattern",
+        "Logic partially aligns with reference",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper loop bounds"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 90,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 1134 characters of changes",
+        "Unrealistic typing speed (563 chars/min)"
+      ],
+      "tabSwitchCount": 2,
+      "questionTimeSpent": 97
+    },
+    {
+      "questionId": 12,
+      "title": "Duplicate Characters in List of Strings",
+      "description": "Write a program to find duplicate characters across a list of strings [\"hello\", \"world\"]. Print the duplicate characters sorted alphabetically.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "l, o",
+      "actualOutput": "{\"html\":\"Ready to run...\",\"sectionClass\":\"output-section\",\"validationStatus\":\"\",\"lastRunResult\":null}",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 21
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 118,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 42
+  },
+  "aiLikelihood": {
+    "average": 45,
+    "highest": 90,
+    "perQuestion": [
+      {
+        "questionId": 30,
+        "title": "Sort Array Ascending and Descending",
+        "score": 90,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 1134 characters of changes",
+          "Unrealistic typing speed (563 chars/min)"
+        ]
+      },
+      {
+        "questionId": 12,
+        "title": "Duplicate Characters in List of Strings",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

@@ -47,6 +47,10 @@
             <input type="date" id="dateFilter" />
             <button onclick="loadData()" class="btn-primary">Show</button>
             <button onclick="downloadCSV()" class="btn-secondary">📥 Download as CSV</button>
+            <div class="filter-section-right">
+                <button onclick="openEmailManager('candidate')" class="btn-manage">👤 Manage Candidate Emails</button>
+                <button onclick="openEmailManager('panelist')" class="btn-manage"><svg class="btn-manage-icon" width="16" height="16" viewBox="0 0 24 24" fill="#1f2937" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 1.5 3.5 5v6c0 5.25 3.65 9.99 8.5 11.5 4.85-1.51 8.5-6.25 8.5-11.5V5L12 1.5z"/></svg> Manage Panelist Emails</button>
+            </div>
         </div>
 
         <!-- Summary Cards -->
@@ -199,6 +203,84 @@
             </div>
             <div class="modal-footer">
                 <button onclick="closeAgentScoreModal()" class="btn-secondary">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Email Management (Candidate / Panelist) -->
+    <div id="emailManagerModal" class="modal" style="display: none;">
+        <div class="modal-content email-manager-content">
+            <div class="modal-header">
+                <h2 id="emailManagerTitle">Manage Emails</h2>
+                <span class="close" onclick="closeEmailManager()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="email-add-row">
+                    <input type="email" id="newEmailInput" placeholder="Enter email address (e.g. user@example.com)" class="email-input" />
+                    <button onclick="addEmail()" class="btn-primary">➕ Add</button>
+                </div>
+
+                <div class="email-upload-row">
+                    <div class="upload-divider"><span>OR upload a file</span></div>
+                    <div class="upload-controls">
+                        <label for="emailFileInput" class="btn-select-file" id="fileLabel">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>Select a file</span>
+                        </label>
+                        <input type="file" id="emailFileInput" accept=".csv,.txt,.xlsx,.xls,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" onchange="onEmailFileSelected()" hidden />
+                        <button onclick="uploadEmailFile()" id="uploadBtn" class="btn-primary" disabled>➕ Add</button>
+                        <button onclick="removeEmailFile()" id="removeBtn" class="btn-bulk-remove" disabled>🗑 Remove</button>
+                        <span id="fileLabelText" class="file-name-display"></span>
+                        <button onclick="clearEmailFile()" id="clearFileBtn" class="btn-secondary" style="display:none;">✕</button>
+                    </div>
+                    <p class="upload-hint">Accepts .csv, .txt, or .xlsx — one email per line, or any column containing emails. Click <strong>Add</strong> to add the file's emails or <strong>Remove</strong> to delete them. Duplicates and invalid lines are skipped.</p>
+
+                    <div id="uploadDetailsPanel" class="upload-details-panel" style="display:none;">
+                        <div class="upload-details-section" id="duplicateDetailsSection" style="display:none;">
+                            <div class="upload-details-title">
+                                <span class="upload-details-icon dup-icon">⚠</span>
+                                Duplicate mail details (<span id="duplicateDetailsCount">0</span>)
+                                <span class="upload-details-divider"></span>
+                            </div>
+                            <ul class="upload-details-list" id="duplicateDetailsList"></ul>
+                        </div>
+
+                        <div class="upload-details-section" id="invalidDetailsSection" style="display:none;">
+                            <div class="upload-details-title">
+                                <span class="upload-details-icon inv-icon">✕</span>
+                                Invalid details (<span id="invalidDetailsCount">0</span>)
+                                <span class="upload-details-divider"></span>
+                            </div>
+                            <ul class="upload-details-list" id="invalidDetailsList"></ul>
+                        </div>
+
+                        <div class="upload-details-section" id="notFoundDetailsSection" style="display:none;">
+                            <div class="upload-details-title">
+                                <span class="upload-details-icon nf-icon">?</span>
+                                Not found (<span id="notFoundDetailsCount">0</span>)
+                                <span class="upload-details-divider"></span>
+                            </div>
+                            <ul class="upload-details-list" id="notFoundDetailsList"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="emailManagerStatus" class="email-status"></div>
+
+                <div class="email-list-header">
+                    <h3>Current Emails (<span id="emailListCount">0</span>)</h3>
+                    <input type="text" id="emailSearchInput" placeholder="🔍 Search emails..." class="email-search" oninput="filterEmailList()" />
+                </div>
+                <div class="email-list" id="emailListContainer">
+                    <p class="email-empty">Loading...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeEmailManager()" class="btn-secondary">Close</button>
             </div>
         </div>
     </div>

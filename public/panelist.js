@@ -728,3 +728,802 @@ function downloadFile(content, filename, type) {
         }
     });
 })();
+
+// ==================== EMAIL MANAGEMENT (Candidate / Panelist) ====================
+let currentEmailType = null;       // 'candidate' or 'panelist'
+let currentEmailList = [];
+
+function openEmailManager(type) {
+    currentEmailType = type;
+    const modal  = document.getElementById('emailManagerModal');
+    const title  = document.getElementById('emailManagerTitle');
+    const input  = document.getElementById('newEmailInput');
+    const search = document.getElementById('emailSearchInput');
+    const status = document.getElementById('emailManagerStatus');
+
+    if (type === 'candidate') {
+        title.textContent = '👤 Manage Candidate Emails';
+    } else {
+        title.innerHTML = '<svg class="modal-title-icon" width="20" height="20" viewBox="0 0 24 24" fill="#1f2937" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 1.5 3.5 5v6c0 5.25 3.65 9.99 8.5 11.5 4.85-1.51 8.5-6.25 8.5-11.5V5L12 1.5z"/></svg> Manage Panelist Emails';
+    }
+    input.value = '';
+    search.value = '';
+    status.textContent = '';
+    status.className = 'email-status';
+    clearEmailFile();
+    modal.style.display = 'block';
+    loadEmailList();
+
+    // Submit on Enter key
+    input.onkeydown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addEmail();
+        }
+    };
+}
+
+function closeEmailManager() {
+    document.getElementById('emailManagerModal').style.display = 'none';
+    clearEmailFile();
+    currentEmailType = null;
+    currentEmailList = [];
+}
+
+async function loadEmailList() {
+    const container = document.getElementById('emailListContainer');
+    const countEl   = document.getElementById('emailListCount');
+    container.innerHTML = '<p class="email-empty">Loading...</p>';
+    try {
+        const url = currentEmailType === 'candidate'
+            ? '/api/candidate-emails'
+            : '/api/panelist-emails';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to fetch emails');
+        const data = await res.json();
+        currentEmailList = (data.emails || []).slice().sort((a, b) => a.localeCompare(b));
+        countEl.textContent = currentEmailList.length;
+        renderEmailList(currentEmailList);
+    } catch (err) {
+        container.innerHTML = `<p class="email-empty error">Failed to load emails: ${err.message}</p>`;
+        countEl.textContent = '0';
+    }
+}
+
+function renderEmailList(list) {
+    const container = document.getElementById('emailListContainer');
+    if (!list || list.length === 0) {
+        container.innerHTML = '<p class="email-empty">No emails found.</p>';
+        return;
+    }
+    const currentUserEmail = (localStorage.getItem('candidateId') || '').trim().toLowerCase();
+    const html = list.map((email, idx) => {
+        const isSelf = currentEmailType === 'panelist' && email.toLowerCase() === currentUserEmail;
+        const removeBtn = isSelf
+            ? `<button class="btn-remove-email" disabled title="You cannot remove your own access">🗑 Remove</button>`
+            : `<button class="btn-remove-email" onclick="removeEmail('${escapeAttr(email)}')">🗑 Remove</button>`;
+        return `
+            <div class="email-row">
+                <span class="email-row-index">${idx + 1}</span>
+                <span class="email-row-text">${escapeHtml(email)}${isSelf ? ' <em>(you)</em>' : ''}</span>
+                ${removeBtn}
+            </div>
+        `;
+    }).join('');
+    container.innerHTML = html;
+}
+
+function filterEmailList() {
+    const term = (document.getElementById('emailSearchInput').value || '').trim().toLowerCase();
+    if (!term) {
+        renderEmailList(currentEmailList);
+        return;
+    }
+    const filtered = currentEmailList.filter(e => e.toLowerCase().includes(term));
+    renderEmailList(filtered);
+}
+
+async function addEmail() {
+    const input = document.getElementById('newEmailInput');
+    const email = (input.value || '').trim();
+
+    if (!email) {
+        showEmailStatus('Please enter an email address.', 'error');
+        return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showEmailStatus('Please enter a valid email address.', 'error');
+        return;
+    }
+
+    const url = currentEmailType === 'candidate'
+        ? '/api/candidate-emails/add'
+        : '/api/panelist-emails/add';
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            showEmailStatus(data.error || 'Failed to add email.', 'error');
+            return;
+        }
+        showEmailStatus(`✓ ${data.message}`, 'success');
+        input.value = '';
+        await loadEmailList();
+    } catch (err) {
+        showEmailStatus('Network error: ' + err.message, 'error');
+    }
+}
+
+async function removeEmail(email) {
+    if (!email) return;
+    const label = currentEmailType === 'candidate' ? 'candidate' : 'panelist';
+    if (!confirm(`Remove ${label} email "${email}"?\n\nThis action cannot be undone.`)) return;
+
+    const url = currentEmailType === 'candidate'
+        ? '/api/candidate-emails/remove'
+        : '/api/panelist-emails/remove';
+
+    const requesterEmail = (localStorage.getItem('candidateId') || '').trim().toLowerCase();
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, requesterEmail })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            showEmailStatus(data.error || 'Failed to remove email.', 'error');
+            return;
+        }
+        showEmailStatus(`✓ ${data.message}`, 'success');
+        await loadEmailList();
+    } catch (err) {
+        showEmailStatus('Network error: ' + err.message, 'error');
+    }
+}
+
+function showEmailStatus(message, type) {
+    const status = document.getElementById('emailManagerStatus');
+    status.textContent = message;
+    status.className = 'email-status ' + (type || '');
+    if (type === 'success') {
+        setTimeout(() => {
+            if (status.textContent === message) {
+                status.textContent = '';
+                status.className = 'email-status';
+            }
+        }, 3000);
+    }
+}
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function escapeAttr(str) {
+    return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// Close email manager modal when clicking outside
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('emailManagerModal');
+    if (event.target === modal) {
+        closeEmailManager();
+    }
+});
+
+// ==================== EMAIL FILE UPLOAD (CSV / TXT / XLSX) ====================
+let pendingFileEmails = []; // emails parsed from the selected file, awaiting upload
+let _xlsxLibPromise = null; // lazily loaded SheetJS library
+
+/**
+ * Load SheetJS (xlsx) from a CDN on demand. Cached after first load.
+ * Pure-frontend: keeps the server's "zero npm install" property intact.
+ */
+function loadXlsxLib() {
+    if (typeof window !== 'undefined' && window.XLSX) {
+        return Promise.resolve(window.XLSX);
+    }
+    if (_xlsxLibPromise) return _xlsxLibPromise;
+    _xlsxLibPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        script.async = true;
+        script.onload = () => {
+            if (window.XLSX) resolve(window.XLSX);
+            else reject(new Error('XLSX library failed to initialise'));
+        };
+        script.onerror = () => reject(new Error(
+            'Could not load Excel parser. Check your internet connection, ' +
+            'or convert the file to CSV/TXT.'
+        ));
+        document.head.appendChild(script);
+    });
+    return _xlsxLibPromise;
+}
+
+function onEmailFileSelected() {
+    const fileInput = document.getElementById('emailFileInput');
+    const labelText = document.getElementById('fileLabelText');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const removeBtn = document.getElementById('removeBtn');
+    const clearBtn  = document.getElementById('clearFileBtn');
+
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) {
+        clearEmailFile();
+        return;
+    }
+    // 10MB safety cap (Excel can be larger than plain text)
+    if (file.size > 10 * 1024 * 1024) {
+        showEmailStatus('File is too large (max 10 MB).', 'error');
+        clearEmailFile();
+        return;
+    }
+    const name = file.name || 'file';
+    const lowerName = name.toLowerCase();
+    const isExcel = lowerName.endsWith('.xlsx') || lowerName.endsWith('.xls');
+    const isText  = lowerName.endsWith('.csv')  || lowerName.endsWith('.txt');
+    if (!isExcel && !isText) {
+        showEmailStatus('Only .csv, .txt, or .xlsx/.xls files are supported.', 'error');
+        clearEmailFile();
+        return;
+    }
+
+    if (isExcel) {
+        labelText.textContent = `${name} (parsing Excel...)`;
+        uploadBtn.disabled = true;
+        if (removeBtn) removeBtn.disabled = true;
+        clearBtn.style.display = 'inline-block';
+        readExcelFile(file)
+            .then(parsed => applyParsedEmails(parsed.emails, name, parsed.duplicates, parsed.invalid))
+            .catch(err => {
+                showEmailStatus('Failed to read Excel file: ' + err.message, 'error');
+                clearEmailFile();
+            });
+    } else {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = String(e.target.result || '');
+            const parsed = parseEmailsFromText(text);
+            applyParsedEmails(parsed.emails, name, parsed.duplicates, parsed.invalid);
+        };
+        reader.onerror = () => {
+            showEmailStatus('Failed to read file: ' + (reader.error && reader.error.message || 'unknown error'), 'error');
+            clearEmailFile();
+        };
+        reader.readAsText(file);
+    }
+}
+
+/**
+ * Read an .xlsx/.xls file and harvest every email-like string from
+ * every cell of every sheet. Headers, multiple columns, and merged cells
+ * all just work because we scan cell text, not by column.
+ *
+ * Returns { emails, duplicates, invalid }:
+ * - emails: unique valid email addresses
+ * - duplicates: addresses repeated within the workbook
+ * - invalid: non-empty cells that look like email attempts (a "@"-containing
+ *   token that fails validation, OR any non-empty cell sitting in a column
+ *   that contains at least one valid email but fails validation itself).
+ *   Header rows (where the column-name cell sits in an email column) are
+ *   skipped so a header like "email" is not flagged as invalid.
+ */
+function readExcelFile(file) {
+    return loadXlsxLib().then(XLSX => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                const strictEmail = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+                const looseEmail  = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+
+                const seenLower = new Set();
+                const emails = [];
+                const duplicates = [];
+                const invalid = [];
+                const seenInvalidLower = new Set();
+
+                const recordEmail = (raw) => {
+                    const matches = String(raw).match(looseEmail);
+                    if (!matches) return false;
+                    for (const m of matches) {
+                        const lower = m.toLowerCase();
+                        if (seenLower.has(lower)) duplicates.push(m);
+                        else { seenLower.add(lower); emails.push(m); }
+                    }
+                    return true;
+                };
+                const recordInvalid = (raw) => {
+                    const trimmed = String(raw).trim();
+                    if (!trimmed) return;
+                    const lower = trimmed.toLowerCase();
+                    if (seenInvalidLower.has(lower)) return;
+                    seenInvalidLower.add(lower);
+                    invalid.push(trimmed);
+                };
+
+                for (const sheetName of workbook.SheetNames) {
+                    const sheet = workbook.Sheets[sheetName];
+                    if (!sheet) continue;
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
+                    if (rows.length === 0) continue;
+
+                    // Pass 1: figure out which columns contain at least one valid email.
+                    const colHasEmail = {};
+                    for (let r = 0; r < rows.length; r++) {
+                        const row = rows[r] || [];
+                        for (let c = 0; c < row.length; c++) {
+                            const cellText = String(row[c] == null ? '' : row[c]);
+                            if (strictEmail.test(cellText.trim()) || looseEmail.test(cellText)) {
+                                colHasEmail[c] = true;
+                            }
+                            // Reset the global flag of looseEmail so .test calls don't drift
+                            looseEmail.lastIndex = 0;
+                        }
+                    }
+
+                    // Pass 2: classify each cell.
+                    // - If cell text matches the loose email regex, harvest as email/duplicate.
+                    // - Else if the cell is in an "email column" and is non-empty,
+                    //   flag the trimmed cell value as invalid.
+                    //   Only skip the first non-empty cell as a header when it
+                    //   matches a known header keyword (so junk like
+                    //   "saidheeraj123" gets flagged, not silently swallowed).
+                    const headerSeen = {}; // colIndex -> true (we have evaluated row 1)
+                    for (let r = 0; r < rows.length; r++) {
+                        const row = rows[r] || [];
+                        for (let c = 0; c < row.length; c++) {
+                            const cellRaw  = row[c];
+                            const cellText = String(cellRaw == null ? '' : cellRaw);
+                            const trimmed  = cellText.trim();
+                            if (!trimmed) continue;
+
+                            const matched = recordEmail(cellText);
+                            if (matched) continue;
+
+                            // Cell didn't yield any email. Is it in an email column?
+                            if (!colHasEmail[c]) continue;
+
+                            // First non-empty cell in this column: is it a real header?
+                            if (!headerSeen[c]) {
+                                headerSeen[c] = true;
+                                if (looksLikeHeaderRow(trimmed)) continue;
+                            }
+
+                            recordInvalid(trimmed);
+                        }
+                    }
+                }
+                resolve({ emails, duplicates, invalid });
+            } catch (err) {
+                reject(err);
+            }
+        };
+        reader.onerror = () => reject(new Error(reader.error && reader.error.message || 'read error'));
+        reader.readAsArrayBuffer(file);
+    }));
+}
+
+/** Common UI update after parsing any file type. */
+function applyParsedEmails(emails, fileName, duplicates, invalid) {
+    const labelText = document.getElementById('fileLabelText');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const removeBtn = document.getElementById('removeBtn');
+    const clearBtn  = document.getElementById('clearFileBtn');
+    pendingFileEmails = emails || [];
+    duplicates = duplicates || [];
+    invalid = invalid || [];
+    const dupCount = duplicates.length;
+    const invCount = invalid.length;
+
+    if (pendingFileEmails.length === 0) {
+        const skippedNote = invCount > 0 ? ` ${invCount} invalid line(s) skipped.` : '';
+        showEmailStatus(`No valid emails found in "${fileName}".${skippedNote}`, 'error');
+        if (uploadBtn) uploadBtn.disabled = true;
+        if (removeBtn) removeBtn.disabled = true;
+        labelText.textContent = `${fileName} (0 emails)`;
+    } else {
+        const skipBits = [];
+        if (dupCount > 0) skipBits.push(`${dupCount} duplicate`);
+        if (invCount > 0) skipBits.push(`${invCount} invalid`);
+        const skippedNote = skipBits.length ? `, ${skipBits.join(', ')} skipped` : '';
+        showEmailStatus(
+            `✓ Found ${pendingFileEmails.length} email(s) in "${fileName}"${skippedNote}. Click "Add" to add them or "Remove" to delete them.`,
+            'success'
+        );
+        if (uploadBtn) uploadBtn.disabled = false;
+        if (removeBtn) removeBtn.disabled = false;
+        labelText.textContent = `${fileName} (${pendingFileEmails.length} emails)`;
+    }
+    clearBtn.style.display = 'inline-block';
+
+    // Show "what got skipped from this file" panel
+    renderUploadDetails({ duplicates, invalid });
+}
+
+/**
+ * Render the duplicate / invalid / not-found details panel.
+ * Any list may be empty; the panel hides itself when all are empty.
+ * Items are deduplicated for display so the user sees each entry once.
+ */
+function renderUploadDetails({ duplicates = [], invalid = [], serverDuplicates = [], notFound = [] } = {}) {
+    const panel       = document.getElementById('uploadDetailsPanel');
+    const dupSection  = document.getElementById('duplicateDetailsSection');
+    const invSection  = document.getElementById('invalidDetailsSection');
+    const nfSection   = document.getElementById('notFoundDetailsSection');
+    const dupList     = document.getElementById('duplicateDetailsList');
+    const invList     = document.getElementById('invalidDetailsList');
+    const nfList      = document.getElementById('notFoundDetailsList');
+    const dupCountEl  = document.getElementById('duplicateDetailsCount');
+    const invCountEl  = document.getElementById('invalidDetailsCount');
+    const nfCountEl   = document.getElementById('notFoundDetailsCount');
+
+    // Combine within-file duplicates with server-reported duplicates (already-existing emails)
+    const allDuplicates = [...duplicates, ...serverDuplicates];
+    const uniqDuplicates = dedupCaseInsensitive(allDuplicates);
+    const uniqInvalid    = dedupCaseInsensitive(invalid);
+    const uniqNotFound   = dedupCaseInsensitive(notFound);
+
+    if (uniqDuplicates.length === 0 && uniqInvalid.length === 0 && uniqNotFound.length === 0) {
+        panel.style.display = 'none';
+        dupSection.style.display = 'none';
+        invSection.style.display = 'none';
+        if (nfSection) nfSection.style.display = 'none';
+        dupList.innerHTML = '';
+        invList.innerHTML = '';
+        if (nfList) nfList.innerHTML = '';
+        return;
+    }
+
+    panel.style.display = 'block';
+
+    if (uniqDuplicates.length > 0) {
+        dupSection.style.display = 'block';
+        dupCountEl.textContent = uniqDuplicates.length;
+        dupList.innerHTML = uniqDuplicates.map(e => `<li>${escapeHtml(e)}</li>`).join('');
+    } else {
+        dupSection.style.display = 'none';
+        dupList.innerHTML = '';
+    }
+
+    if (uniqInvalid.length > 0) {
+        invSection.style.display = 'block';
+        invCountEl.textContent = uniqInvalid.length;
+        invList.innerHTML = uniqInvalid.map(e => `<li>${escapeHtml(e)}</li>`).join('');
+    } else {
+        invSection.style.display = 'none';
+        invList.innerHTML = '';
+    }
+
+    if (nfSection && nfList && nfCountEl) {
+        if (uniqNotFound.length > 0) {
+            nfSection.style.display = 'block';
+            nfCountEl.textContent = uniqNotFound.length;
+            nfList.innerHTML = uniqNotFound.map(e => `<li>${escapeHtml(e)}</li>`).join('');
+        } else {
+            nfSection.style.display = 'none';
+            nfList.innerHTML = '';
+        }
+    }
+}
+
+function dedupCaseInsensitive(arr) {
+    const seen = new Set();
+    const out = [];
+    for (const item of arr || []) {
+        const key = String(item || '').toLowerCase();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(item);
+    }
+    return out;
+}
+
+function clearEmailFile() {
+    const fileInput = document.getElementById('emailFileInput');
+    const labelText = document.getElementById('fileLabelText');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const removeBtn = document.getElementById('removeBtn');
+    const clearBtn  = document.getElementById('clearFileBtn');
+    if (fileInput) fileInput.value = '';
+    if (labelText) labelText.textContent = '';
+    if (uploadBtn) uploadBtn.disabled = true;
+    if (removeBtn) removeBtn.disabled = true;
+    if (clearBtn)  clearBtn.style.display = 'none';
+    pendingFileEmails = [];
+    // Hide the duplicate / invalid details panel
+    const panel = document.getElementById('uploadDetailsPanel');
+    if (panel) panel.style.display = 'none';
+}
+
+/** Like clearEmailFile but leaves the details panel visible — used after a
+ *  successful upload so the user can still see which addresses were
+ *  duplicates / invalid / not-found. */
+function resetFilePickerOnly() {
+    const fileInput = document.getElementById('emailFileInput');
+    const labelText = document.getElementById('fileLabelText');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const removeBtn = document.getElementById('removeBtn');
+    const clearBtn  = document.getElementById('clearFileBtn');
+    if (fileInput) fileInput.value = '';
+    if (labelText) labelText.textContent = '';
+    if (uploadBtn) uploadBtn.disabled = true;
+    if (removeBtn) removeBtn.disabled = true;
+    if (clearBtn)  clearBtn.style.display = 'none';
+    pendingFileEmails = [];
+}
+
+/**
+ * Parse emails out of CSV/TXT text.
+ * - Splits on newlines AND on commas/semicolons/spaces (so a single line with
+ *   "a@x.com, b@x.com" works, and a CSV row also works).
+ * - Detects and skips a header line if it looks like a column header
+ *   (i.e. doesn't contain "@").
+ * - Also skips quoted "email" headers, BOM, and empty lines.
+ *
+ * Returns { emails, duplicates, invalid }: emails are unique valid addresses,
+ * duplicates are repeated addresses encountered within the file, and invalid
+ * are tokens that look like an email attempt but failed validation.
+ */
+function parseEmailsFromText(text) {
+    if (!text) return { emails: [], duplicates: [], invalid: [] };
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const lines = text.split(/\r?\n/);
+    const found = [];
+    const seenLower = new Set();
+    const duplicates = [];
+    const invalid = [];
+    const seenInvalidLower = new Set();
+
+    const recordValid = (tok) => {
+        const lower = tok.toLowerCase();
+        if (seenLower.has(lower)) duplicates.push(tok);
+        else { seenLower.add(lower); found.push(tok); }
+    };
+    const recordInvalid = (tok) => {
+        const lower = tok.toLowerCase();
+        if (!seenInvalidLower.has(lower)) {
+            seenInvalidLower.add(lower);
+            invalid.push(tok);
+        }
+    };
+
+    // Look at the first non-empty line. If it looks like a multi-column CSV header
+    // with an "email" column at a specific index, route data to that column only.
+    let emailColumnIndex = -1; // -1 means "no column-aware mode"
+    let firstDataLineIndex = -1;
+    for (let i = 0; i < lines.length; i++) {
+        const trimmed = lines[i].trim();
+        if (!trimmed) continue;
+        const cols = splitCsvLine(trimmed);
+        if (cols.length >= 2) {
+            const lowerCols = cols.map(c => c.replace(/^["']|["']$/g, '').trim().toLowerCase());
+            const allHeaderish = lowerCols.every(c => HEADER_WORDS.has(c));
+            const idx = lowerCols.findIndex(c => c === 'email' || c === 'emails' || c === 'e-mail' || c === 'mail' || c === 'email address' || c === 'emailaddress' || c === 'email_address');
+            if (allHeaderish && idx >= 0) {
+                emailColumnIndex = idx;
+                firstDataLineIndex = i + 1;
+                break;
+            }
+        }
+        firstDataLineIndex = i; // first non-empty wasn't a multi-col header
+        break;
+    }
+
+    if (emailColumnIndex >= 0) {
+        // Column-aware: only inspect cells in that column. Flag invalid only if the
+        // cell is non-empty in that specific column.
+        for (let i = firstDataLineIndex; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+            const cols = splitCsvLine(line);
+            const cell = (cols[emailColumnIndex] || '').replace(/^["']|["']$/g, '').trim();
+            if (!cell) continue;
+            if (emailRegex.test(cell)) recordValid(cell);
+            else recordInvalid(cell);
+        }
+        return { emails: found, duplicates, invalid };
+    }
+
+    // Single-column / unstructured fallback: treat every token on every line
+    // as an email attempt. Skip a literal "email" header line.
+    let firstNonEmpty = true;
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+
+        if (firstNonEmpty) {
+            firstNonEmpty = false;
+            if (looksLikeHeaderRow(line)) continue;
+        }
+
+        const tokens = line.split(/[,;\s\t]+/);
+        for (let tok of tokens) {
+            tok = tok.replace(/^["']|["']$/g, '').trim();
+            if (!tok) continue;
+            if (emailRegex.test(tok)) recordValid(tok);
+            else recordInvalid(tok);
+        }
+    }
+    return { emails: found, duplicates, invalid };
+}
+
+/**
+ * Split a CSV line on commas (or tabs / semicolons). Naive: doesn't fully handle
+ * quoted commas, but good enough for one-email-per-row spreadsheets exported
+ * from Excel/Google Sheets.
+ */
+function splitCsvLine(line) {
+    return line.split(/[,;\t]/);
+}
+
+const HEADER_WORDS = new Set([
+    'email', 'emails', 'email address', 'emailaddress', 'email_address',
+    'e-mail', 'mail', 'address',
+    'name', 'full name', 'fullname', 'first name', 'last name',
+    'phone', 'mobile', 'contact', 'id', 'sl', 'sno', 's.no', 'sl.no',
+    'role', 'department', 'title', 'company', 'notes', 'comments',
+    'designation', 'location', 'team'
+]);
+
+/**
+ * Decide whether a line looks like a column-header row rather than data.
+ * We only skip when EVERY token on the line is a well-known header keyword,
+ * so that a single garbage word like "saidheeraj123" is still flagged as
+ * invalid email data instead of being silently swallowed.
+ */
+function looksLikeHeaderRow(line) {
+    const tokens = line.split(/[,;\t]+/).map(t => t.replace(/^["']|["']$/g, '').trim().toLowerCase()).filter(Boolean);
+    if (tokens.length === 0) return false;
+    return tokens.every(t => HEADER_WORDS.has(t));
+}
+
+async function uploadEmailFile() {
+    if (!pendingFileEmails || pendingFileEmails.length === 0) {
+        showEmailStatus('No emails to upload. Please choose a file first.', 'error');
+        return;
+    }
+    const url = currentEmailType === 'candidate'
+        ? '/api/candidate-emails/bulk-add'
+        : '/api/panelist-emails/bulk-add';
+
+    const uploadBtn = document.getElementById('uploadBtn');
+    const removeBtn = document.getElementById('removeBtn');
+    uploadBtn.disabled = true;
+    if (removeBtn) removeBtn.disabled = true;
+    showEmailStatus('Uploading...', '');
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emails: pendingFileEmails })
+        });
+        let data = {};
+        try { data = await res.json(); } catch (_) { /* non-json response */ }
+        if (!res.ok) {
+            let msg;
+            if (res.status === 404) {
+                msg = 'Bulk upload endpoint not available on this server. Please restart the server (stop & re-run "node src/server.js") so the new endpoints load.';
+            } else {
+                msg = data.error || `Bulk add failed (HTTP ${res.status}).`;
+            }
+            showEmailStatus(msg, 'error');
+            uploadBtn.disabled = false;
+            if (removeBtn) removeBtn.disabled = false;
+            return;
+        }
+
+        // Build a friendly multi-line status message
+        const parts = [`✓ Added ${data.addedCount || 0} new email(s).`];
+        if (data.duplicateCount > 0) parts.push(`${data.duplicateCount} duplicate(s) skipped.`);
+        if (data.invalidCount > 0)   parts.push(`${data.invalidCount} invalid skipped.`);
+        showEmailStatus(parts.join(' '), data.addedCount > 0 ? 'success' : 'error');
+
+        // Show server-reported duplicates + invalid in the details panel
+        renderUploadDetails({
+            duplicates: [],
+            invalid: Array.isArray(data.invalid) ? data.invalid : [],
+            serverDuplicates: Array.isArray(data.duplicates) ? data.duplicates : []
+        });
+
+        resetFilePickerOnly();
+        await loadEmailList();
+    } catch (err) {
+        showEmailStatus('Network error: ' + err.message, 'error');
+        uploadBtn.disabled = false;
+        if (removeBtn) removeBtn.disabled = false;
+    }
+}
+
+/**
+ * Bulk-remove emails listed in the chosen file. Same semantics as the per-row
+ * Remove button, but operates on every email parsed from the uploaded file.
+ * Asks for confirmation, then sends to /bulk-remove and shows a result panel
+ * with what was removed, what wasn't found, and what was rejected as invalid.
+ */
+async function removeEmailFile() {
+    if (!pendingFileEmails || pendingFileEmails.length === 0) {
+        showEmailStatus('No emails to remove. Please choose a file first.', 'error');
+        return;
+    }
+    const label = currentEmailType === 'candidate' ? 'candidate' : 'panelist';
+    if (!confirm(`Remove all ${pendingFileEmails.length} ${label} email(s) listed in this file?\n\nThis action cannot be undone.`)) {
+        return;
+    }
+
+    const url = currentEmailType === 'candidate'
+        ? '/api/candidate-emails/bulk-remove'
+        : '/api/panelist-emails/bulk-remove';
+
+    const uploadBtn = document.getElementById('uploadBtn');
+    const removeBtn = document.getElementById('removeBtn');
+    uploadBtn.disabled = true;
+    if (removeBtn) removeBtn.disabled = true;
+    showEmailStatus('Removing...', '');
+
+    const requesterEmail = (localStorage.getItem('candidateId') || '').trim().toLowerCase();
+
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emails: pendingFileEmails, requesterEmail })
+        });
+        let data = {};
+        try { data = await res.json(); } catch (_) { /* non-json response */ }
+        if (!res.ok) {
+            let msg;
+            if (res.status === 404) {
+                msg = 'Bulk remove endpoint not available on this server. Please restart the server (stop & re-run "node src/server.js") so the new endpoints load.';
+            } else {
+                msg = data.error || `Bulk remove failed (HTTP ${res.status}).`;
+            }
+            showEmailStatus(msg, 'error');
+            uploadBtn.disabled = false;
+            if (removeBtn) removeBtn.disabled = false;
+            return;
+        }
+
+        // Build a friendly result message
+        const parts = [`✓ Removed ${data.removedCount || 0} email(s).`];
+        if (data.notFoundCount > 0)   parts.push(`${data.notFoundCount} not found.`);
+        if (data.invalidCount > 0)    parts.push(`${data.invalidCount} invalid skipped.`);
+        if (data.skippedSelf && data.skippedSelf.length > 0) {
+            parts.push('Your own email was skipped for safety.');
+        }
+        showEmailStatus(parts.join(' '), data.removedCount > 0 ? 'success' : 'error');
+
+        // Server-reported "not found" and "invalid" go into the details panel
+        renderUploadDetails({
+            duplicates: [],
+            invalid: Array.isArray(data.invalid) ? data.invalid : [],
+            notFound: Array.isArray(data.notFound) ? data.notFound : []
+        });
+
+        resetFilePickerOnly();
+        await loadEmailList();
+    } catch (err) {
+        showEmailStatus('Network error: ' + err.message, 'error');
+        uploadBtn.disabled = false;
+        if (removeBtn) removeBtn.disabled = false;
+    }
+}

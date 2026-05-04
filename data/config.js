@@ -24,7 +24,7 @@ module.exports = {
     // verified OTP once, they will be blocked from a second attempt.
     //   true  → only CSV-listed emails can take the test (recommended)
     //   false → any email can take the test (open access)
-    candidateEmailVerification: false,
+    candidateEmailVerification: true,
 
     // Path to the CSV file containing authorized candidate emails.
     // The CSV must have a header row with "email" as the column name.
