@@ -1,0 +1,90 @@
+{
+  "personName": "sai dheeraj goud",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Noida",
+  "experienceYears": "6",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 4,
+      "title": "Remove Duplicates from Sorted Array",
+      "description": "Write a program to remove duplicate elements from a sorted array and print the unique elements.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "[1, 2, 3, 4, 5]",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 13
+    },
+    {
+      "questionId": 7,
+      "title": "Uppercase 2nd Character of Each Word",
+      "description": "Write a program to change the 2nd character of each word in a string to uppercase.",
+      "completed": true,
+      "language": "java",
+      "code": "public class UppercaseSecondChar {\n\n    public static void main(String[] args) {\n\n        String input = \"My name is Praveen\";\n        String[] words = input.split(\" \");\n\n        StringBuilder result = new StringBuilder();\n\n        for (String word : words) {\n            if (word.length() >= 2) {\n                // Convert 2nd character to uppercase\n                char secondChar = Character.toUpperCase(word.charAt(1));\n                result.append(word.charAt(0))\n                      .append(secondChar)\n                      .append(word.substring(2));\n            } else {\n                // If word has only one character\n                result.append(word);\n            }\n            result.append(\" \");\n        }\n\n        System.out.println(result.toString().trim());\n    }\n}",
+      "expectedOutput": "MY nAme iS PRaveen",
+      "actualOutput": "MY nAme iS PRaveen",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 95,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Uses enhanced iteration"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 650 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 52
+    }
+  ],
+  "tabSwitchCount": 1,
+  "totalTimeTaken": 67,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 48
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 4,
+        "title": "Remove Duplicates from Sorted Array",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      },
+      {
+        "questionId": 7,
+        "title": "Uppercase 2nd Character of Each Word",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 650 characters of changes"
+        ]
+      }
+    ]
+  }
+}

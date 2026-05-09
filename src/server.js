@@ -80,6 +80,11 @@ const USE_OLLAMA = (process.env.USE_OLLAMA || 'false').toLowerCase() === 'true';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'phi3';
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 
+// --- Feedback Configuration ---
+// Email address that receives candidate feedback submissions.
+// If unset, feedback is delivered to the configured SMTP user (legacy behavior).
+const FEEDBACK_RECIPIENT = (process.env.FEEDBACK_RECIPIENT || '').trim();
+
 // ==================== PORTABLE RUNTIME RESOLUTION ====================
 function resolvePortableRuntime(lang) {
     const runtimesDir = path.join(__dirname, '..', 'runtimes');
@@ -4411,11 +4416,17 @@ const server = http.createServer(async (req, res) => {
                 // Find matching result file for this candidate
                 const candidateName = row['Candidate Name'] || '';
                 const candidateDate = row['Date'] || date;
+                // Files on disk are saved with safeName (non-alphanumerics -> '_'), so a
+                // candidate like "MANVITHA JUTURU" is stored as "MANVITHA_JUTURU".
+                // Build a list of name variants to match against filenames.
+                const safeCandidateName = candidateName.replace(/[^a-zA-Z0-9]/g, '_');
+                const nameVariants = [candidateName, safeCandidateName].filter(Boolean);
+                const nameMatches = (file) => nameVariants.some(n => n && file.includes(n));
                 let matchingFile = null;
                 
                 // Search for result file matching this candidate and date
                 for (const file of resultFiles) {
-                    if (file.includes(candidateName) && file.includes(candidateDate)) {
+                    if (nameMatches(file) && file.includes(candidateDate)) {
                         matchingFile = file.replace('.json', '');
                         break;
                     }
@@ -4425,7 +4436,7 @@ const server = http.createServer(async (req, res) => {
                 if (!matchingFile) {
                     for (const file of resultFiles) {
                         const fileDate = file.match(/(\d{4})-(\d{2})-(\d{2})/);
-                        if (fileDate && file.includes(candidateName) && fileDate[0] === candidateDate) {
+                        if (fileDate && nameMatches(file) && fileDate[0] === candidateDate) {
                             matchingFile = file.replace('.json', '');
                             break;
                         }
@@ -4490,9 +4501,16 @@ const server = http.createServer(async (req, res) => {
             let sessionData = null;
             let fileName = null;
             
+            // Build set of acceptable matches: exact, and a sanitized variant
+            // (spaces/special chars -> '_') because files on disk are saved using
+            // safeName transformation. This protects against stale or fallback
+            // sessionIds containing spaces (e.g. "FIRST LAST-2026-05-08").
+            const sanitizedSessionId = sessionId.replace(/ /g, '_');
+            
             for (const file of files) {
                 // Match by filename (sessionId is the filename without .json)
-                if (file.replace('.json', '') === sessionId) {
+                const baseName = file.replace('.json', '');
+                if (baseName === sessionId || baseName === sanitizedSessionId) {
                     try {
                         const filePath = path.join(resultsDir, file);
                         const content = fs.readFileSync(filePath, 'utf8');
@@ -4501,6 +4519,27 @@ const server = http.createServer(async (req, res) => {
                         break;
                     } catch (e) {
                         // Skip invalid files
+                    }
+                }
+            }
+            
+            // Final fallback: if sessionId looks like "Name-YYYY-MM-DD" (the
+            // daily-summary fallback format when no file was found), try to
+            // locate any file matching that name (sanitized) and date.
+            if (!sessionData) {
+                const fallbackMatch = sessionId.match(/^(.+?)-(\d{4}-\d{2}-\d{2})$/);
+                if (fallbackMatch) {
+                    const fbName = fallbackMatch[1].replace(/[^a-zA-Z0-9]/g, '_');
+                    const fbDate = fallbackMatch[2];
+                    for (const file of files) {
+                        if (file.includes(fbName) && file.includes(fbDate)) {
+                            try {
+                                const content = fs.readFileSync(path.join(resultsDir, file), 'utf8');
+                                sessionData = JSON.parse(content);
+                                fileName = file;
+                                break;
+                            } catch (e) { /* skip */ }
+                        }
                     }
                 }
             }
@@ -4816,7 +4855,10 @@ const server = http.createServer(async (req, res) => {
 
                 // Determine SMTP config — use the SMTP credentials to send the email
                 const smtpConfig = getSmtpConfig(candidateEmail);
-                const recipientEmail = smtpConfig.user; // Send TO the Code Evaluator (SMTP account)
+                // Recipient priority:
+                //   1. FEEDBACK_RECIPIENT env var (preferred — explicit feedback inbox)
+                //   2. SMTP user (legacy fallback so existing setups don't break)
+                const recipientEmail = FEEDBACK_RECIPIENT || smtpConfig.user;
 
                 if (!smtpConfig.user || !smtpConfig.pass) {
                     console.log(`[Feedback] No SMTP credentials configured. Feedback from ${candidateEmail}: ${feedback}`);
@@ -4900,7 +4942,7 @@ const server = http.createServer(async (req, res) => {
                             tlsSocket.write(`QUIT\r\n`);
                             tlsSocket.end();
                             clearTimeout(timeout);
-                            console.log(`✓ Feedback email sent from ${candidateEmail} (${candidateName}) to Code Evaluator`);
+                            console.log(`✓ Feedback email sent from ${candidateEmail} (${candidateName}) → ${recipientEmail}`);
                             resolve(true);
                         } catch (err) {
                             clearTimeout(timeout);

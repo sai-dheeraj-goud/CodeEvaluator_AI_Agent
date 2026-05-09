@@ -1,10 +1,10 @@
 # Code Evaluator AI Agent
 
-> **Version:** 1.0.0 | **Date:** April 2026 | **Status:** Production Ready  
-> **Dependencies:** 0 (Zero!) | **Languages:** Java, Python, JavaScript  
-> **Engine:** Enhanced Rule-Based Scoring + Multi-Provider AI Fallback Chain
+> **Version:** 1.0.0  &nbsp;|&nbsp;  **Status:** Production Ready
+> **Dependencies:** 0 (zero npm packages)  &nbsp;|&nbsp;  **Languages Supported:** Java, Python, JavaScript
+> **Engine:** Multi-Provider AI Fallback Chain + Enhanced Rule-Based Scoring
 
-A comprehensive full-stack web application for interactive coding assessments with AI-powered code review, built with **zero npm dependencies** using only Node.js built-in modules.
+A full-stack web application for conducting interactive coding assessments with AI-powered code review, anti-cheating detection, a panelist dashboard for reviewing results, and built-in candidate feedback. Built on **pure Node.js** — no `npm install` step, no third-party packages.
 
 ---
 
@@ -12,21 +12,24 @@ A comprehensive full-stack web application for interactive coding assessments wi
 
 1. [Quick Start](#1-quick-start)
 2. [Project Structure](#2-project-structure)
-3. [Features Overview](#3-features-overview)
+3. [Features](#3-features)
 4. [Assessment Flow](#4-assessment-flow)
-5. [Configuration](#5-configuration)
-6. [API Endpoints](#6-api-endpoints)
-7. [AI Code Review & Scoring Logic](#7-ai-code-review--scoring-logic)
-8. [Anti-Cheating System](#8-anti-cheating-system)
-9. [Results & Analytics](#9-results--analytics)
-10. [Question Bank](#10-question-bank)
-11. [Logging System](#11-logging-system)
-12. [VS Code Integration](#12-vs-code-integration)
-13. [Deployment](#13-deployment)
-14. [Customization](#14-customization)
-15. [Troubleshooting](#15-troubleshooting)
-16. [Technology Stack](#16-technology-stack)
-17. [Security](#17-security)
+5. [Panelist Dashboard](#5-panelist-dashboard)
+6. [Candidate Feedback](#6-candidate-feedback)
+7. [Configuration](#7-configuration)
+8. [Environment Variables](#8-environment-variables)
+9. [API Reference](#9-api-reference)
+10. [AI Code Review & Scoring](#10-ai-code-review--scoring)
+11. [Anti-Cheating System](#11-anti-cheating-system)
+12. [Results & Analytics](#12-results--analytics)
+13. [Question Bank](#13-question-bank)
+14. [Logging](#14-logging)
+15. [Deployment](#15-deployment)
+16. [Customization](#16-customization)
+17. [Troubleshooting](#17-troubleshooting)
+18. [Technology Stack](#18-technology-stack)
+19. [Security](#19-security)
+20. [License](#20-license)
 
 ---
 
@@ -34,410 +37,492 @@ A comprehensive full-stack web application for interactive coding assessments wi
 
 ### Prerequisites
 
-- **Node.js** v12+ (install from https://nodejs.org/)
-- **Java** JDK 8+ (optional, for Java code execution)
-- **Python** 3.6+ (optional, for Python code execution)
-- **(Optional) Ollama** for local AI code review (https://ollama.ai/)
+- **Node.js** v12 or higher — https://nodejs.org/
+- **Java JDK 8+** — only required if candidates will run Java code locally
+- **Python 3.6+** — only required if candidates will run Python code locally
+- **(Optional) Ollama** — for fully-local AI code review — https://ollama.ai/
 
 ### Installation & Running
 
-**Windows:**
-```batch
-start.bat
-```
-
-**Linux/Mac:**
 ```bash
+# Clone the repo, then from the project root:
+
+# Linux / Mac
 chmod +x start.sh
 ./start.sh
-```
 
-**Manual:**
-```bash
+# Windows
+start.bat
+
+# Or, on any platform:
 node src/server.js
 ```
 
-Then open your browser at: **http://localhost:3000**
+The server listens on **http://localhost:3000** by default.
 
-### First Test (No Email Required)
+### First Test (No Email Setup Needed)
 
-1. Enter any email: `test@example.com`
-2. Check the **Node.js server console** for the 6-digit OTP
-3. Enter OTP in browser → Enter name & experience → Accept instructions
-4. Start solving questions → Run code → Ask AI Agent for score
+1. Open `http://localhost:3000`
+2. Enter any email — e.g. `test@example.com`
+3. Look at the Node.js server console — the 6-digit OTP is printed there as a fallback when SMTP isn't configured
+4. Enter the OTP → enter name & experience → accept instructions
+5. Solve the question → click **Run Code** → click **Agent Score**
 
 ---
 
 ## 2. Project Structure
 
 ```
-CodePracticeAIAgent/
+CodeEvaluator_AI_Agent/
 ├── src/
-│   ├── server.js              # Pure Node.js backend (all API routes)
+│   ├── server.js              # Pure Node.js backend — all API routes
 │   └── logger.js              # Custom logging (file + memory + API)
 ├── public/
-│   ├── index.html             # Single-page app (5-step assessment)
-│   ├── app.js                 # All frontend logic & state management
-│   ├── styles.css             # Responsive styling
-│   └── lib/
-│       └── codemirror/        # CodeMirror editor (bundled)
-│           ├── codemirror.min.js / .css
-│           ├── material.min.css
-│           ├── addon/         # closebrackets, comment, matchbrackets
-│           └── mode/          # clike, javascript, python
+│   ├── index.html             # Candidate single-page app (5-step flow)
+│   ├── app.js                 # Frontend logic & state management
+│   ├── styles.css             # Candidate UI styling
+│   ├── panelist.html          # Panelist dashboard
+│   ├── panelist.js            # Panelist dashboard logic
+│   └── panelist-styles.css    # Panelist dashboard styling
 ├── data/
-│   └── questions.json         # 25 programming questions
-├── results/                   # Auto-created on first run
-│   ├── json/                  # Full assessment results (JSON)
-│   └── csv/                   # Performance data (CSV)
-├── logs/                      # Auto-created
-│   └── server.log             # Rotating log file (5 MB max)
-├── temp/                      # Temporary code execution files (auto-cleaned)
-├── .env                       # Configuration (email, AI keys, etc.)
+│   ├── config.js              # Centralized assessment configuration
+│   ├── questions.json         # 25 programming questions
+│   ├── candidate-emails.csv   # Authorized candidate emails (one per line)
+│   └── panelist-emails.csv    # Authorized panelist emails (one per line)
+├── results/                   # Auto-created at runtime
+│   ├── json/                  # Full assessment JSON (one per session)
+│   └── csv/                   # Per-candidate + daily consolidated CSVs
+├── logs/                      # Auto-created — server logs (rotating, 5 MB)
+├── .env                       # Local secrets (NOT committed)
+├── .env.example               # Template — copy to .env and fill in
 ├── package.json               # Zero dependencies
-├── start.bat / start.sh       # Platform launchers
-├── setup-runtimes.bat / .sh   # Optional: download portable runtimes
-├── Dockerfile                 # Docker support
-├── railway.json               # Railway deployment config
-└── render.yaml                # Render deployment config
+├── render.yaml                # Render.com one-click deploy config
+├── Dockerfile                 # Container build (Render / Railway / self-hosted)
+└── start.sh / start.bat       # Platform launchers
 ```
 
 ---
 
-## 3. Features Overview
+## 3. Features
 
 ### Core Assessment
-- ✅ **OTP-based Login** — Secure access via email one-time passwords
-- ✅ **Timed Coding Challenges** — 10–15 minute questions based on difficulty
-- ✅ **Java, Python & JavaScript Support** — Write and execute code in three languages
-- ✅ **Live Code Editor** — CodeMirror 5 with syntax highlighting, bracket matching, auto-close
-- ✅ **Real-time Output Validation** — Compare expected vs actual output
-- ✅ **AI-Powered Code Review** — Correctness scores from Gemini, Claude, OpenAI, or Ollama
-- ✅ **Anti-Cheating Detection** — 13-metric AI-generated code detection system
-- ✅ **Tab Switch Monitoring** — Detects when candidates switch windows/tabs
-- ✅ **Session Auto-Save** — Every 30 seconds to localStorage
-- ✅ **Resume Capability** — Continue interrupted assessments (up to 2 hours)
 
-### AI Integration (4 Providers with Fallback)
-1. **Google Gemini** — Primary (free, round-robin keys + models)
-2. **Claude (Anthropic)** — Secondary
-3. **OpenAI** — Tertiary (gpt-3.5-turbo)
-4. **Ollama** — Local fallback (free, requires local installation)
-5. **Enhanced Rule-Based Engine** — Final offline fallback (zero latency, deterministic)
+- **OTP-based login** — secure access via email one-time passwords
+- **Email allowlist** — only pre-approved emails can take the test (CSV-driven)
+- **Timed coding challenges** — 10 or 15 minutes per question depending on difficulty
+- **Java, Python, JavaScript** — pick a preferred language; switch tabs while coding
+- **CodeMirror editor** — syntax highlighting, bracket matching, auto-close
+- **Real-time output validation** — expected vs actual output comparison
+- **AI code review** — correctness scoring from up to four providers
+- **Anti-cheating detection** — 13 behavioral metrics for AI/copy-paste detection
+- **Tab-switch monitoring** — flagged in results
+- **Auto-save** — session state to `localStorage` every 30 seconds
+- **Resume capability** — interrupted sessions can be continued (within 2 hours)
 
-### Results & Analytics
-- Per-candidate CSV with detailed metrics
-- Daily consolidated CSV for all candidates
-- JSON results with full assessment records
-- Performance dashboard with filterable tables
-- Candidate Code & Results viewer (per-question cards)
-- Completion pie charts
+### AI Provider Fallback Chain
+
+1. **Google Gemini** — primary (free tier, supports multiple keys/models with round-robin)
+2. **Claude (Anthropic)** — secondary
+3. **OpenAI** — tertiary
+4. **Ollama** — local fallback (free, runs on the host)
+5. **Enhanced Rule-Based Engine** — final offline fallback (zero latency, deterministic)
+
+### Panelist Dashboard
+
+- View every candidate's session by date
+- Per-question code, expected/actual output, AI score, AI-likelihood, tab switches, time
+- Download daily summary as CSV or PDF
+- Manage candidate & panelist email allowlists from the UI
 
 ### Email System
-- Resend API (HTTPS, recommended)
-- Custom SMTP client (Office 365, Gmail, etc.) with TLS/STARTTLS
-- Console fallback (OTP printed to terminal)
-- Rate limiting (5 OTP requests per 10 minutes)
+
+- Resend API (HTTPS — works through corporate firewalls)
+- Custom SMTP client (Office 365, Gmail) with TLS / STARTTLS
+- Console fallback (OTP printed to terminal if neither configured)
+- Rate limit: 5 OTP requests per 10 minutes per email
+
+### Candidate Feedback
+
+- Floating "Feedback" button on the candidate UI
+- Submissions sent to a dedicated inbox via the `FEEDBACK_RECIPIENT` env var
 
 ---
 
 ## 4. Assessment Flow
 
 ```
-Step 0: Login
-├─ Enter email → Receive OTP (email or console)
-├─ Enter 6-digit OTP
-└─ Session token issued
+Step 0 — Login
+    Enter email → receive OTP (email or console)
+    Enter 6-digit OTP → session token issued
 
-Step 2: Candidate Details
-├─ Name input
-├─ Experience input (X.Y years)
-└─ Total questions count display
+Step 1 — Role Selection (panelist emails only)
+    Candidate (take the test)  |  Panelist (review results)
 
-Step 1: Instructions
-├─ 9 assessment rules displayed
-├─ Consent checkbox
-└─ Start Assessment button
+Step 2 — Candidate Details
+    Name, experience (X.Y years), preferred language
 
-Step 3: Coding Challenge
-├─ Question title, description, example
-├─ Language tabs (Java / Python / JavaScript)
-├─ CodeMirror editor with syntax highlighting
-├─ Run Code → Output validation
-├─ AI Code Review Score (single or bulk)
-├─ Previous / Next navigation
-├─ Timer per question (10 or 15 min)
-└─ Mark Complete / Submit
+Step 3 — Instructions
+    9 assessment rules → consent checkbox → Start Assessment
 
-Step 4: Results Dashboard
-├─ Score display (X/Y correct)
-├─ Per-question cards with code, status, AI review
-├─ View Candidate Code & Results (new window)
-├─ View Candidate Performance (CSV table)
-├─ View All Candidates Summary
-└─ Download reports
+Step 4 — Coding Challenge
+    Question, example, language tabs, CodeMirror editor
+    Run Code → Output validation
+    Get AI Score → Per-question or bulk
+    Previous / Next, timer per question
+    Mark Complete → final Submit
+
+Step 5 — Results Dashboard
+    Per-question cards (code, status, AI review)
+    View Performance CSV / All Candidates Summary / Pie chart
+    Download reports
 ```
 
 ### Experience Tiers & Question Selection
 
 | Experience | Questions Assigned |
-|------------|-------------------|
-| 0–4 years | 1 moderate question |
-| 4–6 years | 2 moderate questions |
-| 6+ years | 1 moderate + 1 complex question |
+|---|---|
+| 0 – 4 years | 1 moderate |
+| 4 – 6 years | 2 moderate |
+| 6+ years | 1 moderate + 1 complex |
 
-### Timers
+### Per-Question Time Limits
 
-| Difficulty | Time per Question |
-|------------|-------------------|
+| Difficulty | Time |
+|---|---|
 | Moderate | 10 minutes |
 | Complex | 15 minutes |
 
 ---
 
-## 5. Configuration
+## 5. Panelist Dashboard
 
-### Environment Variables (.env)
+After OTP verification, any email listed in `data/panelist-emails.csv` sees a role-selection prompt. Choosing **Panelist** opens `/panelist.html`.
 
-```env
-# ───── Email Provider ─────
-EMAIL_PROVIDER=auto          # 'resend', 'smtp', or 'auto'
+### What the dashboard offers
 
-# Resend (recommended — works everywhere)
+- **Date filter** — pick any date to load that day's submissions
+- **Summary cards** — total candidates, breakdown by score band (Excellent / Good / Average / Poor)
+- **Candidate table** — name, email, location, experience, language, programs completed, test score, agent score, plagiarism avg/max, tab switches, total time, submitted-at
+- **View Code & Results** button per candidate — full per-question breakdown including submitted code, expected vs actual output, AI suggestions, AI-detection reasons
+- **Download CSV** — daily summary export
+- **Manage Candidate Emails** — bulk add/remove emails from the candidate allowlist
+- **Manage Panelist Emails** — bulk add/remove emails from the panelist allowlist
+
+### Adding a panelist
+
+Two equivalent options:
+
+1. **From the dashboard:** "Manage Panelist Emails" → paste emails → Save
+2. **Edit the CSV:** add an email row to `data/panelist-emails.csv`, then call `POST /api/panelist-emails/reload` (or restart the server)
+
+The CSV needs a header row of `email` and one address per line.
+
+---
+
+## 6. Candidate Feedback
+
+A floating "Feedback" button is always visible on the candidate UI. Submissions are emailed to the address configured in the `FEEDBACK_RECIPIENT` env var.
+
+### Setup
+
+Add to your `.env` (or your Render / Railway environment settings):
+
+```dotenv
+FEEDBACK_RECIPIENT=cognizanttest9871@gmail.com
+```
+
+If `FEEDBACK_RECIPIENT` is unset, feedback is delivered to the SMTP user account (legacy behavior).
+
+The email body includes the candidate's name, email, submission timestamp (IST), and feedback text. The `Reply-To` header is set to the candidate's email so panelists can respond directly.
+
+---
+
+## 7. Configuration
+
+### Centralized config — `data/config.js`
+
+Both server (`src/server.js`) and frontend (`public/app.js`) read from this single file. Common settings:
+
+| Setting | Default | Purpose |
+|---|---|---|
+| `panelistEmailsCsvPath` | `./data/panelist-emails.csv` | CSV of authorized panelist emails |
+| `candidateEmailsCsvPath` | `./data/candidate-emails.csv` | CSV of authorized candidate emails |
+| `candidateEmailVerification` | `true` | If `false`, any email can take the test |
+| `maxExperienceYears` | `20` | Validation cap |
+| `questionTimeLimits.moderate` | `600` (s) | 10 min for moderate questions |
+| `questionTimeLimits.complex` | `900` (s) | 15 min for complex questions |
+| `tabSwitchFreezeLimit` | `3` | Max tab switches before freeze |
+| `instructionReadTimer` | `120` (s) | Auto-advance from instructions page |
+
+### Adding / removing emails
+
+Edit `data/candidate-emails.csv` or `data/panelist-emails.csv`. Each file looks like:
+
+```csv
+email
+alice@example.com
+bob@example.com
+```
+
+Or use the dashboard's "Manage Emails" buttons (recommended — no restart needed).
+
+---
+
+## 8. Environment Variables
+
+Copy `.env.example` to `.env` and fill in only the values you need. Everything is optional — the app falls back gracefully when secrets are missing.
+
+```dotenv
+# ─── Server ──────────────────────────────────────
+# PORT is auto-set by Render / Railway. Override only for local dev.
+# PORT=3000
+
+# ─── Email Provider ──────────────────────────────
+EMAIL_PROVIDER=auto                # 'resend' | 'smtp' | 'auto'
+
+# Resend (recommended — HTTPS, works through firewalls)
 RESEND_API_KEY=re_xxxxxxxxxxxx
-RESEND_FROM=Code Evaluator <sender@resend.dev>
+RESEND_FROM=Code Evaluator <onboarding@resend.dev>
 
-# SMTP (Office 365, Gmail, etc.)
+# Office 365 / corporate SMTP
 SMTP_HOST=smtp.office365.com
 SMTP_PORT=587
 SMTP_USER=your_email@company.com
 SMTP_PASS=your_password
 SMTP_FROM=Code Evaluator
 
-# Gmail-specific
+# Gmail SMTP — use a Google App Password, not the account password
 GMAIL_SMTP_HOST=smtp.gmail.com
 GMAIL_SMTP_PORT=587
 GMAIL_SMTP_USER=your.email@gmail.com
-GMAIL_SMTP_PASS=your_app_password     # Use App Password, not regular
+GMAIL_SMTP_PASS=xxxx xxxx xxxx xxxx
 GMAIL_SMTP_FROM=Code Evaluator
 
-# ───── AI Providers ─────
-# Google Gemini (primary — free, supports multiple keys)
-GEMINI_API_KEY=your_gemini_key
-GEMINI_MODEL=gemini-2.0-flash
+# ─── Feedback Inbox ──────────────────────────────
+# All candidate feedback is delivered to this address.
+FEEDBACK_RECIPIENT=cognizanttest9871@gmail.com
 
-# Claude (Anthropic)
+# ─── AI Providers ────────────────────────────────
+# Google Gemini — primary (free, supports multiple keys with round-robin)
+GEMINI_API_KEY=your_gemini_key
+# Or rotate across many keys:
+# GEMINI_API_KEYS=key1,key2,key3
+GEMINI_MODEL=gemini-2.0-flash
+# Or rotate across models:
+# GEMINI_MODELS=gemini-2.0-flash,gemini-1.5-pro
+
+# Claude (Anthropic) — secondary
 USE_CLAUDE=false
 CLAUDE_API_KEY=sk-ant-...
 CLAUDE_MODEL=claude-opus-4-0-20250514
+CLAUDE_BASE_URL=
+CLAUDE_TIMEOUT_MS=30000
 
-# OpenAI
+# OpenAI — tertiary
 OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-3.5-turbo
 
-# Ollama (local, free)
-USE_OLLAMA=true
+# Ollama — local fallback (only works where the Ollama process is running)
+USE_OLLAMA=false
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llama3
 ```
 
+> **Security note:** never commit a real `.env` file. The `.env.example` should contain placeholders only.
+
 ---
 
-## 6. API Endpoints
+## 9. API Reference
+
+### Public / candidate-facing
 
 | # | Method | Path | Description |
-|---|--------|------|-------------|
+|---|---|---|---|
 | 1 | POST | `/api/auth/send-otp` | Send OTP to email |
-| 2 | POST | `/api/auth/verify-otp` | Verify OTP & get session token |
-| 3 | GET | `/api/version` | Get app version & IST timestamp |
-| 4 | GET | `/api/health/runtime` | Check Java/Python/Node availability |
-| 5 | GET | `/api/config` | Get experience tiers, timers, settings |
-| 6 | GET | `/api/questions` | Get questions (with experience filter) |
-| 7 | GET | `/api/questions/:id` | Get single question by ID |
-| 8 | POST | `/api/execute/java` | Compile & execute Java code |
-| 9 | POST | `/api/execute/python` | Execute Python code |
-| 10 | POST | `/api/execute/javascript` | Execute JavaScript code |
-| 11 | POST | `/api/agent/assist` | AI code review (percentage scoring) |
-| 12 | POST | `/api/result` | Save assessment results (JSON + CSV) |
-| 13 | GET | `/api/candidate-performance` | Get candidate's performance CSV data |
-| 14 | GET | `/api/download/csv` | Download candidate's CSV file |
-| 15 | GET | `/api/all-candidates-summary` | Get all candidates' daily summary |
-| 16 | GET | `/api/pie-chart-data` | Get completion pie chart data |
-| 17 | GET | `/api/logs` | Get recent server logs |
+| 2 | POST | `/api/auth/verify-otp` | Verify OTP, get session token |
+| 3 | GET | `/api/version` | App version + IST timestamp |
+| 4 | GET | `/api/health/runtime` | Java/Python/Node availability |
+| 5 | GET | `/api/config` | Frontend config (timers, tiers) |
+| 6 | GET | `/api/questions` | Question list (filtered by experience) |
+| 7 | GET | `/api/questions/:id` | Single question by ID |
+| 8 | POST | `/api/execute/java` | Compile + run Java code |
+| 9 | POST | `/api/execute/python` | Run Python code |
+| 10 | POST | `/api/execute/javascript` | Run JavaScript code |
+| 11 | POST | `/api/agent/assist` | AI code review (returns 0–100% score) |
+| 12 | POST | `/api/result` | Save assessment results (writes JSON + CSV) |
+| 13 | POST | `/api/feedback` | Submit candidate feedback |
+| 14 | GET | `/api/candidate-performance` | Candidate's CSV data |
+| 15 | GET | `/api/download/csv` | Download a candidate's CSV |
+| 16 | GET | `/api/all-candidates-summary` | Daily roll-up |
+| 17 | GET | `/api/pie-chart-data` | Completion pie data |
+| 18 | GET | `/api/logs?lines=100` | Recent server logs |
+
+### Panelist dashboard
+
+| # | Method | Path | Description |
+|---|---|---|---|
+| 19 | GET | `/api/panelist/daily-summary?date=YYYY-MM-DD` | All candidates for a date |
+| 20 | GET | `/api/panelist/candidate-session/:id` | Full session details for a candidate |
+| 21 | GET | `/api/panelist/export-csv?date=YYYY-MM-DD` | Daily summary as CSV |
+| 22 | GET | `/api/panelist/export-pdf?date=YYYY-MM-DD` | Daily summary as PDF |
+
+### Email allowlist management
+
+| # | Method | Path | Description |
+|---|---|---|---|
+| 23 | GET | `/api/candidate-emails` | List authorized candidate emails |
+| 24 | POST | `/api/candidate-emails/add` | Add a single candidate email |
+| 25 | POST | `/api/candidate-emails/remove` | Remove a single candidate email |
+| 26 | POST | `/api/candidate-emails/bulk-add` | Bulk add candidate emails |
+| 27 | POST | `/api/candidate-emails/bulk-remove` | Bulk remove candidate emails |
+| 28 | POST | `/api/candidate-emails/reload` | Re-read CSV from disk |
+| 29 | POST | `/api/candidate-emails/reset-login` | Allow a candidate to log in again |
+| 30 | GET | `/api/panelist-emails` | List authorized panelist emails |
+| 31 | POST | `/api/panelist-emails/add` | Add a single panelist email |
+| 32 | POST | `/api/panelist-emails/remove` | Remove a single panelist email |
+| 33 | POST | `/api/panelist-emails/bulk-add` | Bulk add panelist emails |
+| 34 | POST | `/api/panelist-emails/bulk-remove` | Bulk remove panelist emails |
+| 35 | POST | `/api/panelist-emails/reload` | Re-read CSV from disk |
 
 ---
 
-## 7. AI Code Review & Scoring Logic
+## 10. AI Code Review & Scoring
 
 ### Architecture
 
 ```
-Client Request (/api/agent/assist)
-        │
-        ▼
-┌───────────────────────┐
-│  Output Match Check   │──── outputMatched === false → 0% immediately
-└───────────┬───────────┘
-            │
-            ▼
-┌───────────────────────────────────────────────┐
-│         AI PROVIDER FALLBACK CHAIN            │
-│                                               │
-│  1. Google Gemini (PRIMARY — free, round-robin│
-│     keys + models)                            │
-│  2. Claude (secondary)                        │
-│  3. OpenAI (tertiary)                         │
-│  4. Ollama (local LLM, last resort)           │
-│                                               │
-│  All providers use the same AI_SYSTEM_PROMPT  │
-│  with 7-category scoring rubric               │
-└───────────┬───────────────────────────────────┘
-            │ All AI providers fail?
-            ▼
-┌───────────────────────────────────────────────┐
-│     ENHANCED RULE-BASED SCORING ENGINE        │
-│                                               │
-│  7 deterministic scoring functions            │
-│  No external API calls, zero latency          │
-│  Uses regex & AST-like pattern matching       │
-└───────────────────────────────────────────────┘
-            │
-            ▼
-     Final Score (0–100%)
+Client → POST /api/agent/assist
+    │
+    ├─ outputMatched === false?  →  return 0% immediately
+    │
+    └─ AI Provider Fallback Chain
+         1. Gemini  (round-robin keys + models)
+         2. Claude
+         3. OpenAI
+         4. Ollama  (local LLM)
+              ↓ all providers fail
+         5. Rule-Based Engine  (deterministic, zero latency)
+                    ↓
+             Final score 0–100%
 ```
 
-### 7-Category Scoring Rubric (100 points total)
+All providers receive the same system prompt and are required to return:
+```
+SCORE: <0–100>
+COVERED: <bullet list>
+MISSED: <bullet list>
+```
 
-| # | Category | Max Points | What It Evaluates |
-|---|----------|-----------|-------------------|
-| 1 | Output Correctness | 25 | Output statement, format match, logic alignment with template, input data |
-| 2 | Logic & Algorithm | 20 | Control flow, semantic correctness, data handling, operator usage |
-| 3 | Code Structure | 10 | Class/function definitions, helper methods, variable declarations |
-| 4 | Problem-Specific Relevance | 15 | Correct algorithm/approach for the problem (37 pattern database) |
-| 5 | Code Quality & Style | 10 | Naming conventions, readability, formatting, dead code detection |
-| 6 | Edge Cases & Robustness | 10 | Null/empty guards, error handling, boundary awareness, type safety |
-| 7 | Efficiency & Complexity | 10 | Time complexity, anti-patterns, algorithm choice, resource management |
+### 7-Category Scoring Rubric (100 pts)
 
-### Score Interpretation Bands
+| # | Category | Pts | Evaluates |
+|---|---|---|---|
+| 1 | Output Correctness | 25 | Output statement, format match, alignment with template |
+| 2 | Logic & Algorithm | 20 | Control flow, semantic correctness, data handling |
+| 3 | Code Structure | 10 | Class/function definitions, helper methods, declarations |
+| 4 | Problem-Specific Relevance | 15 | Right algorithm for the problem (37-pattern database) |
+| 5 | Code Quality & Style | 10 | Naming, readability, formatting, dead code |
+| 6 | Edge Cases & Robustness | 10 | Null/empty guards, error handling, boundaries |
+| 7 | Efficiency & Complexity | 10 | Time complexity, anti-patterns, resource use |
 
-| Score | Label | Description |
-|-------|-------|-------------|
-| 90–100 | Excellent | Complete, correct, well-structured solution |
-| 75–89 | Good | Solid solution with minor issues |
-| 50–74 | Partial | Core logic present but incomplete or has issues |
-| 25–49 | Needs Work | Significant problems with logic or structure |
-| 0–24 | Fails | Missing core logic or hardcoded output |
-| 0 | Hardcoded | Only print statements, no actual algorithm |
+### Score Bands
 
-### Hardcoded Output Detection
+| Score | Label | Meaning |
+|---|---|---|
+| 90 – 100 | Excellent | Complete, correct, well-structured |
+| 75 – 89 | Good | Solid with minor issues |
+| 50 – 74 | Partial | Core logic present but incomplete |
+| 25 – 49 | Needs Work | Significant problems |
+| 0 – 24 | Fails | Missing core logic or hardcoded |
+| 0 | Hardcoded | Print statements only, no algorithm |
 
-Strips boilerplate (imports, class declarations, comments) and checks if remaining code contains **any** logic indicators (loops, conditions, data structures, method calls, math, recursion, variable logic). If none found → **0%** immediately.
+### Hardcoded Detection
 
-### Problem-Specific Pattern Database
-
-The engine maintains **37 problem patterns** (e.g., "Reverse String", "Fibonacci", "Palindrome", "Sort by Value", etc.), each with keyword triggers and language-specific regex patterns for Java, Python, and JavaScript. The best-matching pattern determines the relevance score.
-
-### AI Prompt Engineering
-
-All AI providers receive the same system prompt with:
-- Role definition ("code correctness evaluator")
-- 7-category rubric with point allocations
-- Scoring bands and rules
-- Required response format: `SCORE: <number>`, `COVERED:`, `MISSED:`
+The engine strips boilerplate (imports, class declarations, comments) and checks the remainder for any logic indicator (loops, conditions, data structures, method calls, math, recursion, variable logic). If none are found, the score is **0%** regardless of output match.
 
 ---
 
-## 8. Anti-Cheating System
+## 11. Anti-Cheating System
 
-13 behavioral metrics detect AI-generated or copied code:
+13 behavioral metrics produce a per-question AI-likelihood score with reasons:
 
-| # | Metric | What It Detects |
-|---|--------|-----------------|
-| 1 | Keystroke Ratio | Too few keystrokes relative to code length = likely paste |
-| 2 | Burst Paste Detection | Large code blocks appearing instantly |
-| 3 | Tab Switch Code Changes | Significant code changes after switching tabs |
-| 4 | Typing Speed | Unrealistic speeds indicate automation |
-| 5 | Watch-and-Type Pattern | Frequent tab switches with code additions |
-| 6 | Pause-Then-Type Rhythm | Long pauses before typing (reading from source) |
-| 7 | Idle Ratio | High idle time combined with tab switches |
-| 8 | Rapid Tab Switching | Quick, repeated tab changes |
-| 9 | Rhythmic Pauses | Uniform pause durations (robotic pattern) |
-| 10 | Uniform Session Sizes | Consistent typing chunks (transcription pattern) |
-| 11 | Low Deletion Ratio | No corrections made (copy-paste indicator) |
-| 12 | Linear Code Entry | Strictly top-to-bottom entry (0% back-jumps) |
-| 13 | Mouse Inactivity | Near-zero mouse activity during typing |
+| # | Metric | What it detects |
+|---|---|---|
+| 1 | Keystroke ratio | Few keystrokes vs. code length → likely paste |
+| 2 | Burst paste | Large blocks appearing instantly |
+| 3 | Tab-switch code change | Significant changes after tab switching |
+| 4 | Typing speed | Unrealistic speed = automation |
+| 5 | Watch-and-type | Frequent tab switches with code additions |
+| 6 | Pause-then-type | Long reading pauses before typing |
+| 7 | Idle ratio | High idle time + tab switches |
+| 8 | Rapid tab switching | Quick repeated tab changes |
+| 9 | Rhythmic pauses | Uniform pause durations (robotic) |
+| 10 | Uniform session sizes | Consistent typing chunks |
+| 11 | Low deletion ratio | No corrections (paste indicator) |
+| 12 | Linear entry | Strict top-to-bottom, 0% back-jumps |
+| 13 | Mouse inactivity | Near-zero mouse movement during typing |
 
-Each metric produces a 0–100% score with detailed reasons displayed in results.
+Each metric scores 0–100% and is shown alongside reasons in the panelist view.
 
 ---
 
-## 9. Results & Analytics
+## 12. Results & Analytics
 
-### Per-Candidate CSV
-
-```
-Date, Time, Candidate Name, Email, Experience, Question #, Question Title,
-Status, Language, Expected Output, Actual Output, Agent Score (%),
-AI Likelihood (%), AI Reasons, Session Completion (%),
-Session Agent Analysis Avg (%), Tab Switches, Question Time Spent, Total Time Taken
-```
-
-### Daily Consolidated CSV
+### File outputs (auto-generated)
 
 ```
-Date, Time, Candidate Name, Email, Experience, Correct Programs,
-Test Execution Score (%), AI Code Review Score (%), AI Likelihood Avg (%),
-AI Likelihood Max (%), Q1 Tab Switches, Q2 Tab Switches, ...,
+results/json/
+    <Candidate>-coding-results-<timestamp>.json   # full session record
+results/csv/
+    <Candidate>-performance.csv                   # per-candidate detail
+    all-candidates-summary-<YYYY-MM-DD>.csv       # daily roll-up
+```
+
+> **Note on filenames:** the candidate's name is sanitized (non-alphanumeric → `_`) when used in filenames. So `MANVITHA JUTURU` becomes `MANVITHA_JUTURU` on disk.
+
+### Per-Candidate CSV columns
+
+```
+Date, Time, Candidate Name, Candidate EmailId, Location,
+Relevant Experience (Years), Question #, Question Title, Status,
+Language, Expected Output, Actual Output, Agent Score (%),
+Plagiarism (%), Plagiarism Reasons, Session Completion (%),
+Session Agent Analysis Avg (%), Tab Switches, Question Time Spent,
+Total Time Taken
+```
+
+### Daily Consolidated CSV columns
+
+```
+Date, Time, Candidate Name, Candidate Emailid, Location,
+Relevant Experience (Years), Language Preferred, Correct Programs,
+Test Execution Score (%), Agent Score (%), Plagiarism Avg (%),
+Plagiarism Max (%), Q1 Tab Switches, Q2 Tab Switches, ...,
 Total Tab Switches, Total Time Taken
 ```
 
-### JSON Results
+### Persistence on cloud platforms
 
-Full assessment records saved to `results/json/` with candidate details, per-question code, outputs, agent scores, AI likelihoods, typing metrics, and timestamps.
-
-### Performance Dashboard Tabs
-
-- **Candidate Code & Results** — Per-question cards showing code (from the last AI Code Review), language, status, expected/actual output, covered/missed items, AI detection reasons
-- **Candidate Performance** — Filterable CSV table with all per-question metrics (uses the last AI-reviewed language per question)
-- **All Candidates Summary** — Daily overview with completion pie chart
+If you deploy to Render / Railway, attach a **persistent disk** mounted at the project root (or specifically at `results/`). Without it, files in `results/` are lost on every redeploy.
 
 ---
 
-## 10. Question Bank
+## 13. Question Bank
 
-25 questions covering moderate and complex difficulty:
+25 questions in `data/questions.json`:
 
-### Moderate Difficulty (10 min each)
-1. String Reversal
-2. Palindrome Check
-3. Count Vowels
-4. Remove Duplicates from String
-5. Find Maximum in Array
-6. Remove Duplicates from Array
-7. Prime Number Checker
-8. Fibonacci Series
-9. Armstrong Number
-10. Factorial Calculation
-11. String Anagram Check
-12. Reverse Array
-13. Common Elements in Arrays
-14. Sum of Digits
-15. Leap Year Checker
-21. Permutation Check
-22. Missing Number in Array
-23. Intersection of Two Arrays
-24. GCD Calculation
+### Moderate (10 min each)
 
-### Complex Difficulty (15 min each)
-16. Merge Sorted Arrays
-17. Binary Search Implementation
-18. Longest Substring Without Repeating Characters
-19. Rotation Check
-20. Word Frequency Counter
-25. Sorting Algorithms Comparison
+String Reversal · Palindrome Check · Count Vowels · Remove Duplicates from String · Find Maximum in Array · Remove Duplicates from Array · Prime Number Checker · Fibonacci Series · Armstrong Number · Factorial Calculation · String Anagram Check · Reverse Array · Common Elements in Arrays · Sum of Digits · Leap Year Checker · Permutation Check · Missing Number in Array · Intersection of Two Arrays · GCD Calculation
 
-### Adding Custom Questions
+### Complex (15 min each)
 
-Edit `data/questions.json`:
+Merge Sorted Arrays · Binary Search · Longest Substring Without Repeating Characters · Rotation Check · Word Frequency Counter · Sorting Algorithms Comparison
+
+### Adding a custom question
+
+Append an entry to `data/questions.json`:
+
 ```json
 {
   "id": 26,
@@ -445,68 +530,40 @@ Edit `data/questions.json`:
   "description": "What the candidate should do",
   "example": "Input: example_input\nOutput: expected_output",
   "difficulty": "moderate",
-  "javaTemplate": "public class Solution {\n  public static void main(String[] args) {\n    // template\n  }\n}",
+  "javaTemplate":   "public class Solution { ... }",
   "pythonTemplate": "# Write your solution here",
   "javascriptTemplate": "// Write your solution here"
 }
 ```
 
----
-
-## 11. Logging System
-
-### Overview
-
-All server console output is captured by `src/logger.js`:
-
-```
-console.log / error / warn
-       ↓
-   logger.js (intercepts)
-       ↓
-   ├→ logs/server.log    (file, 5 MB rotation, last 5 backups)
-   ├→ In-memory buffer   (last 500 lines)
-   └→ Original console   (displayed in terminal / VS Code Output)
-```
-
-### API Access
-
-```bash
-# Get last 100 log lines
-curl http://localhost:3000/api/logs?lines=100
-```
-
-### Log Format
-
-```
-[2026-04-12T10:30:45.123Z] [LOG] Server started on port 3000
-[2026-04-12T10:30:46.456Z] [ERROR] Error occurred
-[2026-04-12T10:30:47.789Z] [WARN] Warning message
-```
+Restart the server (or hit `/api/questions` to verify it loaded).
 
 ---
 
-## 12. VS Code Integration
+## 14. Logging
 
-### Tasks (`.vscode/tasks.json`)
+All server `console.log / error / warn` output is intercepted by `src/logger.js` and routed to:
 
-| Task | Description |
-|------|-------------|
-| **Run Server (Output Tab)** | Start the server with output in VS Code Output panel |
-| **View Server Logs** | Tail `logs/server.log` in real-time |
-| **Clear Logs** | Delete all log files |
+- `logs/server.log` — rotating file, 5 MB max, last 5 backups
+- in-memory ring buffer — last 500 lines, exposed via `GET /api/logs?lines=100`
+- the original console — still visible in the terminal / Render log stream
 
-### Running via Task
-1. `Ctrl+Shift+P` → "Tasks: Run Task"
-2. Select "Run Server (Output Tab)"
-
-### Running via Debug
-1. `Ctrl+Shift+D` → Select "Run Server"
-2. Click green play button
+Format: `[2026-04-12T10:30:45.123Z] [LOG] message`
 
 ---
 
-## 13. Deployment
+## 15. Deployment
+
+### Render.com (recommended — `render.yaml` is preconfigured)
+
+1. Push the repo to GitHub
+2. New Web Service on Render → connect the repo
+3. Add environment variables (Settings → Environment):
+   - `FEEDBACK_RECIPIENT`
+   - `GMAIL_SMTP_USER`, `GMAIL_SMTP_PASS` (or `RESEND_API_KEY`)
+   - AI provider keys you want to use
+4. Attach a persistent disk if you want `results/` to survive redeploys
+5. Save → Render builds and deploys automatically
 
 ### Docker
 
@@ -517,116 +574,121 @@ docker run -p 3000:3000 --env-file .env code-evaluator
 
 ### Railway
 
-Pre-configured via `railway.json`:
+`railway.json` is preconfigured for a Dockerfile build:
+
 ```bash
 railway up
 ```
 
-### Render
-
-Pre-configured via `render.yaml`. Connect your repo and deploy.
-
-### Any Server with Node.js
+### Bare Node.js host
 
 ```bash
 node src/server.js
-# Listens on port 3000 by default
 ```
 
 ---
 
-## 14. Customization
+## 16. Customization
 
-### Adjusting Timers & Limits
+### Timers and limits — `data/config.js`
 
-In `src/server.js`, update the config object served by `/api/config`:
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `questionTimeLimits.moderate` | 600 (10 min) | Timer for moderate questions |
-| `questionTimeLimits.complex` | 900 (15 min) | Timer for complex questions |
-| `tabSwitchFreezeLimit` | 3 | Max tab switches before freeze |
-| `instructionReadTimer` | 120 (2 min) | Instruction page timer |
+| Setting | Default | Purpose |
+|---|---|---|
+| `questionTimeLimits.moderate` | `600` | 10-min timer for moderate |
+| `questionTimeLimits.complex` | `900` | 15-min timer for complex |
+| `tabSwitchFreezeLimit` | `3` | Max tab switches before UI freezes |
+| `instructionReadTimer` | `120` | Auto-advance from instructions page |
 
 ### Styling
 
-Edit `public/styles.css`:
-- Colors: CSS variables at top
-- Fonts: body font-family
-- Button styles, timer colors, responsive breakpoints
+- Candidate UI: `public/styles.css` (CSS variables at the top control colors)
+- Panelist UI: `public/panelist-styles.css`
 
-### Email Provider
+### Email provider selection
 
 Set `EMAIL_PROVIDER` in `.env`:
 - `resend` — Resend API only
 - `smtp` — SMTP only
-- `auto` — Tries Resend first, falls back to SMTP, then console
+- `auto` — try Resend → SMTP → console fallback
 
 ---
 
-## 15. Troubleshooting
+## 17. Troubleshooting
 
 | Problem | Solution |
-|---------|----------|
-| Server won't start | Ensure Node.js v12+ installed. Check port 3000 is free: `netstat -ano \| findstr :3000` |
-| Java code won't execute | Install JDK (not JRE). Add to PATH. Test: `java -version` |
-| Python code won't execute | Install Python 3.6+. Add to PATH. Test: `python --version` |
-| OTP not sending | Check `.env` config. OTP always printed to server console as fallback |
-| AI agent timeout | For Ollama: first call can take 160s (model loading). Check API keys for cloud providers |
-| Session lost | Auto-saved every 30s. On reload, "Resume Assessment?" dialog appears. Expires after 2 hours |
-| Port in use | Change `const PORT = 3000` in `src/server.js` |
+|---|---|
+| Server won't start | Confirm Node.js v12+. Check port 3000: `lsof -i :3000` (mac/linux) or `netstat -ano \| findstr :3000` (windows) |
+| Java code won't execute | Install JDK (not JRE) and add to PATH. Test: `java -version` |
+| Python code won't execute | Install Python 3.6+ and add to PATH. Test: `python --version` |
+| OTP not arriving | Always printed to the server console as a fallback. For real email, configure Resend or SMTP in `.env` |
+| AI agent timeout | Ollama's first call may take ~160 s while the model loads. For cloud providers, verify the API key |
+| Session lost | Auto-saved every 30 s. Reload shows a "Resume Assessment?" dialog. Expires after 2 hours |
+| Port in use | Set `PORT=3001` in `.env`, or change the default in `src/server.js` |
+| Panelist sees "Failed to load session details" | The candidate's filename on disk uses sanitized name (spaces → `_`). Latest server.js handles this — make sure you're on a recent build |
+| Feedback emails not arriving | Verify `FEEDBACK_RECIPIENT` is set, and that SMTP credentials work. Check the server log for `[Feedback SMTP]` lines |
+| Results disappear after redeploy | Cloud platforms have ephemeral filesystems by default. Attach a persistent disk mounted at project root |
 
 ---
 
-## 16. Technology Stack
+## 18. Technology Stack
 
-| Layer | Technology | Details |
-|-------|-----------|---------|
-| Backend | Node.js | v12+, built-in modules only (`http`, `https`, `fs`, `path`, `crypto`, `child_process`, `net`, `tls`) |
+| Layer | Technology | Notes |
+|---|---|---|
+| Backend | Node.js v12+ | Built-in modules only — `http`, `https`, `fs`, `path`, `crypto`, `child_process`, `net`, `tls` |
 | Frontend | Vanilla JS + HTML5 + CSS3 | No frameworks, single-page app |
 | Code Editor | CodeMirror 5 | Bundled in `public/lib/codemirror/` |
-| Storage | File System | JSON + CSV in `results/` |
-| Email | Custom SMTP + Resend API | TLS/STARTTLS support |
-| AI | Cloud APIs + Local | Gemini, Claude, OpenAI, Ollama, Rule Engine |
-| Code Execution | `child_process` | 5-second timeout, auto-cleanup |
+| Storage | Local filesystem | JSON + CSV in `results/` |
+| Email | Custom SMTP + Resend API | TLS / STARTTLS support |
+| AI | Cloud APIs + local | Gemini, Claude, OpenAI, Ollama, Rule Engine |
+| Code execution | `child_process` | 5-second timeout, auto-cleanup of temp files |
 
 ### Project Statistics
 
 | Metric | Value |
-|--------|-------|
-| Total Lines of Code | ~8,000+ |
-| Backend (server.js) | ~3,400 LOC |
-| Frontend (app.js) | ~3,700 LOC |
-| API Routes | 17 |
-| Programming Questions | 25 |
-| Anti-Cheat Metrics | 13 |
-| AI Providers | 4 + rule engine |
-| Supported Languages | 3 (Java, Python, JavaScript) |
-| npm Dependencies | 0 |
+|---|---|
+| Total LOC | ~8,000 |
+| `src/server.js` | ~5,300 LOC |
+| `public/app.js` | ~3,700 LOC |
+| API routes | 35+ |
+| Programming questions | 25 |
+| Anti-cheat metrics | 13 |
+| AI providers | 4 + rule engine |
+| Languages supported | 3 (Java, Python, JavaScript) |
+| npm dependencies | 0 |
 
 ---
 
-## 17. Security
+## 19. Security
 
 | Feature | Implementation |
-|---------|---------------|
-| OTP Comparison | Constant-time via `crypto.timingSafeEqual` (prevents timing attacks) |
-| Session Tokens | Cryptographically random (32 bytes) |
-| Rate Limiting | 5 OTP requests per 10-minute window |
-| OTP Expiry | 5 minutes |
-| Max OTP Attempts | 3 per code |
-| Copy/Paste Blocking | Configurable event interception |
-| Code Execution Timeout | 5 seconds per run |
-| Temp File Cleanup | Automatic after code execution |
-| SMTP Security | TLS/STARTTLS support |
-| Request Body Limit | 50 MB |
+|---|---|
+| OTP comparison | Constant-time via `crypto.timingSafeEqual` (prevents timing attacks) |
+| Session tokens | Cryptographically random, 32 bytes |
+| Rate limiting | 5 OTP requests per 10-minute window per email |
+| OTP expiry | 5 minutes |
+| Max OTP attempts | 3 per code |
+| Email allowlist | Both candidate and panelist routes are gated by CSV files |
+| Copy/paste blocking | Configurable event interception in candidate UI |
+| Code execution timeout | 5 seconds per run |
+| Temp file cleanup | Automatic after each execution |
+| SMTP security | TLS / STARTTLS |
+| Request body limit | 50 MB |
+
+### Security checklist before production
+
+- [ ] `.env` is git-ignored (and verified — `git ls-files | grep .env`)
+- [ ] No real credentials in `.env.example` — only placeholders
+- [ ] If you're using Gmail SMTP, you're using a Google **App Password**, not the account password
+- [ ] `candidateEmailVerification: true` in `data/config.js`
+- [ ] Production AI API keys are different from development keys
+- [ ] HTTPS is enforced (Render / Railway do this by default)
 
 ---
 
-## License
+## 20. License
 
 MIT
 
 ---
 
-**Built with pure Node.js — Zero npm dependencies required!**
+**Built with pure Node.js — zero npm dependencies required.**

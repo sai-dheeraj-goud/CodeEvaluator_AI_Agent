@@ -1,272 +1,304 @@
-[2026-05-04T05:40:23.386Z] [LOG] ✓ Loaded .env configuration
-[2026-05-04T05:40:23.395Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T05:40:23.398Z] [LOG] ✓ Loaded 3 authorized candidate email(s) from CSV
-[2026-05-04T05:40:23.418Z] [LOG] 
+[2026-05-08T16:58:54.906Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
+[2026-05-08T16:58:54.913Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
+[2026-05-08T16:58:54.938Z] [LOG] 
 === Code Evaluator AI Agent ===
-[2026-05-04T05:40:23.419Z] [LOG] ✓ Server running on http://localhost:3000
-[2026-05-04T05:40:23.421Z] [LOG] ✓ IST Timestamp: 2026-05-04T11:10:23-421+05:30
-[2026-05-04T05:40:23.423Z] [LOG] 
+[2026-05-08T16:58:54.940Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-05-08T16:58:54.943Z] [LOG] ✓ IST Timestamp: 2026-05-08T22:28:54-943+05:30
+[2026-05-08T16:58:54.944Z] [LOG] 
 --- AI Provider Configuration ---
-[2026-05-04T05:40:23.424Z] [LOG]   Gemini:  ✗ disabled
-[2026-05-04T05:40:23.426Z] [LOG]   Claude:  ✗ disabled
-[2026-05-04T05:40:23.428Z] [LOG]   OpenAI:  ✗ disabled (no API key)
-[2026-05-04T05:40:23.429Z] [LOG]   Ollama:  ✗ disabled
-[2026-05-04T05:40:23.433Z] [LOG]   Fallback chain: (none configured)
-[2026-05-04T05:40:23.436Z] [LOG] --------------------------------
+[2026-05-08T16:58:54.945Z] [LOG]   Gemini:  ✗ disabled
+[2026-05-08T16:58:54.946Z] [LOG]   Claude:  ✗ disabled
+[2026-05-08T16:58:54.949Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-05-08T16:58:54.952Z] [LOG]   Ollama:  ✗ disabled
+[2026-05-08T16:58:54.954Z] [LOG]   Fallback chain: (none configured)
+[2026-05-08T16:58:54.956Z] [LOG] --------------------------------
 
-[2026-05-04T05:40:23.438Z] [LOG] ✓ Ready for requests
+[2026-05-08T16:58:54.958Z] [LOG] ✓ Ready for requests
 
-[2026-05-04T05:40:40.037Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
-[2026-05-04T05:40:40.042Z] [LOG] [sendOTPEmail] SMTP attempt 1/3: host=smtp.gmail.com, user=ctsqea260409@gmail.com
-[2026-05-04T05:40:40.045Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsqea260409@gmail.com...
-[2026-05-04T05:40:40.047Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
-[2026-05-04T05:40:40.575Z] [LOG] [SMTP-465] TLS secure connection established
-[2026-05-04T05:40:40.577Z] [LOG] [SMTP-465] Session started at step 0
-[2026-05-04T05:40:41.055Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP d2e1a72fcca58-83515875bb5sm10286686b3a.14 - gsmtp |
-[2026-05-04T05:40:41.057Z] [LOG] [SMTP-465] -> EHLO localhost
-[2026-05-04T05:40:41.318Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.211.133] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
-[2026-05-04T05:40:41.319Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:40:41.320Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:40:41.321Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:40:41.321Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:40:41.322Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:40:41.323Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:40:41.325Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:40:41.327Z] [LOG] [SMTP-465] -> AUTH LOGIN
-[2026-05-04T05:40:41.596Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
-[2026-05-04T05:40:41.599Z] [LOG] [SMTP-465] -> [base64 username]
-[2026-05-04T05:40:41.853Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
-[2026-05-04T05:40:41.854Z] [LOG] [SMTP-465] -> [base64 password]
-[2026-05-04T05:40:42.211Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
-[2026-05-04T05:40:42.213Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
-[2026-05-04T05:40:42.461Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK d2e1a72fcca58-83515875bb5sm10286686b3a.14 - gsmtp |
-[2026-05-04T05:40:42.463Z] [LOG] [SMTP-465] -> RCPT TO:<dheeraj.sai171998@gmail.com>
-[2026-05-04T05:40:42.709Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK d2e1a72fcca58-83515875bb5sm10286686b3a.14 - gsmtp |
-[2026-05-04T05:40:42.711Z] [LOG] [SMTP-465] -> DATA
-[2026-05-04T05:40:43.427Z] [LOG] [SMTP-465] <- received: 354 Go ahead d2e1a72fcca58-83515875bb5sm10286686b3a.14 - gsmtp |
-[2026-05-04T05:40:43.429Z] [LOG] [SMTP-465] -> [message body]
-[2026-05-04T05:40:44.189Z] [LOG] [SMTP-465] <- received: 250 2.0.0 OK  1777873243 d2e1a72fcca58-83515875bb5sm10286686b3a.14 - gsmtp |
-[2026-05-04T05:40:44.193Z] [LOG] [SMTP-465] -> QUIT
-[2026-05-04T05:40:44.196Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (SMTP-465)
-[2026-05-04T05:40:44.198Z] [LOG] [SMTP-465] Session ended: message sent
-[2026-05-04T05:40:44.442Z] [LOG] [SMTP-465] <- received: 221 2.0.0 closing connection d2e1a72fcca58-83515875bb5sm10286686b3a.14 - gsmtp |
-[2026-05-04T05:40:44.448Z] [LOG] [SMTP-465] Socket closed (was at step 8)
-[2026-05-04T05:41:25.671Z] [LOG] ✓ Panelist email removed: saidheeraj.anthati@cognizant.com
-[2026-05-04T05:41:28.390Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T05:41:28.392Z] [LOG] ✓ Loaded 25 panelist email(s) from CSV
-[2026-05-04T05:41:53.421Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T05:41:53.424Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T05:41:59.065Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
-[2026-05-04T05:41:59.068Z] [LOG] [sendOTPEmail] SMTP attempt 1/3: host=smtp.gmail.com, user=cognizanttest9871@gmail.com
-[2026-05-04T05:41:59.072Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with cognizanttest9871@gmail.com...
-[2026-05-04T05:41:59.075Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
-[2026-05-04T05:41:59.142Z] [LOG] [SMTP-465] TLS secure connection established
-[2026-05-04T05:41:59.145Z] [LOG] [SMTP-465] Session started at step 0
-[2026-05-04T05:41:59.393Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP 98e67ed59e1d1-364ec042370sm10214833a91.17 - gsmtp |
-[2026-05-04T05:41:59.397Z] [LOG] [SMTP-465] -> EHLO localhost
-[2026-05-04T05:41:59.643Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.211.133] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
-[2026-05-04T05:41:59.647Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:41:59.649Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:41:59.652Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:41:59.655Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:41:59.658Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:41:59.662Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:41:59.665Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:41:59.668Z] [LOG] [SMTP-465] -> AUTH LOGIN
-[2026-05-04T05:41:59.913Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
-[2026-05-04T05:41:59.916Z] [LOG] [SMTP-465] -> [base64 username]
-[2026-05-04T05:42:00.159Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
-[2026-05-04T05:42:00.163Z] [LOG] [SMTP-465] -> [base64 password]
-[2026-05-04T05:42:00.517Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
-[2026-05-04T05:42:00.519Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
-[2026-05-04T05:42:00.767Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK 98e67ed59e1d1-364ec042370sm10214833a91.17 - gsmtp |
-[2026-05-04T05:42:00.771Z] [LOG] [SMTP-465] -> RCPT TO:<dheeraj.sai171998@gmail.com>
-[2026-05-04T05:42:01.014Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK 98e67ed59e1d1-364ec042370sm10214833a91.17 - gsmtp |
-[2026-05-04T05:42:01.016Z] [LOG] [SMTP-465] -> DATA
-[2026-05-04T05:42:01.360Z] [LOG] [SMTP-465] <- received: 354 Go ahead 98e67ed59e1d1-364ec042370sm10214833a91.17 - gsmtp |
-[2026-05-04T05:42:01.362Z] [LOG] [SMTP-465] -> [message body]
-[2026-05-04T05:42:02.070Z] [LOG] [SMTP-465] <- received: 250 2.0.0 OK  1777873321 98e67ed59e1d1-364ec042370sm10214833a91.17 - gsmtp |
-[2026-05-04T05:42:02.073Z] [LOG] [SMTP-465] -> QUIT
-[2026-05-04T05:42:02.076Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (SMTP-465)
-[2026-05-04T05:42:02.078Z] [LOG] [SMTP-465] Session ended: message sent
-[2026-05-04T05:42:02.317Z] [LOG] [SMTP-465] <- received: 221 2.0.0 closing connection 98e67ed59e1d1-364ec042370sm10214833a91.17 - gsmtp |
-[2026-05-04T05:42:02.322Z] [LOG] [SMTP-465] Socket closed (was at step 8)
-[2026-05-04T05:42:46.087Z] [LOG] ✓ Candidate email removed: dheeraj.sai17@gmail.com
-[2026-05-04T05:42:48.500Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T05:42:48.503Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
-[2026-05-04T05:42:58.449Z] [LOG] ✓ Panelist email removed: saidheeraj.anthati@cognizant.com
-[2026-05-04T05:42:58.507Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T05:42:58.512Z] [LOG] ✓ Loaded 25 panelist email(s) from CSV
-[2026-05-04T05:43:47.377Z] [LOG] ✗ Unauthorized candidate email blocked: dheeraj.sai17@gmail.com
-[2026-05-04T05:43:55.175Z] [LOG] ✗ Unauthorized candidate email blocked: saidheeraj.anthati@cognizant.com
-[2026-05-04T05:44:03.589Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T05:44:03.591Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T05:44:58.370Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
-[2026-05-04T05:44:58.373Z] [LOG] [sendOTPEmail] SMTP attempt 1/3: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
-[2026-05-04T05:44:58.376Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
-[2026-05-04T05:44:58.379Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
-[2026-05-04T05:44:58.464Z] [LOG] [SMTP-465] TLS secure connection established
-[2026-05-04T05:44:58.468Z] [LOG] [SMTP-465] Session started at step 0
-[2026-05-04T05:44:58.720Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP d9443c01a7336-2b9caad28c1sm92053705ad.34 - gsmtp |
-[2026-05-04T05:44:58.721Z] [LOG] [SMTP-465] -> EHLO localhost
-[2026-05-04T05:44:58.971Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.211.133] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
-[2026-05-04T05:44:58.974Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:44:58.976Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:44:58.979Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:44:58.981Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:44:58.984Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:44:58.989Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:44:58.992Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
-[2026-05-04T05:44:58.996Z] [LOG] [SMTP-465] -> AUTH LOGIN
-[2026-05-04T05:44:59.250Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
-[2026-05-04T05:44:59.253Z] [LOG] [SMTP-465] -> [base64 username]
-[2026-05-04T05:44:59.501Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
-[2026-05-04T05:44:59.503Z] [LOG] [SMTP-465] -> [base64 password]
-[2026-05-04T05:44:59.963Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
-[2026-05-04T05:44:59.966Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
-[2026-05-04T05:45:00.216Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK d9443c01a7336-2b9caad28c1sm92053705ad.34 - gsmtp |
-[2026-05-04T05:45:00.218Z] [LOG] [SMTP-465] -> RCPT TO:<dheeraj.sai171998@gmail.com>
-[2026-05-04T05:45:00.467Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK d9443c01a7336-2b9caad28c1sm92053705ad.34 - gsmtp |
-[2026-05-04T05:45:00.470Z] [LOG] [SMTP-465] -> DATA
-[2026-05-04T05:45:01.004Z] [LOG] [SMTP-465] <- received: 354 Go ahead d9443c01a7336-2b9caad28c1sm92053705ad.34 - gsmtp |
-[2026-05-04T05:45:01.007Z] [LOG] [SMTP-465] -> [message body]
-[2026-05-04T05:45:01.996Z] [LOG] [SMTP-465] <- received: 250 2.0.0 OK  1777873501 d9443c01a7336-2b9caad28c1sm92053705ad.34 - gsmtp |
-[2026-05-04T05:45:01.998Z] [LOG] [SMTP-465] -> QUIT
-[2026-05-04T05:45:02.001Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (SMTP-465)
-[2026-05-04T05:45:02.005Z] [LOG] [SMTP-465] Session ended: message sent
-[2026-05-04T05:45:02.248Z] [LOG] [SMTP-465] <- received: 221 2.0.0 closing connection d9443c01a7336-2b9caad28c1sm92053705ad.34 - gsmtp |
-[2026-05-04T05:45:02.250Z] [LOG] [SMTP-465] Socket closed (was at step 8)
-[2026-05-04T05:46:00.446Z] [LOG] ✓ Panelist email removed: saidheeraj.anthati@cognizant.com
-[2026-05-04T05:46:03.594Z] [LOG] ✓ Panelist email added: SaiDheeraj.Anthati@cognizant.com
-[2026-05-04T05:46:03.747Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T05:46:03.752Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T06:18:26.275Z] [LOG] ✓ Loaded .env configuration
-[2026-05-04T06:18:26.283Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T06:18:26.286Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
-[2026-05-04T06:18:26.303Z] [LOG] 
+[2026-05-08T16:59:01.497Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-08T16:59:01.501Z] [LOG] [SMTP] No Gmail credentials configured. [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 342386
+[2026-05-08T16:59:01.504Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 342386
+[2026-05-08T16:59:58.915Z] [LOG] ✓ Loaded .env configuration
+[2026-05-08T16:59:58.923Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
+[2026-05-08T16:59:58.926Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
+[2026-05-08T16:59:58.943Z] [LOG] 
 === Code Evaluator AI Agent ===
-[2026-05-04T06:18:26.304Z] [LOG] ✓ Server running on http://localhost:3000
-[2026-05-04T06:18:26.307Z] [LOG] ✓ IST Timestamp: 2026-05-04T11:48:26-307+05:30
-[2026-05-04T06:18:26.310Z] [LOG] 
+[2026-05-08T16:59:58.945Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-05-08T16:59:58.946Z] [LOG] ✓ IST Timestamp: 2026-05-08T22:29:58-946+05:30
+[2026-05-08T16:59:58.948Z] [LOG] 
 --- AI Provider Configuration ---
-[2026-05-04T06:18:26.311Z] [LOG]   Gemini:  ✗ disabled
-[2026-05-04T06:18:26.312Z] [LOG]   Claude:  ✗ disabled
-[2026-05-04T06:18:26.313Z] [LOG]   OpenAI:  ✗ disabled (no API key)
-[2026-05-04T06:18:26.314Z] [LOG]   Ollama:  ✗ disabled
-[2026-05-04T06:18:26.315Z] [LOG]   Fallback chain: (none configured)
-[2026-05-04T06:18:26.316Z] [LOG] --------------------------------
+[2026-05-08T16:59:58.949Z] [LOG]   Gemini:  ✗ disabled
+[2026-05-08T16:59:58.950Z] [LOG]   Claude:  ✗ disabled
+[2026-05-08T16:59:58.952Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-05-08T16:59:58.956Z] [LOG]   Ollama:  ✗ disabled
+[2026-05-08T16:59:58.958Z] [LOG]   Fallback chain: (none configured)
+[2026-05-08T16:59:58.959Z] [LOG] --------------------------------
 
-[2026-05-04T06:18:26.318Z] [LOG] ✓ Ready for requests
+[2026-05-08T16:59:58.960Z] [LOG] ✓ Ready for requests
 
-[2026-05-04T06:18:48.498Z] [LOG] ✓ Bulk-added 5 candidate email(s)
-[2026-05-04T06:18:51.283Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:18:51.289Z] [LOG] ✓ Loaded 7 authorized candidate email(s) from CSV
-[2026-05-04T06:19:20.366Z] [LOG] ✓ Candidate email removed: saidheeraj123@email.com
-[2026-05-04T06:19:21.316Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:19:21.323Z] [LOG] ✓ Loaded 6 authorized candidate email(s) from CSV
-[2026-05-04T06:19:22.662Z] [LOG] ✓ Candidate email removed: saidheeraj123@gmail.com
-[2026-05-04T06:19:24.410Z] [LOG] ✓ Candidate email removed: saidheeraj123@hal.com
-[2026-05-04T06:19:26.220Z] [LOG] ✓ Candidate email removed: saidheeraj123@yahoo.com
-[2026-05-04T06:19:26.326Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:19:26.331Z] [LOG] ✓ Loaded 3 authorized candidate email(s) from CSV
-[2026-05-04T06:19:28.109Z] [LOG] ✓ Candidate email removed: saidheeraj45@gmail.com
-[2026-05-04T06:19:31.334Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:19:31.340Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
-[2026-05-04T06:38:49.118Z] [LOG] ✓ Bulk-added 5 candidate email(s)
-[2026-05-04T06:38:52.995Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:38:52.998Z] [LOG] ✓ Loaded 7 authorized candidate email(s) from CSV
-[2026-05-04T06:38:57.012Z] [LOG] ✓ Candidate email removed: saidheeraj123@email.com
-[2026-05-04T06:38:58.000Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:38:58.004Z] [LOG] ✓ Loaded 6 authorized candidate email(s) from CSV
-[2026-05-04T06:39:00.953Z] [LOG] ✓ Candidate email removed: saidheeraj123@gmail.com
-[2026-05-04T06:39:02.701Z] [LOG] ✓ Candidate email removed: saidheeraj123@hal.com
-[2026-05-04T06:39:03.007Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:39:03.011Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
-[2026-05-04T06:39:04.581Z] [LOG] ✓ Candidate email removed: saidheeraj123@yahoo.com
-[2026-05-04T06:39:06.353Z] [LOG] ✓ Candidate email removed: saidheeraj45@gmail.com
-[2026-05-04T06:39:08.008Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:39:08.012Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
-[2026-05-04T06:47:46.315Z] [LOG] ✓ Loaded .env configuration
-[2026-05-04T06:47:46.326Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T06:47:46.331Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
-[2026-05-04T06:47:46.356Z] [LOG] 
+[2026-05-08T17:00:05.543Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-08T17:00:05.545Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-08T17:00:05.854Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-08T17:00:05.857Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-08T17:00:05.858Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-08T17:00:05.860Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:00:05.862Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-08T17:00:20.871Z] [LOG] [SMTP-465] Timeout
+[2026-05-08T17:00:20.873Z] [LOG] [sendOTPEmail] Trying SMTP port 587 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:00:35.878Z] [LOG] [SMTP-587] Timeout
+[2026-05-08T17:00:35.880Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 432091
+[2026-05-08T17:00:35.881Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 432091
+[2026-05-08T17:00:59.257Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-08T17:00:59.262Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-08T17:00:59.509Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-08T17:00:59.512Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-08T17:00:59.515Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-08T17:00:59.518Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:00:59.522Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-08T17:01:14.527Z] [LOG] [SMTP-465] Timeout
+[2026-05-08T17:01:14.530Z] [LOG] [sendOTPEmail] Trying SMTP port 587 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:01:29.536Z] [LOG] [SMTP-587] Timeout
+[2026-05-08T17:01:29.539Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 837535
+[2026-05-08T17:01:29.542Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 837535
+[2026-05-08T17:02:37.874Z] [LOG] [Java] Success. Output: ""
+[2026-05-08T17:02:41.034Z] [LOG] ✓ Candidate assessment submitted: dheeraj.sai171998@gmail.com
+[2026-05-08T17:02:45.695Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-08T17:02:45.698Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-08T17:02:46.106Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-08T17:02:46.109Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-08T17:02:46.112Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-08T17:02:46.115Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:02:46.117Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-08T17:03:01.127Z] [LOG] [SMTP-465] Timeout
+[2026-05-08T17:03:01.129Z] [LOG] [sendOTPEmail] Trying SMTP port 587 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:03:16.146Z] [LOG] [SMTP-587] Timeout
+[2026-05-08T17:03:16.149Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 268900
+[2026-05-08T17:03:16.150Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 268900
+[2026-05-08T17:05:22.993Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-08T17:05:22.996Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-08T17:05:23.261Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-08T17:05:23.264Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-08T17:05:23.267Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-08T17:05:23.269Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:05:23.273Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-08T17:05:38.286Z] [LOG] [SMTP-465] Timeout
+[2026-05-08T17:05:38.288Z] [LOG] [sendOTPEmail] Trying SMTP port 587 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:05:53.299Z] [LOG] [SMTP-587] Timeout
+[2026-05-08T17:05:53.302Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 640904
+[2026-05-08T17:05:53.305Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 640904
+[2026-05-08T17:06:47.775Z] [LOG] [JavaScript] Success. Output: ""
+[2026-05-08T17:07:11.291Z] [LOG] ✓ Candidate assessment submitted: dheeraj.sai171998@gmail.com
+[2026-05-08T17:07:15.465Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-08T17:07:15.468Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-08T17:07:15.761Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-08T17:07:15.765Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-08T17:07:15.769Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-08T17:07:15.772Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:07:15.776Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-08T17:07:30.779Z] [LOG] [SMTP-465] Timeout
+[2026-05-08T17:07:30.782Z] [LOG] [sendOTPEmail] Trying SMTP port 587 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:07:45.801Z] [LOG] [SMTP-587] Timeout
+[2026-05-08T17:07:45.804Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 594840
+[2026-05-08T17:07:45.805Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 594840
+[2026-05-08T17:08:51.167Z] [LOG] [Python] Success (using: python). Output: ""
+[2026-05-08T17:09:51.292Z] [LOG] [Python] Success (using: python). Output: "(a1, a2) - True
+(a1, a3) - False"
+[2026-05-08T17:09:53.442Z] [LOG] [Agent] mode=percentage, USE_CLAUDE=false, USE_OLLAMA=false, OPENAI_KEY=not set
+[2026-05-08T17:09:53.447Z] [LOG] [Agent] All AI providers failed or disabled — falling back to Enhanced Rule-Based Scoring Engine
+[2026-05-08T17:09:53.471Z] [LOG] [Agent] Rule-based engine score: 87
+[2026-05-08T17:09:53.476Z] [LOG] [Agent] Result: agent=enhanced-rule-engine, confidence=medium, percentage=87
+[2026-05-08T17:09:53.919Z] [LOG] ✓ Candidate assessment submitted: dheeraj.sai171998@gmail.com
+[2026-05-08T17:10:28.310Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-08T17:10:28.313Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-08T17:10:28.530Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-08T17:10:28.533Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-08T17:10:28.537Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-08T17:10:28.541Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:10:28.544Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-08T17:10:43.546Z] [LOG] [SMTP-465] Timeout
+[2026-05-08T17:10:43.550Z] [LOG] [sendOTPEmail] Trying SMTP port 587 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:10:58.563Z] [LOG] [SMTP-587] Timeout
+[2026-05-08T17:10:58.566Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 339671
+[2026-05-08T17:10:58.568Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 339671
+[2026-05-08T17:15:44.760Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-08T17:15:44.763Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-08T17:15:45.062Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-08T17:15:45.065Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-08T17:15:45.068Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-08T17:15:45.071Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:15:45.075Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-08T17:16:00.079Z] [LOG] [SMTP-465] Timeout
+[2026-05-08T17:16:00.082Z] [LOG] [sendOTPEmail] Trying SMTP port 587 with ctsuhgtest1@gmail.com...
+[2026-05-08T17:16:15.090Z] [LOG] [SMTP-587] Timeout
+[2026-05-08T17:16:15.093Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 529105
+[2026-05-08T17:16:15.095Z] [LOG] [Console Fallback] OTP for dheeraj.sai171998@gmail.com: 529105
+[2026-05-08T17:16:40.600Z] [LOG] [Feedback SMTP] Timeout sending feedback from dheeraj.sai171998@gmail.com
+[2026-05-08T17:16:40.602Z] [LOG] [Feedback Fallback] From: dheeraj.sai171998@gmail.com, Name: dheeraj.sai171998@gmail.com, Feedback: hey
+[2026-05-08T17:16:46.619Z] [ERROR] [Feedback SMTP] Connection error: connect ETIMEDOUT 192.178.211.108:587
+[2026-05-08T17:20:31.305Z] [LOG] [Feedback SMTP] Timeout sending feedback from saidheeraj.anthati@cognizant.com
+[2026-05-08T17:20:31.307Z] [LOG] [Feedback Fallback] From: saidheeraj.anthati@cognizant.com, Name: saidheeraj.anthati@cognizant.com, Feedback: dfgh
+[2026-05-08T17:20:37.337Z] [ERROR] [Feedback SMTP] Connection error: connect ETIMEDOUT 192.178.211.108:587
+[2026-05-09T17:29:45.526Z] [LOG] ✓ Loaded .env configuration
+[2026-05-09T17:29:45.560Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
+[2026-05-09T17:29:45.566Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
+[2026-05-09T17:29:45.615Z] [LOG] 
 === Code Evaluator AI Agent ===
-[2026-05-04T06:47:46.358Z] [LOG] ✓ Server running on http://localhost:3000
-[2026-05-04T06:47:46.359Z] [LOG] ✓ IST Timestamp: 2026-05-04T12:17:46-359+05:30
-[2026-05-04T06:47:46.360Z] [LOG] 
+[2026-05-09T17:29:45.618Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-05-09T17:29:45.621Z] [LOG] ✓ IST Timestamp: 2026-05-09T22:59:45-621+05:30
+[2026-05-09T17:29:45.626Z] [LOG] 
 --- AI Provider Configuration ---
-[2026-05-04T06:47:46.362Z] [LOG]   Gemini:  ✗ disabled
-[2026-05-04T06:47:46.364Z] [LOG]   Claude:  ✗ disabled
-[2026-05-04T06:47:46.366Z] [LOG]   OpenAI:  ✗ disabled (no API key)
-[2026-05-04T06:47:46.367Z] [LOG]   Ollama:  ✗ disabled
-[2026-05-04T06:47:46.368Z] [LOG]   Fallback chain: (none configured)
-[2026-05-04T06:47:46.369Z] [LOG] --------------------------------
+[2026-05-09T17:29:45.634Z] [LOG]   Gemini:  ✗ disabled
+[2026-05-09T17:29:45.638Z] [LOG]   Claude:  ✗ disabled
+[2026-05-09T17:29:45.643Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-05-09T17:29:45.647Z] [LOG]   Ollama:  ✗ disabled
+[2026-05-09T17:29:45.650Z] [LOG]   Fallback chain: (none configured)
+[2026-05-09T17:29:45.656Z] [LOG] --------------------------------
 
-[2026-05-04T06:47:46.370Z] [LOG] ✓ Ready for requests
+[2026-05-09T17:29:45.667Z] [LOG] ✓ Ready for requests
 
-[2026-05-04T06:49:02.062Z] [LOG] ✓ Bulk-added 5 candidate email(s)
-[2026-05-04T06:49:06.372Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:49:06.374Z] [LOG] ✓ Loaded 7 authorized candidate email(s) from CSV
-[2026-05-04T06:49:07.055Z] [LOG] ✓ Candidate email removed: saidheeraj123@email.com
-[2026-05-04T06:49:08.682Z] [LOG] ✓ Candidate email removed: saidheeraj123@gmail.com
-[2026-05-04T06:49:10.315Z] [LOG] ✓ Candidate email removed: saidheeraj123@hal.com
-[2026-05-04T06:49:11.387Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:49:11.391Z] [LOG] ✓ Loaded 4 authorized candidate email(s) from CSV
-[2026-05-04T06:49:11.900Z] [LOG] ✓ Candidate email removed: saidheeraj123@yahoo.com
-[2026-05-04T06:49:13.618Z] [LOG] ✓ Candidate email removed: saidheeraj45@gmail.com
-[2026-05-04T06:49:16.400Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T06:49:16.402Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
-[2026-05-04T06:58:04.140Z] [LOG] ✓ Loaded .env configuration
-[2026-05-04T06:58:04.147Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T06:58:04.149Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
-[2026-05-04T06:58:04.166Z] [LOG] 
+[2026-05-09T17:29:51.006Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-09T17:29:51.011Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-09T17:29:53.515Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-09T17:29:53.517Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-09T17:29:53.520Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-09T17:29:53.522Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-09T17:29:53.529Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-09T17:29:54.118Z] [LOG] [SMTP-465] TLS secure connection established
+[2026-05-09T17:29:54.121Z] [LOG] [SMTP-465] Session started at step 0
+[2026-05-09T17:29:54.709Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP d9443c01a7336-2baf1d4050dsm53206145ad.31 - gsmtp |
+[2026-05-09T17:29:54.711Z] [LOG] [SMTP-465] -> EHLO localhost
+[2026-05-09T17:29:54.963Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.192.152] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
+[2026-05-09T17:29:54.965Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:29:54.968Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:29:54.970Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:29:54.973Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:29:54.976Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:29:54.978Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:29:54.981Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:29:54.984Z] [LOG] [SMTP-465] -> AUTH LOGIN
+[2026-05-09T17:29:55.229Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
+[2026-05-09T17:29:55.231Z] [LOG] [SMTP-465] -> [base64 username]
+[2026-05-09T17:29:55.475Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
+[2026-05-09T17:29:55.478Z] [LOG] [SMTP-465] -> [base64 password]
+[2026-05-09T17:29:55.974Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
+[2026-05-09T17:29:55.976Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
+[2026-05-09T17:29:56.226Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK d9443c01a7336-2baf1d4050dsm53206145ad.31 - gsmtp |
+[2026-05-09T17:29:56.229Z] [LOG] [SMTP-465] -> RCPT TO:<dheeraj.sai171998@gmail.com>
+[2026-05-09T17:29:56.480Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK d9443c01a7336-2baf1d4050dsm53206145ad.31 - gsmtp |
+[2026-05-09T17:29:56.481Z] [LOG] [SMTP-465] -> DATA
+[2026-05-09T17:29:57.170Z] [LOG] [SMTP-465] <- received: 354 Go ahead d9443c01a7336-2baf1d4050dsm53206145ad.31 - gsmtp |
+[2026-05-09T17:29:57.172Z] [LOG] [SMTP-465] -> [message body]
+[2026-05-09T17:29:58.019Z] [LOG] [SMTP-465] <- received: 250 2.0.0 OK  1778347799 d9443c01a7336-2baf1d4050dsm53206145ad.31 - gsmtp |
+[2026-05-09T17:29:58.021Z] [LOG] [SMTP-465] -> QUIT
+[2026-05-09T17:29:58.024Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (SMTP-465)
+[2026-05-09T17:29:58.027Z] [LOG] [SMTP-465] Session ended: message sent
+[2026-05-09T17:29:58.264Z] [LOG] [SMTP-465] <- received: 221 2.0.0 closing connection d9443c01a7336-2baf1d4050dsm53206145ad.31 - gsmtp |
+[2026-05-09T17:29:58.267Z] [LOG] [SMTP-465] Socket closed (was at step 8)
+[2026-05-09T17:32:31.948Z] [LOG] ✓ Loaded .env configuration
+[2026-05-09T17:32:31.959Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
+[2026-05-09T17:32:31.963Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
+[2026-05-09T17:32:31.988Z] [LOG] 
 === Code Evaluator AI Agent ===
-[2026-05-04T06:58:04.168Z] [LOG] ✓ Server running on http://localhost:3000
-[2026-05-04T06:58:04.169Z] [LOG] ✓ IST Timestamp: 2026-05-04T12:28:04-169+05:30
-[2026-05-04T06:58:04.170Z] [LOG] 
+[2026-05-09T17:32:31.991Z] [LOG] ✓ Server running on http://localhost:3000
+[2026-05-09T17:32:31.993Z] [LOG] ✓ IST Timestamp: 2026-05-09T23:02:31-993+05:30
+[2026-05-09T17:32:31.994Z] [LOG] 
 --- AI Provider Configuration ---
-[2026-05-04T06:58:04.171Z] [LOG]   Gemini:  ✗ disabled
-[2026-05-04T06:58:04.172Z] [LOG]   Claude:  ✗ disabled
-[2026-05-04T06:58:04.173Z] [LOG]   OpenAI:  ✗ disabled (no API key)
-[2026-05-04T06:58:04.175Z] [LOG]   Ollama:  ✗ disabled
-[2026-05-04T06:58:04.178Z] [LOG]   Fallback chain: (none configured)
-[2026-05-04T06:58:04.179Z] [LOG] --------------------------------
+[2026-05-09T17:32:31.996Z] [LOG]   Gemini:  ✗ disabled
+[2026-05-09T17:32:31.998Z] [LOG]   Claude:  ✗ disabled
+[2026-05-09T17:32:32.001Z] [LOG]   OpenAI:  ✗ disabled (no API key)
+[2026-05-09T17:32:32.009Z] [LOG]   Ollama:  ✗ disabled
+[2026-05-09T17:32:32.016Z] [LOG]   Fallback chain: (none configured)
+[2026-05-09T17:32:32.020Z] [LOG] --------------------------------
 
-[2026-05-04T06:58:04.180Z] [LOG] ✓ Ready for requests
+[2026-05-09T17:32:32.030Z] [LOG] ✓ Ready for requests
 
-[2026-05-04T07:08:17.056Z] [LOG] ✓ Bulk-added 5 candidate email(s)
-[2026-05-04T07:08:19.964Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T07:08:19.966Z] [LOG] ✓ Loaded 7 authorized candidate email(s) from CSV
-[2026-05-04T07:08:38.289Z] [LOG] ✓ Loaded .env configuration
-[2026-05-04T07:08:38.298Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T07:08:38.300Z] [LOG] ✓ Loaded 7 authorized candidate email(s) from CSV
-[2026-05-04T07:08:38.317Z] [LOG] 
-=== Code Evaluator AI Agent ===
-[2026-05-04T07:08:38.318Z] [LOG] ✓ Server running on http://localhost:3000
-[2026-05-04T07:08:38.320Z] [LOG] ✓ IST Timestamp: 2026-05-04T12:38:38-320+05:30
-[2026-05-04T07:08:38.321Z] [LOG] 
---- AI Provider Configuration ---
-[2026-05-04T07:08:38.322Z] [LOG]   Gemini:  ✗ disabled
-[2026-05-04T07:08:38.325Z] [LOG]   Claude:  ✗ disabled
-[2026-05-04T07:08:38.326Z] [LOG]   OpenAI:  ✗ disabled (no API key)
-[2026-05-04T07:08:38.328Z] [LOG]   Ollama:  ✗ disabled
-[2026-05-04T07:08:38.329Z] [LOG]   Fallback chain: (none configured)
-[2026-05-04T07:08:38.330Z] [LOG] --------------------------------
-
-[2026-05-04T07:08:38.331Z] [LOG] ✓ Ready for requests
-
-[2026-05-04T07:08:50.757Z] [LOG] ✓ Bulk-removed 5 candidate email(s)
-[2026-05-04T07:08:53.289Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T07:08:53.293Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
-[2026-05-04T07:09:03.204Z] [LOG] ✓ Bulk-added 5 panelist email(s)
-[2026-05-04T07:09:03.291Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T07:09:03.297Z] [LOG] ✓ Loaded 31 panelist email(s) from CSV
-[2026-05-04T07:09:08.306Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T07:09:08.311Z] [LOG] ✓ Loaded 31 panelist email(s) from CSV
-[2026-05-04T07:09:16.474Z] [LOG] ✓ Bulk-removed 5 panelist email(s)
-[2026-05-04T07:09:18.320Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T07:09:18.325Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T07:13:48.398Z] [LOG] ↻ Panelist emails CSV changed — reloading...
-[2026-05-04T07:13:48.400Z] [LOG] ✓ Loaded 26 panelist email(s) from CSV
-[2026-05-04T07:13:48.401Z] [LOG] ↻ Candidate emails CSV changed — reloading...
-[2026-05-04T07:13:48.402Z] [LOG] ⚠ Candidate email verification is DISABLED (open access)
+[2026-05-09T17:32:45.890Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-09T17:32:45.895Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-09T17:32:46.184Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-09T17:32:46.187Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-09T17:32:46.191Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-09T17:32:46.192Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-09T17:32:46.195Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-09T17:32:46.256Z] [LOG] [SMTP-465] TLS secure connection established
+[2026-05-09T17:32:46.260Z] [LOG] [SMTP-465] Session started at step 0
+[2026-05-09T17:32:46.534Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP 41be03b00d2f7-c826771c6ddsm4741189a12.23 - gsmtp |
+[2026-05-09T17:32:46.537Z] [LOG] [SMTP-465] -> EHLO localhost
+[2026-05-09T17:32:46.785Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.192.152] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
+[2026-05-09T17:32:46.787Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:32:46.790Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:32:46.793Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:32:46.795Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:32:46.797Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:32:46.799Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:32:46.800Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:32:46.801Z] [LOG] [SMTP-465] -> AUTH LOGIN
+[2026-05-09T17:32:47.050Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
+[2026-05-09T17:32:47.054Z] [LOG] [SMTP-465] -> [base64 username]
+[2026-05-09T17:32:47.325Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
+[2026-05-09T17:32:47.327Z] [LOG] [SMTP-465] -> [base64 password]
+[2026-05-09T17:32:47.837Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
+[2026-05-09T17:32:47.840Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
+[2026-05-09T17:32:48.090Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK 41be03b00d2f7-c826771c6ddsm4741189a12.23 - gsmtp |
+[2026-05-09T17:32:48.093Z] [LOG] [SMTP-465] -> RCPT TO:<dheeraj.sai171998@gmail.com>
+[2026-05-09T17:32:48.340Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK 41be03b00d2f7-c826771c6ddsm4741189a12.23 - gsmtp |
+[2026-05-09T17:32:48.341Z] [LOG] [SMTP-465] -> DATA
+[2026-05-09T17:32:48.826Z] [LOG] [SMTP-465] <- received: 354 Go ahead 41be03b00d2f7-c826771c6ddsm4741189a12.23 - gsmtp |
+[2026-05-09T17:32:48.828Z] [LOG] [SMTP-465] -> [message body]
+[2026-05-09T17:32:50.040Z] [LOG] [SMTP-465] <- received: 250 2.0.0 OK  1778347971 41be03b00d2f7-c826771c6ddsm4741189a12.23 - gsmtp |
+[2026-05-09T17:32:50.042Z] [LOG] [SMTP-465] -> QUIT
+[2026-05-09T17:32:50.044Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (SMTP-465)
+[2026-05-09T17:32:50.046Z] [LOG] [SMTP-465] Session ended: message sent
+[2026-05-09T17:32:50.287Z] [LOG] [SMTP-465] <- received: 221 2.0.0 closing connection 41be03b00d2f7-c826771c6ddsm4741189a12.23 - gsmtp |
+[2026-05-09T17:32:50.292Z] [LOG] [SMTP-465] Socket closed (was at step 8)
+[2026-05-09T17:34:45.807Z] [LOG] [Java] Success. Output: ""
+[2026-05-09T17:36:16.347Z] [LOG] [Java] Success. Output: "MY nAme iS PRaveen"
+[2026-05-09T17:36:19.821Z] [LOG] [Agent] mode=percentage, USE_CLAUDE=false, USE_OLLAMA=false, OPENAI_KEY=not set
+[2026-05-09T17:36:19.843Z] [LOG] [Agent] All AI providers failed or disabled — falling back to Enhanced Rule-Based Scoring Engine
+[2026-05-09T17:36:20.045Z] [LOG] [Agent] Rule-based engine score: 95
+[2026-05-09T17:36:20.074Z] [LOG] [Agent] Result: agent=enhanced-rule-engine, confidence=medium, percentage=95
+[2026-05-09T17:36:23.638Z] [LOG] ✓ Candidate assessment submitted: dheeraj.sai171998@gmail.com
+[2026-05-09T17:36:31.953Z] [LOG] [sendOTPEmail] Attempting to send OTP to dheeraj.sai171998@gmail.com
+[2026-05-09T17:36:32.026Z] [LOG] [Gmail API] Attempt 1/1 using ctsuhgtest1@gmail.com
+[2026-05-09T17:36:32.531Z] [ERROR] [Gmail API] Failed to get access token for ctsuhgtest1@gmail.com
+[2026-05-09T17:36:32.548Z] [ERROR] [Gmail API] All accounts failed
+[2026-05-09T17:36:32.574Z] [LOG] [sendOTPEmail] SMTP attempt 1/1: host=smtp.gmail.com, user=ctsuhgtest1@gmail.com
+[2026-05-09T17:36:32.607Z] [LOG] [sendOTPEmail] Trying SMTP port 465 with ctsuhgtest1@gmail.com...
+[2026-05-09T17:36:32.688Z] [LOG] [SMTP-465] Connecting to smtp.gmail.com:465...
+[2026-05-09T17:36:32.849Z] [LOG] [SMTP-465] TLS secure connection established
+[2026-05-09T17:36:32.869Z] [LOG] [SMTP-465] Session started at step 0
+[2026-05-09T17:36:33.137Z] [LOG] [SMTP-465] <- received: 220 smtp.gmail.com ESMTP 41be03b00d2f7-c826772742bsm5027784a12.29 - gsmtp |
+[2026-05-09T17:36:33.154Z] [LOG] [SMTP-465] -> EHLO localhost
+[2026-05-09T17:36:33.439Z] [LOG] [SMTP-465] <- received: 250-smtp.gmail.com at your service, [49.207.192.152] | 250-SIZE 35882577 | 250-8BITMIME | 250-AUTH LOGIN PLAIN XOAUTH2 PLAIN-CLIENTTOKEN OAUTHBEARER XOAUTH | 250-ENHANCEDSTATUSCODES | 250-PIPELINING | 250-CHUNKING | 250 SMTPUTF8 |
+[2026-05-09T17:36:33.455Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:36:33.483Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:36:33.518Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:36:33.538Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:36:33.553Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:36:33.580Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:36:33.598Z] [LOG] [SMTP-465] (skipping continuation line at step 1)
+[2026-05-09T17:36:33.621Z] [LOG] [SMTP-465] -> AUTH LOGIN
+[2026-05-09T17:36:34.007Z] [LOG] [SMTP-465] <- received: 334 VXNlcm5hbWU6 |
+[2026-05-09T17:36:34.022Z] [LOG] [SMTP-465] -> [base64 username]
+[2026-05-09T17:36:34.281Z] [LOG] [SMTP-465] <- received: 334 UGFzc3dvcmQ6 |
+[2026-05-09T17:36:34.294Z] [LOG] [SMTP-465] -> [base64 password]
+[2026-05-09T17:36:34.871Z] [LOG] [SMTP-465] <- received: 235 2.7.0 Accepted |
+[2026-05-09T17:36:34.877Z] [LOG] [SMTP-465] ✓ Authenticated. -> MAIL FROM
+[2026-05-09T17:36:35.228Z] [LOG] [SMTP-465] <- received: 250 2.1.0 OK 41be03b00d2f7-c826772742bsm5027784a12.29 - gsmtp |
+[2026-05-09T17:36:35.236Z] [LOG] [SMTP-465] -> RCPT TO:<dheeraj.sai171998@gmail.com>
+[2026-05-09T17:36:35.604Z] [LOG] [SMTP-465] <- received: 250 2.1.5 OK 41be03b00d2f7-c826772742bsm5027784a12.29 - gsmtp |
+[2026-05-09T17:36:35.615Z] [LOG] [SMTP-465] -> DATA
+[2026-05-09T17:36:36.160Z] [LOG] [SMTP-465] <- received: 354 Go ahead 41be03b00d2f7-c826772742bsm5027784a12.29 - gsmtp |
+[2026-05-09T17:36:36.170Z] [LOG] [SMTP-465] -> [message body]
+[2026-05-09T17:36:37.354Z] [LOG] [SMTP-465] <- received: 250 2.0.0 OK  1778348199 41be03b00d2f7-c826772742bsm5027784a12.29 - gsmtp |
+[2026-05-09T17:36:37.362Z] [LOG] [SMTP-465] -> QUIT
+[2026-05-09T17:36:37.461Z] [LOG] ✓ OTP sent to dheeraj.sai171998@gmail.com via SMTP (SMTP-465)
+[2026-05-09T17:36:37.505Z] [LOG] [SMTP-465] Session ended: message sent
+[2026-05-09T17:36:37.706Z] [LOG] [SMTP-465] <- received: 221 2.0.0 closing connection 41be03b00d2f7-c826772742bsm5027784a12.29 - gsmtp |
+[2026-05-09T17:36:37.740Z] [LOG] [SMTP-465] Socket closed (was at step 8)
+[2026-05-09T17:37:42.281Z] [LOG] ✓ Candidate email added: dheeraj.sai17@gmail.com
+[2026-05-09T17:37:42.747Z] [LOG] ↻ Candidate emails CSV changed — reloading...
+[2026-05-09T17:37:42.751Z] [LOG] ✓ Loaded 3 authorized candidate email(s) from CSV
+[2026-05-09T17:37:46.269Z] [LOG] ✓ Candidate email removed: dheeraj.sai17@gmail.com
+[2026-05-09T17:37:47.762Z] [LOG] ↻ Candidate emails CSV changed — reloading...
+[2026-05-09T17:37:47.783Z] [LOG] ✓ Loaded 2 authorized candidate email(s) from CSV
+[2026-05-09T17:38:00.607Z] [LOG] ✓ Feedback email sent from dheeraj.sai171998@gmail.com (dheeraj.sai171998@gmail.com) → cognizanttest9871@gmail.com
