@@ -1,3 +1,0 @@
-Date,Time,Candidate Name,Candidate EmailId,Location,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
-"2026-04-14","19:17:32-468","valid1","dheeraj.sai17@gmail.com","Coimbatore","6","1","Filter Words Containing Substring","Not Attempted","PYTHON","[Need, Used, Red]","","0","0","Minimal code written","0","0","0","0:10","0:18"
-"2026-04-14","19:17:32-468","valid1","dheeraj.sai17@gmail.com","Coimbatore","6","2","Star Pyramid Pattern","Not Attempted","PYTHON","*    * *   * * *  * * * * * * * * *","","0","0","Minimal code written","0","0","0","0:07","0:18"

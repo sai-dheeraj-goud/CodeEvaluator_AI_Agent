@@ -1,5 +1,0 @@
-Date,Time,Candidate Name,Candidate EmailId,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
-"2026-04-12","12:53:50-855","david1","dheeraj.sai171998@gmail.com","4","1","Find Positions of Element in Array","Not Attempted","JAVASCRIPT","1st and 6th","","0","0","Minimal code written","0","0","0","0:02","0:02"
-
-"2026-04-15","19:59:30-053","david1","dheeraj.sai171998@gmail.com","Hyderabad","6","1","Swap Two Numbers Without Third Variable","Not Attempted","PYTHON","Before swapping: 23 43 After swapping: 43 23","","0","0","Minimal code written","0","0","0","0:06","0:08"
-"2026-04-15","19:59:30-053","david1","dheeraj.sai171998@gmail.com","Hyderabad","6","2","Double Each Character","Not Attempted","PYTHON","aabbcc","{""html"":""Ready to run..."",""sectionClass"":""output-section"",""validationStatus"":"""",""lastRunResult"":null}","0","0","Minimal code written","0","0","0","0:01","0:08"

@@ -392,9 +392,13 @@ function viewCode(questionId) {
     document.getElementById('submittedCode').textContent = question.submittedCode;
     document.getElementById('expectedOutput').textContent = question.expectedOutput;
     
-    // Handle actual output - show empty message if no output
+    // Handle actual output - show empty message if no output.
+    // Also guard against legacy records where the entire output-panel state
+    // object was JSON.stringify-ed into actualOutput (looked like
+    // {"html":"Ready to run...","sectionClass":"output-section",...}).
+    // Detect that shape and treat it as "no output" so the panel UI stays clean.
     const actualOutput = question.actualOutput;
-    if (!actualOutput || actualOutput === '[object Object]' || actualOutput === '') {
+    if (!actualOutput || actualOutput === '[object Object]' || actualOutput === '' || isStaleOutputStateBlob(actualOutput)) {
         document.getElementById('actualOutput').textContent = '(No output)';
     } else {
         document.getElementById('actualOutput').textContent = actualOutput;
@@ -639,7 +643,9 @@ function generateSessionCSV(session) {
     // Add each question as a row
     session.questions.forEach(q => {
         const status = q.status === 'correct' ? 'Correct' : 'Incorrect';
-        const actualOutput = q.actualOutput && q.actualOutput !== '[object Object]' ? q.actualOutput : '(No output)';
+        const actualOutput = (q.actualOutput && q.actualOutput !== '[object Object]' && !isStaleOutputStateBlob(q.actualOutput))
+            ? q.actualOutput
+            : '(No output)';
         
         csv += `"","","${session.candidateName}","${session.candidateEmail}","","${q.questionId}","${q.questionTitle}","${status}","${q.language}","${q.expectedOutput}","${actualOutput}","${q.agentScore}","","${session.completionPercentage}","${session.tabSwitches}","${q.timeTaken}"\n`;
     });
@@ -910,6 +916,24 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+// Detect legacy records where the entire output-panel UI state object was
+// JSON.stringify-ed into the actualOutput field instead of just the stdout.
+// Such strings look like:
+//   {"html":"Ready to run...","sectionClass":"output-section",
+//    "validationStatus":"","lastRunResult":null}
+// We match conservatively: must start with '{' AND parse as JSON AND have
+// at least one of the telltale UI-state keys. Real stdout that happens to
+// be a JSON object without these keys is left untouched.
+function isStaleOutputStateBlob(str) {
+    if (typeof str !== 'string') return false;
+    const trimmed = str.trim();
+    if (!trimmed.startsWith('{')) return false;
+    let parsed;
+    try { parsed = JSON.parse(trimmed); } catch { return false; }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return false;
+    return ('sectionClass' in parsed) || ('validationStatus' in parsed) || ('lastRunResult' in parsed);
 }
 
 function escapeAttr(str) {
@@ -1525,5 +1549,376 @@ async function removeEmailFile() {
         showEmailStatus('Network error: ' + err.message, 'error');
         uploadBtn.disabled = false;
         if (removeBtn) removeBtn.disabled = false;
+    }
+}
+
+// ==================== QUESTION MANAGEMENT (Panel admin) ====================
+let currentQuestionList = [];        // full list from server
+let editingQuestionId   = null;      // null = adding new, number = editing
+
+function openQuestionManager() {
+    const modal = document.getElementById('questionManagerModal');
+    showQuestionListView();
+    document.getElementById('questionSearchInput').value = '';
+    const diffSel = document.getElementById('questionDifficultyFilter');
+    if (diffSel) diffSel.value = 'all';
+    setQuestionManagerStatus('', '');
+    modal.style.display = 'block';
+    loadQuestionList();
+}
+
+function closeQuestionManager() {
+    document.getElementById('questionManagerModal').style.display = 'none';
+    currentQuestionList = [];
+    editingQuestionId = null;
+}
+
+function showQuestionListView() {
+    document.getElementById('questionListView').style.display = 'block';
+    document.getElementById('questionFormView').style.display = 'none';
+}
+
+function showQuestionFormView() {
+    document.getElementById('questionListView').style.display = 'none';
+    document.getElementById('questionFormView').style.display = 'block';
+}
+
+async function loadQuestionList() {
+    const container = document.getElementById('questionListContainer');
+    const countEl   = document.getElementById('questionListCount');
+    container.innerHTML = '<p class="email-empty">Loading...</p>';
+    try {
+        const res = await fetch('/api/questions/all');
+        if (!res.ok) throw new Error('Failed to fetch questions');
+        const data = await res.json();
+        currentQuestionList = (data.questions || []).slice().sort((a, b) => (a.id || 0) - (b.id || 0));
+        countEl.textContent = currentQuestionList.length;
+        updateDifficultyFilterCounts();
+        renderQuestionList(currentQuestionList);
+    } catch (err) {
+        container.innerHTML = `<p class="email-empty error">Failed to load questions: ${err.message}</p>`;
+        countEl.textContent = '0';
+    }
+}
+
+// Update each <option> label in the difficulty filter to show how many
+// questions fall into that bucket — e.g. "Moderate (42)", "Complex (8)".
+// Called after the list loads or whenever it changes (add / edit / remove).
+function updateDifficultyFilterCounts() {
+    const select = document.getElementById('questionDifficultyFilter');
+    if (!select) return;
+    const total = currentQuestionList.length;
+    const counts = {};
+    for (const q of currentQuestionList) {
+        const d = (q.difficulty || '').toLowerCase();
+        counts[d] = (counts[d] || 0) + 1;
+    }
+    // Base labels — keep them in sync with the static HTML.
+    const baseLabels = {
+        all: 'All difficulties',
+        moderate: 'Moderate',
+        complex: 'Complex',
+        simple: 'Simple',
+        easy: 'Easy'
+    };
+    for (const opt of select.options) {
+        const val = (opt.value || '').toLowerCase();
+        const base = baseLabels[val] || (val.charAt(0).toUpperCase() + val.slice(1));
+        const n = val === 'all' ? total : (counts[val] || 0);
+        opt.textContent = `${base} (${n})`;
+    }
+}
+
+function renderQuestionList(list) {
+    const container = document.getElementById('questionListContainer');
+    if (!list || list.length === 0) {
+        container.innerHTML = '<p class="email-empty">No questions found.</p>';
+        return;
+    }
+    const html = list.map((q, idx) => {
+        const diff = (q.difficulty || '').toLowerCase();
+        const desc = (q.description || '').replace(/\s+/g, ' ').trim();
+        return `
+            <div class="question-row">
+                <span class="question-row-index">${idx + 1}</span>
+                <div class="question-row-body">
+                    <p class="question-row-title">${escapeHtml(q.title || '(untitled)')}</p>
+                    <p class="question-row-desc">${escapeHtml(desc)}</p>
+                    <div class="question-row-meta">
+                        <span class="question-difficulty-badge ${escapeAttr(diff)}">${escapeHtml(diff || 'n/a')}</span>
+                        <span class="question-row-id">ID: ${q.id}</span>
+                    </div>
+                </div>
+                <div class="question-row-actions">
+                    <button class="btn-export-question" onclick="exportQuestion(${q.id})" title="Download this question as JSON">📤 Export</button>
+                    <button class="btn-edit-question" onclick="showQuestionForm(${q.id})">✎ Edit</button>
+                    <button class="btn-delete-question" onclick="deleteQuestion(${q.id})">🗑 Remove</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    container.innerHTML = html;
+}
+
+function filterQuestionList() {
+    const term = (document.getElementById('questionSearchInput').value || '').trim().toLowerCase();
+    const diff = (document.getElementById('questionDifficultyFilter').value || 'all').toLowerCase();
+    let filtered = currentQuestionList;
+    if (diff !== 'all') {
+        filtered = filtered.filter(q => (q.difficulty || '').toLowerCase() === diff);
+    }
+    if (term) {
+        filtered = filtered.filter(q =>
+            (q.title || '').toLowerCase().includes(term) ||
+            (q.description || '').toLowerCase().includes(term)
+        );
+    }
+    renderQuestionList(filtered);
+}
+
+// ---- Add / Edit form ----
+function showQuestionForm(id) {
+    editingQuestionId = id;
+    const title = document.getElementById('questionFormTitle');
+    const saveBtn = document.getElementById('qfSaveBtn');
+    setQuestionFormStatus('', '');
+
+    if (id == null) {
+        title.textContent = 'Add New Question';
+        saveBtn.textContent = '💾 Add Question';
+        // Reset all fields
+        document.getElementById('qfTitle').value = '';
+        document.getElementById('qfDifficulty').value = 'moderate';
+        document.getElementById('qfDescription').value = '';
+        document.getElementById('qfExample').value = '';
+        document.getElementById('qfJavaTemplate').value = '';
+        document.getElementById('qfPythonTemplate').value = '';
+        document.getElementById('qfJavascriptTemplate').value = '';
+    } else {
+        const q = currentQuestionList.find(x => x.id === id);
+        if (!q) {
+            setQuestionManagerStatus('Question not found.', 'error');
+            return;
+        }
+        title.textContent = `Edit Question #${q.id}`;
+        saveBtn.textContent = '💾 Save Changes';
+        document.getElementById('qfTitle').value = q.title || '';
+        const diffSel = document.getElementById('qfDifficulty');
+        const diffVal = (q.difficulty || 'moderate').toLowerCase();
+        // If existing value isn't in dropdown, add it dynamically
+        if (!Array.from(diffSel.options).some(o => o.value === diffVal)) {
+            const opt = document.createElement('option');
+            opt.value = diffVal;
+            opt.textContent = diffVal.charAt(0).toUpperCase() + diffVal.slice(1);
+            diffSel.appendChild(opt);
+        }
+        diffSel.value = diffVal;
+        document.getElementById('qfDescription').value = q.description || '';
+        document.getElementById('qfExample').value = q.example || '';
+        document.getElementById('qfJavaTemplate').value = q.javaTemplate || '';
+        document.getElementById('qfPythonTemplate').value = q.pythonTemplate || '';
+        document.getElementById('qfJavascriptTemplate').value = q.javascriptTemplate || '';
+    }
+    showQuestionFormView();
+    // Scroll modal body to the top so the user sees the title field first
+    const body = document.querySelector('#questionManagerModal .modal-body');
+    if (body) body.scrollTop = 0;
+}
+
+function cancelQuestionForm() {
+    editingQuestionId = null;
+    setQuestionFormStatus('', '');
+    showQuestionListView();
+}
+
+async function saveQuestion() {
+    const payload = {
+        title:              document.getElementById('qfTitle').value.trim(),
+        difficulty:         document.getElementById('qfDifficulty').value,
+        description:        document.getElementById('qfDescription').value.trim(),
+        example:            document.getElementById('qfExample').value.trim(),
+        javaTemplate:       document.getElementById('qfJavaTemplate').value,
+        pythonTemplate:     document.getElementById('qfPythonTemplate').value,
+        javascriptTemplate: document.getElementById('qfJavascriptTemplate').value
+    };
+
+    // Client-side required-field validation
+    const missing = [];
+    if (!payload.title) missing.push('Title');
+    if (!payload.description) missing.push('Description');
+    if (!payload.example) missing.push('Example');
+    if (!payload.javaTemplate.trim()) missing.push('Java Template');
+    if (!payload.pythonTemplate.trim()) missing.push('Python Template');
+    if (!payload.javascriptTemplate.trim()) missing.push('JavaScript Template');
+    if (missing.length) {
+        setQuestionFormStatus('Please fill in: ' + missing.join(', '), 'error');
+        return;
+    }
+
+    const saveBtn = document.getElementById('qfSaveBtn');
+    saveBtn.disabled = true;
+    const origLabel = saveBtn.textContent;
+    saveBtn.textContent = 'Saving...';
+
+    try {
+        let url, body;
+        if (editingQuestionId == null) {
+            url = '/api/questions/add';
+            body = payload;
+        } else {
+            url = '/api/questions/update';
+            body = { id: editingQuestionId, ...payload };
+        }
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            setQuestionFormStatus(data.error || 'Failed to save question.', 'error');
+            saveBtn.disabled = false;
+            saveBtn.textContent = origLabel;
+            return;
+        }
+        // Success → go back to list view, refresh, and show success banner there
+        setQuestionFormStatus('', '');
+        editingQuestionId = null;
+        showQuestionListView();
+        setQuestionManagerStatus('✓ ' + (data.message || 'Saved.'), 'success');
+        await loadQuestionList();
+    } catch (err) {
+        setQuestionFormStatus('Network error: ' + err.message, 'error');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = origLabel;
+    }
+}
+
+async function deleteQuestion(id) {
+    const q = currentQuestionList.find(x => x.id === id);
+    if (!q) return;
+    if (!confirm(`Remove question "${q.title}" (ID ${id})?\n\nThis action cannot be undone.`)) return;
+
+    try {
+        const res = await fetch('/api/questions/remove', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            setQuestionManagerStatus(data.error || 'Failed to remove question.', 'error');
+            return;
+        }
+        setQuestionManagerStatus('✓ ' + (data.message || 'Question removed.'), 'success');
+        await loadQuestionList();
+    } catch (err) {
+        setQuestionManagerStatus('Network error: ' + err.message, 'error');
+    }
+}
+
+function setQuestionManagerStatus(message, type) {
+    const status = document.getElementById('questionManagerStatus');
+    if (!status) return;
+    status.textContent = message || '';
+    status.className = 'email-status ' + (type || '');
+    if (type === 'success' && message) {
+        setTimeout(() => {
+            if (status.textContent === message) {
+                status.textContent = '';
+                status.className = 'email-status';
+            }
+        }, 3500);
+    }
+}
+
+function setQuestionFormStatus(message, type) {
+    const status = document.getElementById('questionFormStatus');
+    if (!status) return;
+    status.textContent = message || '';
+    status.className = 'email-status ' + (type || '');
+}
+
+// Close question manager modal when clicking outside
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('questionManagerModal');
+    if (event.target === modal) {
+        closeQuestionManager();
+    }
+});
+
+// ==================== QUESTION EXPORT (single / all) ====================
+
+// Trigger a browser download for given text content.
+function downloadTextFile(filename, mimeType, content) {
+    const blob = new Blob([content], { type: mimeType + ';charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // Revoke after a short delay so the download actually starts in all browsers.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// Build a filesystem-safe slug from a string. Used for filenames.
+function slugifyForFilename(str, max) {
+    const slug = String(str || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')   // non-alnum -> dash
+        .replace(/^-+|-+$/g, '')        // trim dashes
+        .slice(0, max || 60);
+    return slug || 'question';
+}
+
+// Short IST timestamp for filenames, e.g. "2026-05-12_153045"
+function timestampForFilename() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+}
+
+// Export ONE question as JSON. Wraps it in the same { "questions": [...] }
+// shape as questions.json so it can be re-imported or merged later.
+async function exportQuestion(id) {
+    try {
+        let q = currentQuestionList.find(x => x.id === id);
+        // Fall back to a fresh fetch if the list is stale or empty.
+        if (!q) {
+            const res = await fetch('/api/questions/' + id);
+            if (!res.ok) throw new Error('Question not found');
+            q = await res.json();
+        }
+        const payload = { questions: [q] };
+        const filename = `question-${q.id}-${slugifyForFilename(q.title)}.json`;
+        downloadTextFile(filename, 'application/json', JSON.stringify(payload, null, 2));
+        setQuestionManagerStatus(`✓ Exported "${q.title}"`, 'success');
+    } catch (err) {
+        setQuestionManagerStatus('Failed to export question: ' + err.message, 'error');
+    }
+}
+
+// Export ALL questions as a single JSON file matching questions.json shape.
+async function exportAllQuestions() {
+    try {
+        // Always fetch fresh so the export reflects the latest state on disk,
+        // not whatever happened to be cached in currentQuestionList.
+        const res = await fetch('/api/questions/all');
+        if (!res.ok) throw new Error('Failed to fetch questions');
+        const data = await res.json();
+        const questions = Array.isArray(data.questions) ? data.questions : [];
+        if (questions.length === 0) {
+            setQuestionManagerStatus('No questions to export.', 'error');
+            return;
+        }
+        const payload = { questions };
+        const filename = `questions-all-${questions.length}-${timestampForFilename()}.json`;
+        downloadTextFile(filename, 'application/json', JSON.stringify(payload, null, 2));
+        setQuestionManagerStatus(`✓ Exported ${questions.length} question(s)`, 'success');
+    } catch (err) {
+        setQuestionManagerStatus('Failed to export all questions: ' + err.message, 'error');
     }
 }

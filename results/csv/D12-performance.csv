@@ -1,3 +1,0 @@
-Date,Time,Candidate Name,Candidate EmailId,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
-"2026-04-12","01:36:38-252","D12","dheeraj.sai171998@gmail.com","8","1","Move Zeros to End","Not Attempted","PYTHON","[1, 2, 4, 3, 5, 0, 0, 0]","","0","0","Minimal code written","0","0","0","0:08","0:15"
-"2026-04-12","01:36:38-252","D12","dheeraj.sai171998@gmail.com","8","2","Find Palindrome Substrings","Not Attempted","PYTHON","aba, hcch","","0","0","Minimal code written","0","0","0","0:06","0:15"

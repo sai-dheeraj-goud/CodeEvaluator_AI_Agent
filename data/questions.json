@@ -123,7 +123,7 @@
     {
       "id": 13,
       "title": "Armstrong Number Check",
-      "description": "Write a program to check if 153 is an Armstrong number. An Armstrong number of 3 digits equals the sum of cubes of its digits (1\u00c2\u00b3 + 5\u00c2\u00b3 + 3\u00c2\u00b3 = 153).",
+      "description": "Write a program to check if 153 is an Armstrong number. An Armstrong number of 3 digits equals the sum of cubes of its digits (1Â³ + 5Â³ + 3Â³ = 153).",
       "example": "Input: 153\nOutput: 153 is an Armstrong number",
       "difficulty": "moderate",
       "javaTemplate": "public class Solution {\n    public static void main(String[] args) {\n        int n = 153, original = 153, sum = 0;\n        int digits = String.valueOf(n).length();\n        int temp = n;\n        while (temp > 0) {\n            int d = temp % 10;\n            sum += Math.pow(d, digits);\n            temp /= 10;\n        }\n        System.out.println(n + (sum == original ? \" is an Armstrong number\" : \" is not an Armstrong number\"));\n    }\n}",
@@ -499,6 +499,16 @@
       "javaTemplate": "public class Solution {\n    public static void main(String[] args) {\n        String s = \"i love programming\";\n        String[] words = s.split(\" \");\n        StringBuilder result = new StringBuilder();\n        for (int i = 0; i < words.length; i++) {\n            if (i > 0) result.append(\" \");\n            result.append(new StringBuilder(words[i]).reverse());\n        }\n        System.out.println(result.toString());\n    }\n}",
       "pythonTemplate": "s = \"i love programming\"\nprint(' '.join(w[::-1] for w in s.split()))",
       "javascriptTemplate": "const s = \"i love programming\";\nconsole.log(s.split(\" \").map(w => w.split(\"\").reverse().join(\"\")).join(\" \"));"
+    },
+    {
+      "id": 51,
+      "title": "Reverse of a string",
+      "description": "write a program that has input string \"Optum Healthcare\" and reverses its characters to display the output in reverse order.",
+      "example": "Input : Optum Healthcare\nOutput : erachtlaeH mutpO",
+      "difficulty": "moderate",
+      "javaTemplate": "public class ReverseString {\n    public static void main(String[] args) {\n        String input = \"Optum Healthcare\";\n        String reversed = \"\";\n\n        for (int i = input.length() - 1; i >= 0; i--) {\n            reversed += input.charAt(i);\n        }\n\n        System.out.println(\"Reversed String: \" + reversed);\n    }\n}",
+      "pythonTemplate": "input_string = \"Optum Healthcare\"\nreversed_string = input_string[::-1]\n\nprint(\"Reversed String:\", reversed_string)",
+      "javascriptTemplate": "const input = \"Optum Healthcare\";\nconst reversed = input.split(\"\").reverse().join(\"\");\n\nconsole.log(\"Reversed String:\", reversed);"
     }
   ]
 }

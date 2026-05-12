@@ -2391,6 +2391,33 @@ function shuffleArray(arr) {
     return shuffled;
 }
 
+// --- Validate a question payload coming from the panel UI ---
+// Returns { ok: true } or { ok: false, error: 'message' }
+function validateQuestionPayload(p) {
+    if (!p || typeof p !== 'object') return { ok: false, error: 'Invalid payload' };
+    const requiredStrings = ['title', 'description', 'example', 'difficulty', 'javaTemplate', 'pythonTemplate', 'javascriptTemplate'];
+    for (const key of requiredStrings) {
+        if (typeof p[key] !== 'string' || !p[key].trim()) {
+            return { ok: false, error: `Field "${key}" is required` };
+        }
+    }
+    const allowedDifficulty = ['simple', 'easy', 'moderate', 'complex'];
+    if (!allowedDifficulty.includes(p.difficulty.trim().toLowerCase())) {
+        return { ok: false, error: `Difficulty must be one of: ${allowedDifficulty.join(', ')}` };
+    }
+    if (p.title.trim().length > 200) {
+        return { ok: false, error: 'Title is too long (max 200 chars)' };
+    }
+    // Soft cap on individual fields to avoid runaway payloads.
+    const MAX_FIELD = 20000;
+    for (const key of ['description', 'example', 'javaTemplate', 'pythonTemplate', 'javascriptTemplate']) {
+        if (p[key].length > MAX_FIELD) {
+            return { ok: false, error: `Field "${key}" is too long (max ${MAX_FIELD} chars)` };
+        }
+    }
+    return { ok: true };
+}
+
 function getQuestionsByExperience(allQuestions, yearsOfExperience) {
     const tier = EXPERIENCE_TIERS.find(t => yearsOfExperience <= t.maxYears) || EXPERIENCE_TIERS[EXPERIENCE_TIERS.length - 1];
     const selected = [];
@@ -3476,6 +3503,195 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    // --- All Questions (Panel admin view: full unfiltered list) ---
+    if (pathname === '/api/questions/all' && req.method === 'GET') {
+        try {
+            const questionsData = JSON.parse(fs.readFileSync(QUESTIONS_FILE, 'utf-8'));
+            const questions = questionsData.questions || [];
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ questions, count: questions.length }));
+        } catch (err) {
+            console.error('\u2717 Failed to load all questions:', err.message);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Failed to load questions: ' + err.message }));
+        }
+        return;
+    }
+
+    // --- Add a new Question ---
+    if (pathname === '/api/questions/add' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const payload = JSON.parse(body || '{}');
+                const validation = validateQuestionPayload(payload);
+                if (!validation.ok) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: validation.error }));
+                    return;
+                }
+                const questionsData = JSON.parse(fs.readFileSync(QUESTIONS_FILE, 'utf-8'));
+                const questions = Array.isArray(questionsData.questions) ? questionsData.questions : [];
+
+                // Duplicate title check (case-insensitive, trimmed)
+                const newTitleNorm = payload.title.trim().toLowerCase();
+                const dupTitle = questions.some(q =>
+                    (q.title || '').trim().toLowerCase() === newTitleNorm
+                );
+                if (dupTitle) {
+                    res.writeHead(409, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'A question with this title already exists' }));
+                    return;
+                }
+
+                const nextId = questions.reduce((m, q) => Math.max(m, q.id || 0), 0) + 1;
+                const newQuestion = {
+                    id: nextId,
+                    title: payload.title.trim(),
+                    description: payload.description.trim(),
+                    example: payload.example.trim(),
+                    difficulty: payload.difficulty.trim().toLowerCase(),
+                    javaTemplate: payload.javaTemplate,
+                    pythonTemplate: payload.pythonTemplate,
+                    javascriptTemplate: payload.javascriptTemplate
+                };
+                questions.push(newQuestion);
+                questionsData.questions = questions;
+                fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(questionsData, null, 2) + '\n', 'utf-8');
+
+                console.log(`\u2713 Question added (id=${nextId}): ${newQuestion.title}`);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Question "${newQuestion.title}" added`,
+                    question: newQuestion,
+                    count: questions.length
+                }));
+            } catch (err) {
+                console.error('\u2717 Failed to add question:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Failed to add question: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    // --- Update an existing Question ---
+    if (pathname === '/api/questions/update' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const payload = JSON.parse(body || '{}');
+                const id = parseInt(payload.id);
+                if (!id || isNaN(id)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Question id is required' }));
+                    return;
+                }
+                const validation = validateQuestionPayload(payload);
+                if (!validation.ok) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: validation.error }));
+                    return;
+                }
+                const questionsData = JSON.parse(fs.readFileSync(QUESTIONS_FILE, 'utf-8'));
+                const questions = Array.isArray(questionsData.questions) ? questionsData.questions : [];
+                const idx = questions.findIndex(q => q.id === id);
+                if (idx === -1) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Question not found' }));
+                    return;
+                }
+
+                // Duplicate title check (exclude self)
+                const newTitleNorm = payload.title.trim().toLowerCase();
+                const dupTitle = questions.some(q =>
+                    q.id !== id && (q.title || '').trim().toLowerCase() === newTitleNorm
+                );
+                if (dupTitle) {
+                    res.writeHead(409, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Another question with this title already exists' }));
+                    return;
+                }
+
+                questions[idx] = {
+                    id,
+                    title: payload.title.trim(),
+                    description: payload.description.trim(),
+                    example: payload.example.trim(),
+                    difficulty: payload.difficulty.trim().toLowerCase(),
+                    javaTemplate: payload.javaTemplate,
+                    pythonTemplate: payload.pythonTemplate,
+                    javascriptTemplate: payload.javascriptTemplate
+                };
+                questionsData.questions = questions;
+                fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(questionsData, null, 2) + '\n', 'utf-8');
+
+                console.log(`\u2713 Question updated (id=${id}): ${questions[idx].title}`);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Question "${questions[idx].title}" updated`,
+                    question: questions[idx],
+                    count: questions.length
+                }));
+            } catch (err) {
+                console.error('\u2717 Failed to update question:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Failed to update question: ' + err.message }));
+            }
+        });
+        return;
+    }
+
+    // --- Remove a Question ---
+    if (pathname === '/api/questions/remove' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => {
+            try {
+                const payload = JSON.parse(body || '{}');
+                const id = parseInt(payload.id);
+                if (!id || isNaN(id)) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Question id is required' }));
+                    return;
+                }
+                const questionsData = JSON.parse(fs.readFileSync(QUESTIONS_FILE, 'utf-8'));
+                const questions = Array.isArray(questionsData.questions) ? questionsData.questions : [];
+                const idx = questions.findIndex(q => q.id === id);
+                if (idx === -1) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Question not found' }));
+                    return;
+                }
+
+                // Guard: don't allow removing the very last question
+                if (questions.length <= 1) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Cannot remove the last remaining question.' }));
+                    return;
+                }
+
+                const [removed] = questions.splice(idx, 1);
+                questionsData.questions = questions;
+                fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(questionsData, null, 2) + '\n', 'utf-8');
+
+                console.log(`\u2713 Question removed (id=${id}): ${removed.title}`);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    message: `Question "${removed.title}" removed`,
+                    count: questions.length
+                }));
+            } catch (err) {
+                console.error('\u2717 Failed to remove question:', err.message);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Failed to remove question: ' + err.message }));
+            }
+        });
+        return;
+    }
+
     // --- Execute Java ---
     if (pathname === '/api/execute/java' && req.method === 'POST') {
         let body = '';
@@ -4170,21 +4386,37 @@ const server = http.createServer(async (req, res) => {
                     consolidatedContent = fs.readFileSync(consolidatedFile, 'utf-8');
                     const existingLines = consolidatedContent.split('\n');
 
-                    // Determine how many Q columns the current header has (if any)
-                    const oldHasPerQ = existingLines[0].includes('Q1 Tab Switches');
-                    const oldQCount = oldHasPerQ ? (existingLines[0].match(/Q\d+ Tab Switches/g) || []).length : 0;
+                    // Determine which expected columns the existing header already has.
+                    // The header was previously upgraded only when per-question tab columns
+                    // were missing; if a today-CSV was first created by an older binary that
+                    // also predated the Location / Language Preferred columns, those columns
+                    // never got added — but the writer below still emits 16-col rows. The
+                    // result is column-shift corruption (Location data lands in Experience,
+                    // etc). Check every required column, not just the per-Q ones.
+                    const oldHeaderLine = existingLines[0] || '';
+                    const oldHasPerQ = oldHeaderLine.includes('Q1 Tab Switches');
+                    const oldQCount = oldHasPerQ ? (oldHeaderLine.match(/Q\d+ Tab Switches/g) || []).length : 0;
+                    const oldHasLocation = oldHeaderLine.includes('Location');
+                    const oldHasLanguagePref = oldHeaderLine.includes('Language Preferred');
                     const targetQCount = numQuestions;
 
-                    if (!oldHasPerQ || targetQCount > oldQCount) {
-                        // Need to upgrade header and migrate old data rows
-                        existingLines[0] = conHeaders;
+                    const needsUpgrade = !oldHasPerQ
+                        || targetQCount > oldQCount
+                        || !oldHasLocation
+                        || !oldHasLanguagePref;
 
-                        // Migrate data rows from old format to new format
+                    if (needsUpgrade) {
+                        // Upgrade the header in place. Existing data rows are reshaped below
+                        // depending on which legacy schema they came from. We never throw
+                        // anything away — every legacy value goes into a sensible slot.
+                        existingLines[0] = conHeaders;
+                        const expectedNewCount = 12 + targetQCount + 2; // 12 base + perQ + TotalTabs + TotalTime
+
                         for (let li = 1; li < existingLines.length; li++) {
                             const line = existingLines[li].trim();
                             if (!line) continue;
 
-                            // Parse the CSV row respecting quoted fields
+                            // Parse CSV row respecting quoted fields
                             const fields = [];
                             let current = '';
                             let inQuotes = false;
@@ -4193,7 +4425,7 @@ const server = http.createServer(async (req, res) => {
                                 if (ch === '"') {
                                     if (inQuotes && ci + 1 < line.length && line[ci + 1] === '"') {
                                         current += '"';
-                                        ci++; // skip escaped quote
+                                        ci++;
                                     } else {
                                         inQuotes = !inQuotes;
                                     }
@@ -4206,39 +4438,65 @@ const server = http.createServer(async (req, res) => {
                             }
                             fields.push(current);
 
-                            // Old format: 12 fields (no per-Q tab switches, single Tab Switches + Total Time)
-                            // New format: 12 base + numQuestions Q-cols + Total Tab Switches + Total Time
-                            const expectedNewCount = 12 + targetQCount + 2;
-                            if (fields.length < expectedNewCount) {
-                                // This is an old-format row — may not have Location or Language Preferred columns
-                                const baseFields = fields.slice(0, 4); // Date,Time,Name,Email
-                                let restFields = fields.slice(4);
-                                // Insert empty Location if missing (old rows don't have it)
-                                if (fields.length < expectedNewCount) {
-                                    baseFields.push(''); // empty Location
-                                }
-                                baseFields.push(restFields.shift()); // Experience
-                                // If old row doesn't have Language Preferred, insert empty placeholder
-                                const hasLangCol = fields.length >= 12;
-                                if (!hasLangCol || fields.length <= 12) {
-                                    baseFields.push(''); // empty Language Preferred
-                                } else {
-                                    baseFields.push(restFields.shift()); // Language Preferred already present
-                                }
-                                // Remaining: Correct Programs ... then trailing tab switch cols + Total Tab Switches + Total Time
-                                const remaining = hasLangCol ? restFields : fields.slice(5);
-                                const oldTabSwitches = remaining.length > 5 ? remaining[remaining.length - 2] : '';
-                                const oldTotalTime = remaining.length > 5 ? remaining[remaining.length - 1] : '';
-                                const coreFields = remaining.slice(0, 5); // Correct,TestExec,Agent,AIAvg,AIMax
+                            // Classify what schema this row was written under by looking at
+                            // its column count compared to the *old* header it was written
+                            // against, NOT compared to the new target. We do this so we can
+                            // tell apart "row aligned to new schema but old header" from
+                            // "row aligned to old schema, needs padding".
+                            const oldHeaderColCount = oldHeaderLine
+                                ? oldHeaderLine.split(',').length
+                                : fields.length;
 
-                                // Insert empty per-Q tab switch columns, then Total Tab Switches, then Total Time
-                                const emptyQCols = new Array(targetQCount).fill('');
-                                const newFields = [...baseFields, ...coreFields, ...emptyQCols, oldTabSwitches, oldTotalTime];
-                                existingLines[li] = newFields.map(f => {
-                                    let s = String(f).replace(/\r\n|\n|\r/g, ' ');
-                                    return '"' + s.replace(/"/g, '""') + '"';
-                                }).join(',');
+                            // If a row has MORE fields than the old header had columns, it
+                            // was written by the newer writer (which always emits Location +
+                            // Language + per-Q columns) against an old header that didn't
+                            // declare them. Such rows are already aligned to the new schema —
+                            // just normalize their length to the target if needed.
+                            let newFields;
+                            if (fields.length >= expectedNewCount) {
+                                // Already new-schema; truncate/pad to exact target length
+                                newFields = fields.slice(0, expectedNewCount);
+                                while (newFields.length < expectedNewCount) newFields.push('');
+                            } else {
+                                // Legacy short row. Reconstruct each column by name from the
+                                // old header so we never blindly trust positional order.
+                                const oldHeaders = oldHeaderLine
+                                    ? oldHeaderLine.split(',').map(h => h.replace(/^"|"$/g, '').trim())
+                                    : [];
+                                const get = (name) => {
+                                    const i = oldHeaders.findIndex(h => h.toLowerCase() === name.toLowerCase());
+                                    return i >= 0 && i < fields.length ? fields[i] : '';
+                                };
+
+                                // Per-question tab switch values from any Q-N Tab Switches columns we can find
+                                const perQ = [];
+                                for (let qi = 1; qi <= targetQCount; qi++) {
+                                    perQ.push(get(`Q${qi} Tab Switches`));
+                                }
+
+                                newFields = [
+                                    get('Date'),
+                                    get('Time'),
+                                    get('Candidate Name'),
+                                    get('Candidate Emailid') || get('Candidate EmailId') || get('Candidate Email'),
+                                    get('Location'),                                    // empty for pre-Location legacy
+                                    get('Relevant Experience (Years)') || get('Experience'),
+                                    get('Language Preferred') || get('Language'),       // empty for pre-Language legacy
+                                    get('Correct Programs'),
+                                    get('Test Execution Score (%)'),
+                                    get('Agent Score (%)') || get('AI Code Review Score (%)'),
+                                    get('Plagiarism Avg (%)') || get('AI Likelihood Avg (%)'),
+                                    get('Plagiarism Max (%)') || get('AI Likelihood Max (%)'),
+                                    ...perQ,
+                                    get('Total Tab Switches') || get('Tab Switches'),
+                                    get('Total Time Taken')
+                                ];
                             }
+
+                            existingLines[li] = newFields.map(f => {
+                                let s = String(f == null ? '' : f).replace(/\r\n|\n|\r/g, ' ');
+                                return '"' + s.replace(/"/g, '""') + '"';
+                            }).join(',');
                         }
                         consolidatedContent = existingLines.join('\n');
                     }
@@ -4374,10 +4632,20 @@ const server = http.createServer(async (req, res) => {
             const csvDir = path.join(__dirname, '../results/csv');
             const csvFile = path.join(csvDir, `all-candidates-summary-${date}.csv`);
             const resultsDir = path.join(__dirname, '../results/json');
-            
+
+            // Never let the browser or any intermediary serve a stale snapshot
+            // of this dataset — candidates submit throughout the day and the
+            // panel must always reflect the live state on disk.
+            const noCacheHeaders = {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            };
+
             // If CSV doesn't exist, return empty
             if (!fs.existsSync(csvFile)) {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.writeHead(200, noCacheHeaders);
                 res.end(JSON.stringify({
                     date,
                     totalCandidates: 0,
@@ -4385,12 +4653,12 @@ const server = http.createServer(async (req, res) => {
                 }));
                 return;
             }
-            
+
             const content = fs.readFileSync(csvFile, 'utf-8');
             const lines = content.trim().split('\n');
-            
+
             if (lines.length < 2) {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.writeHead(200, noCacheHeaders);
                 res.end(JSON.stringify({
                     date,
                     totalCandidates: 0,
@@ -4400,6 +4668,34 @@ const server = http.createServer(async (req, res) => {
             }
             
             const headers = parseCsvRow(lines[0]).map(h => h.trim());
+            const headerHasLocation = headers.some(h => h.toLowerCase() === 'location');
+            const headerHasLanguagePref = headers.some(h => h.toLowerCase() === 'language preferred');
+
+            // If the header is from an older schema (missing Location and/or Language
+            // Preferred) but the writer has since been appending wider rows, those rows
+            // are column-shifted when read by-name. Build a "repaired" per-row header
+            // that reconstructs the new-schema column order so values map correctly.
+            // We only synthesize when a row is wider than the on-disk header (a sure
+            // sign of schema drift); legitimate legacy rows stay on the original header.
+            function buildRepairedHeaders(rowFieldCount) {
+                if (rowFieldCount <= headers.length) return headers; // not drifted
+                if (headerHasLocation && headerHasLanguagePref) return headers; // header already current
+                // Find how many Q tab columns the current file declares (or guess from row)
+                const declaredQCount = (lines[0].match(/Q\d+ Tab Switches/g) || []).length;
+                const perQCount = declaredQCount > 0
+                    ? declaredQCount
+                    : Math.max(0, rowFieldCount - 14); // 12 base + 2 trailing (TotalTabs + TotalTime)
+                const repaired = [
+                    'Date', 'Time', 'Candidate Name', 'Candidate Emailid',
+                    'Location', 'Relevant Experience (Years)', 'Language Preferred',
+                    'Correct Programs', 'Test Execution Score (%)',
+                    'Agent Score (%)', 'Plagiarism Avg (%)', 'Plagiarism Max (%)'
+                ];
+                for (let qi = 1; qi <= perQCount; qi++) repaired.push(`Q${qi} Tab Switches`);
+                repaired.push('Total Tab Switches');
+                repaired.push('Total Time Taken');
+                return repaired;
+            }
             const candidates = [];
             
             // Get all result files for this date
@@ -4408,8 +4704,9 @@ const server = http.createServer(async (req, res) => {
             // Parse each row
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCsvRow(lines[i]);
+                const effectiveHeaders = buildRepairedHeaders(values.length);
                 const row = {};
-                headers.forEach((h, idx) => {
+                effectiveHeaders.forEach((h, idx) => {
                     row[h] = (values[idx] || '').trim().replace(/^"|"$/g, '');
                 });
                 
@@ -4471,7 +4768,7 @@ const server = http.createServer(async (req, res) => {
                 candidates.push(candidate);
             }
             
-            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.writeHead(200, noCacheHeaders);
             res.end(JSON.stringify({
                 date,
                 totalCandidates: candidates.length,

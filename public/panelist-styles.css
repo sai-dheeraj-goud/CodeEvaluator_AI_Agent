@@ -1486,3 +1486,287 @@ code {
     vertical-align: -3px;
     margin-right: 4px;
 }
+
+/* ==================== Question Manager ==================== */
+.question-manager-content {
+    max-width: 1000px;
+    width: 92%;
+}
+
+.question-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 4px 0 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.question-list-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.question-list-header-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.question-filter-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.question-filter-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.question-list {
+    max-height: 480px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.question-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+}
+
+.question-row:last-child {
+    border-bottom: none;
+}
+
+.question-row:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.question-row-index {
+    color: #888;
+    font-size: 13px;
+    min-width: 32px;
+    text-align: right;
+    padding-top: 2px;
+    font-weight: 600;
+}
+
+.question-row-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.question-row-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px;
+    word-break: break-word;
+}
+
+.question-row-desc {
+    font-size: 13px;
+    color: #555;
+    margin: 0 0 6px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.question-row-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.question-difficulty-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.question-difficulty-badge.moderate {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.question-difficulty-badge.complex {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
+.question-difficulty-badge.simple,
+.question-difficulty-badge.easy {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.question-row-id {
+    font-size: 11px;
+    color: #888;
+}
+
+.question-row-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.btn-edit-question {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #1d77e0;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-edit-question:hover {
+    background: #1864bc;
+}
+
+.btn-delete-question {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #f44336;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-delete-question:hover {
+    background: #d32f2f;
+}
+
+/* ---- Form view ---- */
+.question-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.question-form-header h3 {
+    margin: 0;
+    font-size: 17px;
+    color: #333;
+}
+
+.question-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-row label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-row .required {
+    color: #f44336;
+}
+
+.qf-textarea {
+    font-family: inherit;
+    resize: vertical;
+    min-height: 60px;
+    line-height: 1.45;
+}
+
+.qf-code-area {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 13px;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+    tab-size: 4;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+/* Question manager Add/Save buttons share the unified blue */
+.question-manager-content .btn-primary {
+    background: #1d77e0;
+}
+.question-manager-content .btn-primary:hover {
+    background: #1864bc;
+}
+.question-manager-content .btn-primary:disabled {
+    background: #c0c0c0;
+    cursor: not-allowed;
+}
+
+/* ==================== Question Export Buttons ==================== */
+.btn-export-question {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #2e7d32;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-export-question:hover {
+    background: #1b5e20;
+}
+
+/* "Export All" lives in the list header next to "Add New Question".
+   Uses a deeper green to read as a primary action without colliding
+   with the existing blue "Add" / red "Remove" semantics. */
+.btn-export-all {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #2e7d32;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-export-all:hover {
+    background: #1b5e20;
+}

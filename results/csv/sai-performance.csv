@@ -1,6 +1,0 @@
-Date,Time,Candidate Name,Candidate EmailId,Relevant Experience (Years),Question #,Question Title,Status,Language,Expected Output,Actual Output,Agent Score (%),AI Likelihood (%),AI Reasons,Session Completion (%),Session Agent Analysis Avg (%),Tab Switches,Question Time Spent,Total Time Taken
-"2026-04-12","11:58:36-237","sai","dheeraj.sai171998@gmail.com","8","1","Average of Map Values","Not Attempted","PYTHON","17.33","","0","80","Code pasted entirely — near-zero keystrokes for 362 characters of changes","0","0","1","0:53","0:56"
-"2026-04-12","11:58:36-237","sai","dheeraj.sai171998@gmail.com","8","2","Print 1 to 100 Without Loops","Not Attempted","PYTHON","1 2 3 4 ... 99 100","","0","0","Minimal code written","0","0","0","0:03","0:56"
-"2026-04-13","11:41:04-627","Sai","dheeraj.sai171998@gmail.com","Bangalore","8","1","Find Median of Array","Not Attempted","PYTHON","7","7","81","80","Code pasted entirely — near-zero keystrokes for 230 characters of changes","50","41","1","1:06","1:20"
-"2026-04-13","11:41:04-627","Sai","dheeraj.sai171998@gmail.com","Bangalore","8","2","Vowel Word Rearrangement","Not Attempted","PYTHON","Anamika are anymore and Suman never going to quarrel","","0","0","Minimal code written","50","41","0","0:14","1:20"
-

@@ -48,6 +48,7 @@
             <button onclick="loadData()" class="btn-primary">Show</button>
             <button onclick="downloadCSV()" class="btn-secondary">📥 Download as CSV</button>
             <div class="filter-section-right">
+                <button onclick="openQuestionManager()" class="btn-manage">📝 Manage Question List</button>
                 <button onclick="openEmailManager('candidate')" class="btn-manage">👤 Manage Candidate Emails</button>
                 <button onclick="openEmailManager('panelist')" class="btn-manage"><svg class="btn-manage-icon" width="16" height="16" viewBox="0 0 24 24" fill="#1f2937" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 1.5 3.5 5v6c0 5.25 3.65 9.99 8.5 11.5 4.85-1.51 8.5-6.25 8.5-11.5V5L12 1.5z"/></svg> Manage Panelist Emails</button>
             </div>
@@ -281,6 +282,95 @@
             </div>
             <div class="modal-footer">
                 <button onclick="closeEmailManager()" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Question Management -->
+    <div id="questionManagerModal" class="modal" style="display: none;">
+        <div class="modal-content question-manager-content">
+            <div class="modal-header">
+                <h2 id="questionManagerTitle">📝 Manage Question List</h2>
+                <span class="close" onclick="closeQuestionManager()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- LIST VIEW -->
+                <div id="questionListView">
+                    <div class="question-list-header">
+                        <h3>Current Questions (<span id="questionListCount">0</span>)</h3>
+                        <div class="question-list-header-controls">
+                            <input type="text" id="questionSearchInput" placeholder="🔍 Search questions..." class="email-search" oninput="filterQuestionList()" />
+                            <select id="questionDifficultyFilter" class="question-filter-select" onchange="filterQuestionList()">
+                                <option value="all">All difficulties</option>
+                                <option value="moderate">Moderate</option>
+                                <option value="complex">Complex</option>
+                            </select>
+                            <button onclick="exportAllQuestions()" class="btn-export-all" title="Download all questions as a JSON file">📤 Export All</button>
+                            <button onclick="showQuestionForm(null)" class="btn-primary">➕ Add New Question</button>
+                        </div>
+                    </div>
+                    <div id="questionManagerStatus" class="email-status"></div>
+                    <div class="question-list" id="questionListContainer">
+                        <p class="email-empty">Loading...</p>
+                    </div>
+                </div>
+
+                <!-- ADD / EDIT FORM VIEW -->
+                <div id="questionFormView" style="display: none;">
+                    <div class="question-form-header">
+                        <h3 id="questionFormTitle">Add New Question</h3>
+                        <button onclick="cancelQuestionForm()" class="btn-secondary">← Back to list</button>
+                    </div>
+                    <div id="questionFormStatus" class="email-status"></div>
+
+                    <div class="question-form">
+                        <div class="form-row">
+                            <label for="qfTitle">Title <span class="required">*</span></label>
+                            <input type="text" id="qfTitle" class="email-input" placeholder="e.g. Reverse a String" />
+                        </div>
+
+                        <div class="form-row">
+                            <label for="qfDifficulty">Difficulty <span class="required">*</span></label>
+                            <select id="qfDifficulty" class="email-input">
+                                <option value="moderate">Moderate</option>
+                                <option value="complex">Complex</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="qfDescription">Description <span class="required">*</span></label>
+                            <textarea id="qfDescription" class="email-input qf-textarea" rows="4" placeholder="Write the problem statement..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="qfExample">Example <span class="required">*</span></label>
+                            <textarea id="qfExample" class="email-input qf-textarea qf-code-area" rows="3" placeholder="Input: ...\nOutput: ..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="qfJavaTemplate">Java Template <span class="required">*</span></label>
+                            <textarea id="qfJavaTemplate" class="email-input qf-textarea qf-code-area" rows="6" placeholder="public class Solution { ... }"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="qfPythonTemplate">Python Template <span class="required">*</span></label>
+                            <textarea id="qfPythonTemplate" class="email-input qf-textarea qf-code-area" rows="6" placeholder="# Python code here"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="qfJavascriptTemplate">JavaScript Template <span class="required">*</span></label>
+                            <textarea id="qfJavascriptTemplate" class="email-input qf-textarea qf-code-area" rows="6" placeholder="// JavaScript code here"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button onclick="cancelQuestionForm()" class="btn-secondary">Cancel</button>
+                            <button id="qfSaveBtn" onclick="saveQuestion()" class="btn-primary">💾 Save Question</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeQuestionManager()" class="btn-secondary">Close</button>
             </div>
         </div>
     </div>

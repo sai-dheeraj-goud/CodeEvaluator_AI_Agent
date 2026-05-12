@@ -1,9 +1,0 @@
-Date,Time,Candidate Name,Candidate Emailid,Location,Relevant Experience (Years),Language Preferred,Correct Programs,Test Execution Score (%),AI Code Review Score (%),AI Likelihood Avg (%),AI Likelihood Max (%),Q1 Tab Switches,Q2 Tab Switches,Total Tab Switches,Total Time Taken
-"2026-04-13","11:25:42-806","Raja","dheeraj.sai171998@gmail.com","Bangalore","6","Java","1/2","50","44","40","80","0","1","1","1:52"
-"2026-04-13","11:41:04-627","Sai","dheeraj.sai171998@gmail.com","Bangalore","8","Python","1/2","50","41","40","80","1","0","1","1:20"
-"2026-04-13","11:51:05-498","Raja1","dheeraj.sai171998@gmail.com","Pune","8","Javascript","1/2","50","81","80","80","1","1","2","4:15"
-"2026-04-13","12:15:21-608","Daniel","dheeraj.sai171998@gmail.com","Coimbatore","6","Java","0/2","0","42","40","80","0","2","2","2:19"
-"2026-04-13","12:22:46-963","dheeraj","dheeraj.sai171998@gmail.com","Bangalore","4","Java","0/1","0","0","0","0","0","0","0","0:45"
-"2026-04-13","12:53:26-881","dheeraj123","dheeraj.sai171998@gmail.com","Bangalore","5.11","Javascript","0/2","0","0","0","0","1","0","1","0:36"
-"2026-04-13","12:55:54-956","dheeraj1234","dheeraj.sai171998@gmail.com","Visakhapatnam","5.11","Python","2/2","100","81","80","80","1","1","2","1:27"
-"2026-04-13","12:59:35-711","dheeraj56","dheeraj.sai171998@gmail.com","Noida","5.11","Python","1/2","50","42","40","80","1","0","1","1:51"

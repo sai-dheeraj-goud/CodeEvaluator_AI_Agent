@@ -2871,19 +2871,29 @@ async function submitAssessment() {
         const code = savedAgentCodeForReview[`q${q.id}`] || codeState[`q${q.id}-${lang}`] || codeState[`q${q.id}-java`] || '';
         const attempted = code.trim().length > 50;
 
-        // Pull actual output for the AI-reviewed language from outputState
+        // Pull actual output for the AI-reviewed language from outputState.
+        // outputState[`q${id}`][lang] is a UI-state snapshot object
+        // ({ html, sectionClass, validationStatus, lastRunResult }) — the only
+        // field that holds real stdout is lastRunResult.actualOutput. If the
+        // user never executed code for this language, lastRunResult is null,
+        // and we must treat the actual output as an empty string. The old
+        // fallback that JSON.stringify-ed the whole state object surfaced
+        // strings like {"html":"Ready to run...","sectionClass":...} as the
+        // candidate's "Actual Output" in the panel UI — that's wrong.
         const qOutputState = outputState[`q${q.id}`] || {};
-        const langOutputObj = qOutputState[lang] || '';
+        const langOutputObj = qOutputState[lang];
         let langActualOutput = '';
-        if (typeof langOutputObj === 'object' && langOutputObj !== null) {
-            if (langOutputObj.lastRunResult) {
-                langActualOutput = langOutputObj.lastRunResult.actualOutput || '';
-            } else {
-                try { langActualOutput = JSON.stringify(langOutputObj); } catch(e) { langActualOutput = ''; }
+        if (langOutputObj && typeof langOutputObj === 'object') {
+            // New shape: state-snapshot object
+            if (langOutputObj.lastRunResult && typeof langOutputObj.lastRunResult.actualOutput === 'string') {
+                langActualOutput = langOutputObj.lastRunResult.actualOutput;
             }
-        } else {
-            langActualOutput = String(langOutputObj || '');
+            // else: never executed -> leave as ''
+        } else if (typeof langOutputObj === 'string') {
+            // Legacy shape: plain string output stored directly
+            langActualOutput = langOutputObj;
         }
+        // Guard against stale '[object Object]' coercions from any legacy data
         if (langActualOutput === '[object Object]') langActualOutput = '';
 
         // Determine completion status based on the AI-reviewed language's output
