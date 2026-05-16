@@ -1,0 +1,92 @@
+{
+  "personName": "Dheeraj",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Hyderabad",
+  "experienceYears": "8",
+  "preferredLanguage": "python",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 13,
+      "title": "Armstrong Number Check",
+      "description": "Write a program to check if 153 is an Armstrong number. An Armstrong number of 3 digits equals the sum of cubes of its digits (1Â³ + 5Â³ + 3Â³ = 153).",
+      "completed": true,
+      "language": "python",
+      "code": "# Static input\nnum = 153\n\n# Store original number\noriginal_num = num\n\n# Initialize sum\nsum_of_cubes = 0\n\n# Calculate sum of cubes of digits\nwhile num > 0:\n    digit = num % 10\n    sum_of_cubes += digit ** 3\n    num //= 10\n\n# Check Armstrong condition\nif sum_of_cubes == original_num:\n    print(f\"{original_num} is an Armstrong number\")\nelse:\n    print(f\"{original_num} is not an Armstrong number\")",
+      "expectedOutput": "153 is an Armstrong number",
+      "actualOutput": "153 is an Armstrong number",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 88,
+      "agentSuggestion": "Good solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem. Minor: Consider using functions for modularity.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper variable usage"
+      ],
+      "agentMissed": [
+        "Consider using functions for modularity"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 371 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 41
+    },
+    {
+      "questionId": 46,
+      "title": "Sort HashMap by Value",
+      "description": "Write a program to sort a HashMap by its values in ascending order and print the sorted entries.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here",
+      "expectedOutput": "Key = Data Structure, Value = 85\nKey = Database, Value = 91\nKey = Math, Value = 98",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 15
+    }
+  ],
+  "tabSwitchCount": 1,
+  "totalTimeTaken": 56,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 44
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 13,
+        "title": "Armstrong Number Check",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 371 characters of changes"
+        ]
+      },
+      {
+        "questionId": 46,
+        "title": "Sort HashMap by Value",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

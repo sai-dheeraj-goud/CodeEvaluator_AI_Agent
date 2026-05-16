@@ -1,0 +1,92 @@
+{
+  "personName": "sai",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Visakhapatnam",
+  "experienceYears": "5.11",
+  "preferredLanguage": "python",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 25,
+      "title": "Character Frequency in String",
+      "description": "Write a program to find the frequency of each non-space character in the string \"i love programming love\". Print each character with its count.",
+      "completed": true,
+      "language": "python",
+      "code": "# Static input\ninput_str = \"i love programming love\"\n\n# Dictionary to store frequency\nfreq = {}\n\n# Count frequency\nfor ch in input_str:\n    if ch != ' ':  # ignore spaces\n        if ch in freq:\n            freq[ch] += 1\n        else:\n            freq[ch] = 1\n\n# Print result\nfor key, value in freq.items():\n    print(f\"{key}={value}\", end=\", \")",
+      "expectedOutput": "i=2, l=2, o=3, v=2, e=2, p=1, r=2, g=2, a=1, m=2, n=1",
+      "actualOutput": "i=2, l=2, o=3, v=2, e=2, p=1, r=2, g=2, a=1, m=2, n=1,",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 88,
+      "agentSuggestion": "Good solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem. Minor: Consider using functions for modularity.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Pythonic iteration patterns"
+      ],
+      "agentMissed": [
+        "Consider using functions for modularity"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 318 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 49
+    },
+    {
+      "questionId": 51,
+      "title": "Reverse of a string",
+      "description": "write a program that has input string \"Optum Healthcare\" and reverses its characters to display the output in reverse order.",
+      "completed": false,
+      "language": "python",
+      "code": "# Write your solution here",
+      "expectedOutput": "Output : erachtlaeH mutpO",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 14
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 65,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 44
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 25,
+        "title": "Character Frequency in String",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 318 characters of changes"
+        ]
+      },
+      {
+        "questionId": 51,
+        "title": "Reverse of a string",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

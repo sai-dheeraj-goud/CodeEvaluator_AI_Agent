@@ -1,0 +1,90 @@
+{
+  "personName": "Manvitha Juturu",
+  "email": "Manvitha.Juturu@cognizant.com",
+  "location": "Pune",
+  "experienceYears": "6",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 4,
+      "title": "Remove Duplicates from Sorted Array",
+      "description": "Write a program to remove duplicate elements from a sorted array and print the unique elements.",
+      "completed": true,
+      "language": "java",
+      "code": "public class Main {\n    public static void main(String[] args) {\n        \n        // Static input\n        int[] arr = {1, 2, 2, 3, 4, 4, 4, 5, 5};\n        \n        int n = arr.length;\n\n        System.out.print(\"[\");\n\n        for (int i = 0; i < n; i++) {\n            // Print first element or if current is not equal to previous\n            if (i == 0 || arr[i] != arr[i - 1]) {\n                System.out.print(arr[i]);\n                \n                // Print comma if not the last element\n                if (i < n - 1) {\n                    System.out.print(\", \");\n                }\n            }\n        }\n\n        System.out.print(\"]\");\n    }\n}",
+      "expectedOutput": "[1, 2, 3, 4, 5]",
+      "actualOutput": "[1, 2, 3, 4, 5, ]",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 91,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper loop bounds"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 512 characters of changes"
+      ],
+      "tabSwitchCount": 2,
+      "questionTimeSpent": 56
+    },
+    {
+      "questionId": 7,
+      "title": "Uppercase 2nd Character of Each Word",
+      "description": "Write a program to change the 2nd character of each word in a string to uppercase.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "MY nAme iS PRaveen",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 3
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 60,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 46
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 4,
+        "title": "Remove Duplicates from Sorted Array",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 512 characters of changes"
+        ]
+      },
+      {
+        "questionId": 7,
+        "title": "Uppercase 2nd Character of Each Word",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

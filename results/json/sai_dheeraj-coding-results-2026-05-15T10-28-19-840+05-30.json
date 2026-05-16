@@ -1,0 +1,97 @@
+{
+  "personName": "sai dheeraj",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Bangalore",
+  "experienceYears": "5.11",
+  "preferredLanguage": "java",
+  "programsCompleted": 2,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 21,
+      "title": "Remove Duplicates Without HashSet",
+      "description": "Write a program to remove duplicates from an array without using HashSet.",
+      "completed": true,
+      "language": "java",
+      "code": "public class Main {\n    public static void main(String[] args) {\n        int[] arr = {2, 4, 4, 5, 6, 7, 8, 5};\n        \n        int n = arr.length;\n\n        System.out.print(\"{\");\n        \n        for (int i = 0; i < n; i++) {\n            boolean isDuplicate = false;\n\n            // Check if current element appeared before\n            for (int j = 0; j < i; j++) {\n                if (arr[i] == arr[j]) {\n                    isDuplicate = true;\n                    break;\n                }\n            }\n\n            // If not duplicate, print it\n            if (!isDuplicate) {\n                System.out.print(arr[i]);\n                \n                // Print comma only if not last unique element\n                if (i < n - 1) {\n                    System.out.print(\", \");\n                }\n            }\n        }\n\n        System.out.print(\"}\");\n    }\n}",
+      "expectedOutput": "{2, 4, 5, 6, 7, 8}",
+      "actualOutput": "{2, 4, 5, 6, 7, 8, }",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 90,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper loop bounds"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 722 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 49
+    },
+    {
+      "questionId": 38,
+      "title": "First Non-Repeating Character",
+      "description": "Write a program to find the first non-repeating character in a given string.",
+      "completed": true,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        String input = \"GeeksForGeeks\";\n\n        // Count frequency of each character\n        Map<Character, Integer> freqMap = new LinkedHashMap<>();\n\n        for (char c : input.toCharArray()) {\n            freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);\n        }\n\n        // Find first non-repeating character\n        for (char c : input.toCharArray()) {\n            if (freqMap.get(c) == 1) {\n                System.out.println(c);\n                break;\n            }\n        }\n    }\n}\n",
+      "expectedOutput": "F",
+      "actualOutput": "F",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 95,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper variable usage"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 438 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 37
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 86,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 93
+  },
+  "aiLikelihood": {
+    "average": 80,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 21,
+        "title": "Remove Duplicates Without HashSet",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 722 characters of changes"
+        ]
+      },
+      {
+        "questionId": 38,
+        "title": "First Non-Repeating Character",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 438 characters of changes"
+        ]
+      }
+    ]
+  }
+}

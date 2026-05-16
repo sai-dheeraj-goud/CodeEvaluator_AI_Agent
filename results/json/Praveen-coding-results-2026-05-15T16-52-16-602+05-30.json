@@ -1,0 +1,90 @@
+{
+  "personName": "Praveen",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Hyderabad",
+  "experienceYears": "6",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 22,
+      "title": "First and Last Position of Element",
+      "description": "Write a program to find the first and last position (0-based index) of a given element in a sorted array. If not found, print \"Element not found\".",
+      "completed": true,
+      "language": "java",
+      "code": "public class Main {\n    public static void main(String[] args) {\n        \n        // Static input\n        int[] arr = {1, 2, 2, 2, 2, 3, 4, 7, 8, 8};\n        int key = 2;\n\n        int first = -1;\n        int last = -1;\n\n        // Traverse array\n        for (int i = 0; i < arr.length; i++) {\n            if (arr[i] == key) {\n                if (first == -1) {\n                    first = i; // first occurrence\n                }\n                last = i; // keep updating last occurrence\n            }\n        }\n\n        // Print result\n        if (first == -1) {\n            System.out.println(\"Element not found\");\n        } else {\n            System.out.println(first + \", \" + last);\n        }\n    }\n}",
+      "expectedOutput": "1, 4",
+      "actualOutput": "1, 4",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 91,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper loop bounds"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 566 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 128
+    },
+    {
+      "questionId": 15,
+      "title": "Remove Duplicates from Unsorted Array",
+      "description": "Write a program to remove duplicate numbers from an unsorted array while maintaining original order.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        int \n    }\n}",
+      "expectedOutput": "[1, 5, 3, 2, 7]",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "Output does not match expected for JAVA. Please run your code first.",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Typing patterns appear normal"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 147
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 275,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 46
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 22,
+        "title": "First and Last Position of Element",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 566 characters of changes"
+        ]
+      },
+      {
+        "questionId": 15,
+        "title": "Remove Duplicates from Unsorted Array",
+        "score": 0,
+        "reasons": [
+          "Typing patterns appear normal"
+        ]
+      }
+    ]
+  }
+}

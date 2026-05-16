@@ -1,0 +1,101 @@
+{
+  "personName": "Bryan",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Noida",
+  "experienceYears": "8",
+  "preferredLanguage": "javascript",
+  "programsCompleted": 2,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 27,
+      "title": "Second Smallest and Second Largest",
+      "description": "Write a program to find the second smallest and second largest numbers in an array.",
+      "completed": true,
+      "language": "javascript",
+      "code": "// Write your solution here\n// Static input\nlet arr = [2, 6, 10, 55, 32, 45];\n\n// Remove duplicates (optional but safer)\nlet uniqueArr = [...new Set(arr)];\n\n// Sort the array\nuniqueArr.sort((a, b) => a - b);\n\n// Find second smallest and second largest\nlet secondSmallest = uniqueArr[1];\nlet secondLargest = uniqueArr[uniqueArr.length - 2];\n\n// Print result\nconsole.log(\"Second Smallest - \" + secondSmallest + \", Second Largest - \" + secondLargest);\n",
+      "expectedOutput": "Second Smallest - 6, Second Largest - 45",
+      "actualOutput": "Second Smallest - 6, Second Largest - 45",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 91,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Uses modern const/let declarations",
+        "Proper variable usage"
+      ],
+      "agentMissed": [
+        "Missing control flow logic"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 421 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 54
+    },
+    {
+      "questionId": 37,
+      "title": "Expand Compressed String",
+      "description": "Write a program to expand a compressed string where each letter is followed by its count.",
+      "completed": true,
+      "language": "javascript",
+      "code": "// Write your solution here\n// Static input\nlet input = \"a2b3c4\";\nlet result = \"\";\n\n// Loop through string\nfor (let i = 0; i < input.length; i += 2) {\n    let char = input[i];        // letter\n    let count = parseInt(input[i + 1]); // number\n    \n    // Repeat character 'count' times\n    result += char.repeat(count);\n}\n\n// Print result\nconsole.log(result);",
+      "expectedOutput": "aabbbcccc",
+      "actualOutput": "aabbbcccc",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 94,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper loop bounds"
+      ],
+      "agentMissed": [
+        "Consider using functions for modularity"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 332 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 58
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 113,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 93
+  },
+  "aiLikelihood": {
+    "average": 80,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 27,
+        "title": "Second Smallest and Second Largest",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 421 characters of changes"
+        ]
+      },
+      {
+        "questionId": 37,
+        "title": "Expand Compressed String",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 332 characters of changes"
+        ]
+      }
+    ]
+  }
+}

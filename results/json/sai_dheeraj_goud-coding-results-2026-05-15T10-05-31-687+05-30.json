@@ -1,0 +1,97 @@
+{
+  "personName": "sai dheeraj goud",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Visakhapatnam",
+  "experienceYears": "6",
+  "preferredLanguage": "java",
+  "programsCompleted": 2,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 25,
+      "title": "Character Frequency in String",
+      "description": "Write a program to find the frequency of each non-space character in the string \"i love programming love\". Print each character with its count.",
+      "completed": true,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        String input = \"i love programming love\"; // static input\n        \n        // Use LinkedHashMap to maintain order\n        Map<Character, Integer> freqMap = new LinkedHashMap<>();\n        \n        for (char c : input.toCharArray()) {\n            if (c != ' ') { // ignore spaces\n                freqMap.put(c, freqMap.getOrDefault(c, 0) + 1);\n            }\n        }\n        \n        // Print result\n        for (Map.Entry<Character, Integer> entry : freqMap.entrySet()) {\n            System.out.print(entry.getKey() + \"=\" + entry.getValue() + \", \");\n        }\n    }\n}\n",
+      "expectedOutput": "i=2, l=2, o=3, v=2, e=2, p=1, r=2, g=2, a=1, m=2, n=1",
+      "actualOutput": "i=2, l=2, o=3, v=2, e=2, p=1, r=2, g=2, a=1, m=2, n=1,",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 94,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper variable usage"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 522 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 59
+    },
+    {
+      "questionId": 35,
+      "title": "Swap Two Words Using StringBuilder",
+      "description": "Write a program to swap two words in a string using StringBuilder.",
+      "completed": true,
+      "language": "java",
+      "code": "public class Main {\n    public static void main(String[] args) {\n        String input = \"Hello World\";\n\n        StringBuilder sb = new StringBuilder(input);\n\n        // Find space index (separator between words)\n        int spaceIndex = sb.indexOf(\" \");\n\n        // Extract two words\n        String firstWord = sb.substring(0, spaceIndex);\n        String secondWord = sb.substring(spaceIndex + 1);\n\n        // Clear StringBuilder\n        sb.setLength(0);\n\n        // Append in swapped order\n        sb.append(secondWord).append(\" \").append(firstWord);\n\n        // Print result\n        System.out.println(sb.toString());\n    }\n}",
+      "expectedOutput": "World Hello",
+      "actualOutput": "World Hello",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 92,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper variable usage"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 534 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 39
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 97,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 93
+  },
+  "aiLikelihood": {
+    "average": 80,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 25,
+        "title": "Character Frequency in String",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 522 characters of changes"
+        ]
+      },
+      {
+        "questionId": 35,
+        "title": "Swap Two Words Using StringBuilder",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 534 characters of changes"
+        ]
+      }
+    ]
+  }
+}

@@ -4252,6 +4252,17 @@ const server = http.createServer(async (req, res) => {
                     return s;
                 }
 
+                // For duration values like "0:45", "1:11", or "2:12", Excel auto-parses
+                // them as time-of-day (12:45 AM, 1:11 AM, 2:12 AM) and stores a
+                // date-time serial number instead of the original string. Wrapping the
+                // value in Excel's ="..." string-formula form forces text. Google
+                // Sheets and LibreOffice behave the same way.
+                function escapeCsvTime(value) {
+                    if (value == null || value === '') return '""';
+                    const s = String(value).replace(/\r\n|\n|\r/g, ' ').replace(/"/g, '""');
+                    return `"=""${s}"""`;
+                }
+
                 function formatSeconds(totalSec) {
                     const sec = Number(totalSec) || 0;
                     const h = Math.floor(sec / 3600);
@@ -4360,8 +4371,8 @@ const server = http.createServer(async (req, res) => {
                         escapeCsvField(sessionCompletion),
                         escapeCsvField(sessionAgentAvg),
                         escapeCsvField(perQuestionTabSwitch),
-                        escapeCsvField(questionTimeSpent),
-                        escapeCsvField(formattedTime)
+                        escapeCsvTime(questionTimeSpent),
+                        escapeCsvTime(formattedTime)
                     ].join(',');
                     csvContent += row + '\n';
                 }
@@ -4535,7 +4546,7 @@ const server = http.createServer(async (req, res) => {
                     escapeCsvField(aiMax),
                     ...perQTabValues,
                     escapeCsvField(totalTabSwitches),
-                    escapeCsvField(formattedTime)
+                    escapeCsvTime(formattedTime)
                 ].join(',');
                 consolidatedContent += conRow + '\n';
                 fs.writeFileSync(consolidatedFile, consolidatedContent);
@@ -5284,9 +5295,17 @@ const server = http.createServer(async (req, res) => {
             }
 
             const csvDir = path.join(__dirname, '../results/csv');
-            const csvFile = path.join(csvDir, `${name}-performance.csv`);
+            // Files on disk are saved with safeName (non-alphanumerics -> '_'),
+            // e.g. "MANVITHA JUTURU" -> "MANVITHA_JUTURU-performance.csv".
+            // Try the safeName variant first, then fall back to the raw name.
+            const safeName = name.replace(/[^a-zA-Z0-9]/g, '_');
+            const candidatePaths = [
+                path.join(csvDir, `${safeName}-performance.csv`),
+                path.join(csvDir, `${name}-performance.csv`)
+            ];
+            const csvFile = candidatePaths.find(p => fs.existsSync(p));
 
-            if (!fs.existsSync(csvFile)) {
+            if (!csvFile) {
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Candidate not found' }));
                 return;
@@ -5331,9 +5350,17 @@ const server = http.createServer(async (req, res) => {
             }
 
             const csvDir = path.join(__dirname, '../results/csv');
-            const csvFile = path.join(csvDir, `${name}-performance.csv`);
+            // Files on disk are saved with safeName (non-alphanumerics -> '_'),
+            // e.g. "MANVITHA JUTURU" -> "MANVITHA_JUTURU-performance.csv".
+            // Try the safeName variant first, then fall back to the raw name.
+            const safeName = name.replace(/[^a-zA-Z0-9]/g, '_');
+            const candidatePaths = [
+                path.join(csvDir, `${safeName}-performance.csv`),
+                path.join(csvDir, `${name}-performance.csv`)
+            ];
+            const csvFile = candidatePaths.find(p => fs.existsSync(p));
 
-            if (!fs.existsSync(csvFile)) {
+            if (!csvFile) {
                 res.writeHead(404, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'File not found' }));
                 return;
@@ -5342,7 +5369,7 @@ const server = http.createServer(async (req, res) => {
             const content = fs.readFileSync(csvFile, 'utf-8');
             res.writeHead(200, {
                 'Content-Type': 'text/csv',
-                'Content-Disposition': `attachment; filename="${name}-performance.csv"`
+                'Content-Disposition': `attachment; filename="${safeName}-performance.csv"`
             });
             res.end(content);
         } catch (err) {
@@ -5485,15 +5512,25 @@ function parseCsvRow(line) {
             if (ch === '"') {
                 inQuotes = true;
             } else if (ch === ',') {
-                result.push(current);
+                result.push(unwrapExcelFormula(current));
                 current = '';
             } else {
                 current += ch;
             }
         }
     }
-    result.push(current);
+    result.push(unwrapExcelFormula(current));
     return result;
+}
+
+// Time/duration fields are written as Excel formula strings (="0:45") to stop
+// Excel from auto-parsing them as time-of-day. When reading the CSV back for
+// API responses (panel UI etc.), strip the wrapper so consumers see plain "0:45".
+// Rows written before this fix have no wrapper and pass through unchanged.
+function unwrapExcelFormula(value) {
+    if (typeof value !== 'string') return value;
+    const m = value.match(/^="(.*)"$/);
+    return m ? m[1].replace(/""/g, '"') : value;
 }
 
 // ==================== SERVER STARTUP ====================

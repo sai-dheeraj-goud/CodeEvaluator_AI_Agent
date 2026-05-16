@@ -1,0 +1,92 @@
+{
+  "personName": "Rajesh",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Mumbai",
+  "experienceYears": "5.11",
+  "preferredLanguage": "javascript",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 4,
+      "title": "Remove Duplicates from Sorted Array",
+      "description": "Write a program to remove duplicate elements from a sorted array and print the unique elements.",
+      "completed": true,
+      "language": "javascript",
+      "code": "// Write your solution here\n// Static input\nlet arr = [1, 2, 2, 3, 4, 4, 4, 5, 5];\n\n// Array to store unique elements\nlet unique = [];\n\n// Loop through array\nfor (let i = 0; i < arr.length; i++) {\n    // Add element if it's the first or different from previous\n    if (i === 0 || arr[i] !== arr[i - 1]) {\n        unique.push(arr[i]);\n    }\n}\n\n// Print result\nconsole.log(unique);\n",
+      "expectedOutput": "[1, 2, 3, 4, 5]",
+      "actualOutput": "[ 1, 2, 3, 4, 5 ]",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 93,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper loop bounds"
+      ],
+      "agentMissed": [
+        "Consider using functions for modularity"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 352 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 56
+    },
+    {
+      "questionId": 30,
+      "title": "Sort Array Ascending and Descending",
+      "description": "Write a program to sort an array in both ascending (increment) and descending (decrement) order.",
+      "completed": false,
+      "language": "javascript",
+      "code": "// Write your solution here\n",
+      "expectedOutput": "Increment Order - {1, 2, 5, 7, 12, 19, 30}\nDecrement Order - {30, 19, 12, 7, 5, 2, 1}",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": false,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 18
+    }
+  ],
+  "tabSwitchCount": 2,
+  "totalTimeTaken": 74,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 47
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 4,
+        "title": "Remove Duplicates from Sorted Array",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 352 characters of changes"
+        ]
+      },
+      {
+        "questionId": 30,
+        "title": "Sort Array Ascending and Descending",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

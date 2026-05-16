@@ -567,7 +567,16 @@ function downloadCSV() {
     }
 
     const date = document.getElementById('dateFilter').value;
-    const headers = ['#','Candidate Name','Email','Location','Experience (Yrs)','Language','Programs Completed','Test Score (%)','Agent Score (%)','Plagiarism Avg (%)','Plagiarism Max (%)','Total Tab Switches','Total Time','Submitted At'];
+    const headers = ['#','Candidate Name','Email','Location','Experience (Yrs)','Language','Programs Completed','Test Score (%)','Agent Score (%)','Plagiarism Avg (%)','Plagiarism Max (%)','Total Tab Switches','Total Time (MM:SS)','Submitted At'];
+
+    // Excel auto-parses values like "2:12" or "1:09" as time-of-day (2:12 AM,
+    // 1:09 AM) and stores a date-time serial. Wrapping the value in the
+    // ="..." formula form forces Excel/Sheets/LibreOffice to keep it as text.
+    const excelText = (v) => {
+        if (v == null || v === '') return '""';
+        const s = String(v).replace(/"/g, '""');
+        return `"=""${s}"""`;
+    };
 
     let csv = '\uFEFF' + headers.join(',') + '\n';
     const candidates = getFilteredCandidates();
@@ -579,13 +588,13 @@ function downloadCSV() {
             `"${(c.location || '').replace(/"/g, '""')}"`,
             `"${c.experience || ''}"`,
             `"${c.language || ''}"`,
-            `"\t${c.correctPrograms || ''}"`,
+            excelText(c.correctPrograms || ''),
             c.testScore || 0,
             c.agentScore || 0,
             c.aiLikelihoodAvg || 0,
             c.aiLikelihoodMax || 0,
             c.totalTabSwitches || 0,
-            `"${c.totalTime || ''}"`,
+            excelText(c.totalTime || ''),
             `"${c.submittedAt || ''}"`
         ];
         csv += row.join(',') + '\n';
@@ -646,8 +655,11 @@ function generateSessionCSV(session) {
         const actualOutput = (q.actualOutput && q.actualOutput !== '[object Object]' && !isStaleOutputStateBlob(q.actualOutput))
             ? q.actualOutput
             : '(No output)';
-        
-        csv += `"","","${session.candidateName}","${session.candidateEmail}","","${q.questionId}","${q.questionTitle}","${status}","${q.language}","${q.expectedOutput}","${actualOutput}","${q.agentScore}","","${session.completionPercentage}","${session.tabSwitches}","${q.timeTaken}"\n`;
+        // Wrap duration in Excel ="..." formula form so it doesn't get parsed
+        // as a time-of-day by Excel/Sheets/LibreOffice.
+        const timeTaken = q.timeTaken == null || q.timeTaken === '' ? '' : `=""${String(q.timeTaken).replace(/"/g, '""')}""`;
+
+        csv += `"","","${session.candidateName}","${session.candidateEmail}","","${q.questionId}","${q.questionTitle}","${status}","${q.language}","${q.expectedOutput}","${actualOutput}","${q.agentScore}","","${session.completionPercentage}","${session.tabSwitches}","${timeTaken}"\n`;
     });
     
     return csv;

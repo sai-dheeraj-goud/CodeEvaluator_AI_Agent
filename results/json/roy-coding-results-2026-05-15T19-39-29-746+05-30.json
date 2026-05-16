@@ -1,0 +1,103 @@
+{
+  "personName": "roy",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Noida",
+  "experienceYears": "8",
+  "preferredLanguage": "java",
+  "programsCompleted": 2,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 38,
+      "title": "First Non-Repeating Character",
+      "description": "Write a program to find the first non-repeating character in a given string.",
+      "completed": true,
+      "language": "java",
+      "code": "import java.util.LinkedHashMap;\nimport java.util.Map;\n\npublic class FirstNonRepeatingChar {\n\n    public static void main(String[] args) {\n        \n        // Static input\n        String input = \"GeeksForGeeks\";\n        \n        // Use LinkedHashMap to maintain insertion order\n        Map<Character, Integer> map = new LinkedHashMap<>();\n        \n        // Step 1: Count frequency of each character\n        for (char ch : input.toCharArray()) {\n            map.put(ch, map.getOrDefault(ch, 0) + 1);\n        }\n        \n        // Step 2: Find first non-repeating character\n        for (char ch : input.toCharArray()) {\n            if (map.get(ch) == 1) {\n                System.out.println(ch);\n                return;\n            }\n        }\n        \n        // If no non-repeating character found\n        System.out.println(\"No non-repeating character found.\");\n    }\n}",
+      "expectedOutput": "F",
+      "actualOutput": "F",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 95,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Proper variable usage"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 732 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 94
+    },
+    {
+      "questionId": 47,
+      "title": "Merge Two Unsorted Arrays - Sorted, No Duplicates",
+      "description": "Write a program to merge two unsorted arrays into a single sorted array without duplicates.",
+      "completed": true,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        int []a={4,2,5,1};\n        int []b={8,1,9,5};\n        TreeSet<Integer> ms=new TreeSet<>();\n        for(int num:a){\n            ms.add(num);\n        }\n        for(int num:b){\n            ms.add(num);\n        }\n        System.out.println(\"Output: \"+ms);\n    }\n}",
+      "expectedOutput": "[1, 2, 4, 5, 8, 9]",
+      "actualOutput": "Output: [1, 2, 4, 5, 8, 9]",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 92,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Uses enhanced iteration"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 15,
+      "aiReasons": [
+        "5 long pauses detected (avg 4s)",
+        "Rhythmic pause pattern detected (CV=0.25) — consistent read-type-read cycle from external device",
+        "Strictly linear code entry (0.0% back-jumps) — code written top-to-bottom like transcription",
+        "Near-zero mouse activity during typing (0 moves / 182 keystrokes) — eyes likely on external device"
+      ],
+      "tabSwitchCount": 2,
+      "questionTimeSpent": 409
+    }
+  ],
+  "tabSwitchCount": 3,
+  "totalTimeTaken": 503,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 94
+  },
+  "aiLikelihood": {
+    "average": 48,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 38,
+        "title": "First Non-Repeating Character",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 732 characters of changes"
+        ]
+      },
+      {
+        "questionId": 47,
+        "title": "Merge Two Unsorted Arrays - Sorted, No Duplicates",
+        "score": 15,
+        "reasons": [
+          "5 long pauses detected (avg 4s)",
+          "Rhythmic pause pattern detected (CV=0.25) — consistent read-type-read cycle from external device",
+          "Strictly linear code entry (0.0% back-jumps) — code written top-to-bottom like transcription",
+          "Near-zero mouse activity during typing (0 moves / 182 keystrokes) — eyes likely on external device"
+        ]
+      }
+    ]
+  }
+}

@@ -3250,10 +3250,28 @@ function escapeCsvField(val) {
     return s;
 }
 
+// Wraps duration-like values ("0:45", "1:11") in Excel's ="..." string-formula
+// form so Excel / Google Sheets / LibreOffice don't auto-parse them as
+// time-of-day (12:45 AM, 1:11 AM).
+function escapeCsvTime(val) {
+    if (val == null || val === '') return '""';
+    var s = String(val).replace(/"/g, '""');
+    return '"=""' + s + '"""';
+}
+
+function isTimeHeader(h) {
+    if (!h) return false;
+    var lower = String(h).toLowerCase();
+    return lower.indexOf('time spent') >= 0 || lower.indexOf('time taken') >= 0;
+}
+
 function downloadCsv() {
     var lines = [allHeaders.map(escapeCsvField).join(',')];
     allRows.forEach(function(row) {
-        lines.push(allHeaders.map(function(h){ return escapeCsvField(row[h] || ''); }).join(','));
+        lines.push(allHeaders.map(function(h){
+            var v = row[h] || '';
+            return isTimeHeader(h) ? escapeCsvTime(v) : escapeCsvField(v);
+        }).join(','));
     });
     var csv = lines.join('\\n');
     var blob = new Blob([csv], {type:'text/csv'});
