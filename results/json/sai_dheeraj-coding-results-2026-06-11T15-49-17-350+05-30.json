@@ -1,0 +1,92 @@
+{
+  "personName": "sai dheeraj",
+  "email": "dheeraj.sai171998@gmail.com",
+  "location": "Hyderabad",
+  "experienceYears": "5",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 39,
+      "title": "Filter Words Containing Substring",
+      "description": "Write a program that filters a list of words and keeps only those containing the substring \"ed\".",
+      "completed": true,
+      "language": "java",
+      "code": "import java.util.ArrayList;\nimport java.util.Arrays;\nimport java.util.List;\n\npublic class FilterWords {\n    public static void main(String[] args) {\n        // Static input list\n        List<String> input = Arrays.asList(\"Need\", \"Used\", \"Java\", \"Selenium\", \"Red\", \"Read\");\n\n        // List to store filtered words\n        List<String> result = new ArrayList<>();\n\n        // Loop through each word\n        for (String word : input) {\n            // Check if the word contains \"ed\"\n            if (word.contains(\"ed\")) {\n                result.add(word);\n            }\n        }\n\n        // Print the result\n        System.out.println(result);\n    }\n}",
+      "expectedOutput": "[Need, Used, Red]",
+      "actualOutput": "[Need, Used, Red]",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 90,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Has iteration/recursion logic.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Has iteration/recursion logic",
+        "Uses enhanced iteration",
+        "Proper variable usage"
+      ],
+      "agentMissed": [
+        "ArrayList.contains() in loop is O(n) — consider HashSet for O(1) lookup"
+      ],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 543 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 65
+    },
+    {
+      "questionId": 13,
+      "title": "Armstrong Number Check",
+      "description": "Write a program to check if 153 is an Armstrong number. An Armstrong number of 3 digits equals the sum of cubes of its digits (1Â³ + 5Â³ + 3Â³ = 153).",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "153 is an Armstrong number",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 2,
+      "questionTimeSpent": 106
+    }
+  ],
+  "tabSwitchCount": 3,
+  "totalTimeTaken": 170,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 45
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 39,
+        "title": "Filter Words Containing Substring",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 543 characters of changes"
+        ]
+      },
+      {
+        "questionId": 13,
+        "title": "Armstrong Number Check",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}

@@ -2746,6 +2746,7 @@ const server = http.createServer(async (req, res) => {
             instructionReadTimer:APP_CONFIG.instructionReadTimer,
             primaryAgent:        primaryAgent,
             panelistEmails:      Array.from(authorizedPanelistEmails),
+            candidateEmails:     Array.from(authorizedCandidateEmails),
             candidateEmailVerification: CANDIDATE_EMAIL_VERIFICATION
         }));
         return;

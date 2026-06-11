@@ -725,11 +725,21 @@ document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
             clearSession();
         }
 
-        // Show role selection only for panelist-authorized emails
-        if (isPanelistEmail(email)) {
+        // Routing rules after successful login:
+        //   - Email in BOTH panel & candidate lists -> show role selection modal.
+        //   - Email in PANEL list only             -> go straight to Panelist/Admin page.
+        //   - Email in CANDIDATE list only         -> go straight to candidate test (step 2).
+        const inPanel = isPanelistEmail(email);
+        const inCandidate = isCandidateEmail(email);
+
+        if (inPanel && inCandidate) {
+            // User is allowed to do both — let them choose.
             document.getElementById('roleSelectionModal').classList.remove('hidden');
+        } else if (inPanel) {
+            // Panel-only -> Panelist/Admin dashboard.
+            goToPanelistDashboard();
         } else {
-            // Non-admin users go straight to candidate dashboard
+            // Candidate-only (or candidate verification disabled) -> candidate test.
             showStep(2);
         }
         
@@ -3487,19 +3497,30 @@ window.addEventListener('beforeunload', (e) => {
 
 // Admin/Panelist whitelist — loaded dynamically from /api/config (data/config.js)
 let PANELIST_EMAILS = [];
+let CANDIDATE_EMAILS = [];
+let CANDIDATE_EMAIL_VERIFICATION_ENABLED = true;
 
 async function loadPanelistEmails() {
-    if (PANELIST_EMAILS.length > 0) return; // already loaded
+    if (PANELIST_EMAILS.length > 0 || CANDIDATE_EMAILS.length > 0) return; // already loaded
     try {
         const cfg = await apiCall('GET', '/api/config');
         PANELIST_EMAILS = (cfg.panelistEmails || []).map(e => e.trim().toLowerCase());
+        CANDIDATE_EMAILS = (cfg.candidateEmails || []).map(e => e.trim().toLowerCase());
+        CANDIDATE_EMAIL_VERIFICATION_ENABLED = cfg.candidateEmailVerification !== false;
     } catch (err) {
-        console.error('Failed to load panelist emails:', err);
+        console.error('Failed to load panelist/candidate emails:', err);
     }
 }
 
 function isPanelistEmail(email) {
     return PANELIST_EMAILS.includes((email || '').trim().toLowerCase());
+}
+
+function isCandidateEmail(email) {
+    const e = (email || '').trim().toLowerCase();
+    // If candidate verification is disabled, treat everyone as a candidate.
+    if (!CANDIDATE_EMAIL_VERIFICATION_ENABLED) return true;
+    return CANDIDATE_EMAILS.includes(e);
 }
 
 // Role Selection Functions

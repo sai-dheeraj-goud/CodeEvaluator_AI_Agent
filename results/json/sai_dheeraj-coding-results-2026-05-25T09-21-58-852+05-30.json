@@ -1,0 +1,90 @@
+{
+  "personName": "sai dheeraj",
+  "email": "dheeraj.sai1798@gmail.com",
+  "location": "Bangalore",
+  "experienceYears": "6.5",
+  "preferredLanguage": "java",
+  "programsCompleted": 1,
+  "totalPrograms": 2,
+  "results": [
+    {
+      "questionId": 17,
+      "title": "Most Repeated Character",
+      "description": "Write a program to print the character that appears the maximum number of times in the string.",
+      "completed": true,
+      "language": "java",
+      "code": "import java.util.HashMap;\nimport java.util.Map;\n\npublic class MaxCharFrequency {\n    public static void main(String[] args) {\n        String input = \"geeksforgeeks\";\n\n        char maxChar = findMaxFrequencyChar(input);\n        System.out.println(maxChar);\n    }\n\n    public static char findMaxFrequencyChar(String str) {\n        // Map to store character frequencies\n        Map<Character, Integer> map = new HashMap<>();\n\n        // Count frequency of each character\n        for (char ch : str.toCharArray()) {\n            map.put(ch, map.getOrDefault(ch, 0) + 1);\n        }\n\n        // Find max frequency character\n        char maxChar = str.charAt(0);\n        int maxCount = 0;\n\n        for (Map.Entry<Character, Integer> entry : map.entrySet()) {\n            if (entry.getValue() > maxCount) {\n                maxCount = entry.getValue();\n                maxChar = entry.getKey();\n            }\n        }\n\n        return maxChar;\n    }\n}\n",
+      "expectedOutput": "e",
+      "actualOutput": "e",
+      "validationMessage": "Output matches expected",
+      "attempted": true,
+      "agentPercentage": 96,
+      "agentSuggestion": "Excellent solution. Has output statement; Output matches expected; Logic aligns well with reference solution; Correctly initializes input data from problem.",
+      "agentCovered": [
+        "Has output statement",
+        "Output matches expected",
+        "Logic aligns well with reference solution",
+        "Correctly initializes input data from problem",
+        "Has iteration/recursion logic",
+        "Methods return computed values"
+      ],
+      "agentMissed": [],
+      "aiLikelihood": 80,
+      "aiReasons": [
+        "Code pasted entirely — near-zero keystrokes for 802 characters of changes"
+      ],
+      "tabSwitchCount": 1,
+      "questionTimeSpent": 32
+    },
+    {
+      "questionId": 46,
+      "title": "Sort HashMap by Value",
+      "description": "Write a program to sort a HashMap by its values in ascending order and print the sorted entries.",
+      "completed": false,
+      "language": "java",
+      "code": "import java.util.*;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // TODO: Write your solution here\n    }\n}",
+      "expectedOutput": "Key = Data Structure, Value = 85\nKey = Database, Value = 91\nKey = Math, Value = 98",
+      "actualOutput": "",
+      "validationMessage": "Output does not match",
+      "attempted": true,
+      "agentPercentage": 0,
+      "agentSuggestion": "No code written",
+      "agentCovered": [],
+      "agentMissed": [],
+      "aiLikelihood": 0,
+      "aiReasons": [
+        "Minimal code written"
+      ],
+      "tabSwitchCount": 0,
+      "questionTimeSpent": 6
+    }
+  ],
+  "tabSwitchCount": 1,
+  "totalTimeTaken": 38,
+  "agentAnalysis": {
+    "analyzedCount": 2,
+    "averagePercentage": 48
+  },
+  "aiLikelihood": {
+    "average": 40,
+    "highest": 80,
+    "perQuestion": [
+      {
+        "questionId": 17,
+        "title": "Most Repeated Character",
+        "score": 80,
+        "reasons": [
+          "Code pasted entirely — near-zero keystrokes for 802 characters of changes"
+        ]
+      },
+      {
+        "questionId": 46,
+        "title": "Sort HashMap by Value",
+        "score": 0,
+        "reasons": [
+          "Minimal code written"
+        ]
+      }
+    ]
+  }
+}
